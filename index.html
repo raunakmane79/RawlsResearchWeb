@@ -114,15 +114,18 @@
     <div style="overflow:auto; max-height:500px; border:1px solid #eee; border-radius:6px;">
       <table>
         <thead>
-          <tr>
-            <th>Person</th>
-            <th>Position / Area</th>
-            <th>Year</th>
-            <th>Article Title</th>
-            <th>Journal</th>
-            <th>Ranking / Flags</th>
-          </tr>
-        </thead>
+  <tr>
+    <th>Person</th>
+    <th>Position / Area</th>
+    <th>Year</th>
+    <th>Article Title</th>
+    <th>Journal</th>
+    <th>Ranking</th>
+    <th>UTD</th>
+    <th>Financial Times</th>
+  </tr>
+</thead>
+
         <tbody id="resultsBody"></tbody>
       </table>
     </div>
@@ -154,26 +157,26 @@
     attachListeners();
   });
 
-  // 🔍 Find the sheet that actually has the right headers
+  // 🔍 Find the sheet that has the expected headers
   function findSheetWithHeaders(workbook) {
     const targetHeaders = [
-      "Personname",
-      "Position",
-      "Area",
+      "personname",
+      "position",
+      "area",
       "year",
       "articletitle",
       "journalname",
-      "Ranking - Updated",
-      "UTD Journal",
-      "Financial Times Journal",
-    ].map(h => h.toLowerCase());
+      "ranking - updated",
+      "utd journal",
+      "financial times journal",
+    ];
 
     let bestSheet = workbook.SheetNames[0];
 
     workbook.SheetNames.forEach(name => {
       const sheet = workbook.Sheets[name];
       const rows = XLSX.utils.sheet_to_json(sheet, {
-        header: 1,      // get rows as arrays
+        header: 1,
         range: 0,
         blankrows: false,
       });
@@ -184,16 +187,24 @@
       );
 
       const matchesAll = targetHeaders.every(h => headerSet.has(h));
-      if (matchesAll) {
-        bestSheet = name;
-      }
+      if (matchesAll) bestSheet = name;
     });
 
     return bestSheet;
   }
 
+  // Normalize object keys: "Journalname  " -> "journalname"
+  function normalizeRow(row) {
+    const norm = {};
+    Object.keys(row).forEach(key => {
+      const nk = String(key || "").trim().toLowerCase();
+      norm[nk] = row[key];
+    });
+    return norm;
+  }
+
   function loadWorkbookFromServer() {
-    // ⚠️ must match exact filename + case in the repo: Database.xlsx
+    // ⚠️ match the exact filename & case in the repo
     fetch("Database.xlsx")
       .then(res => {
         console.log("Fetch response:", res.status, res.statusText);
@@ -209,19 +220,22 @@
         const sheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-        console.log("First row keys:", Object.keys(json[0] || {}));
+        console.log("Raw keys from first row:", Object.keys(json[0] || {}));
 
-        data = json.map(row => ({
-          personName: row.Personname || "",
-          position: row.Position || "",
-          area: row.Area || "",
-          year: row.year || "",
-          articleTitle: row.articletitle || "",
-          journalName: row.journalname || "",
-          ranking: row["Ranking - Updated"] || "",
-          utdJournal: row["UTD Journal"] || "",
-          ftJournal: row["Financial Times Journal"] || "",
-        }));
+        data = json.map(row => {
+          const r = normalizeRow(row);
+          return {
+            personName: r["personname"] || "",
+            position: r["position"] || "",
+            area: r["area"] || "",
+            year: r["year"] || "",
+            articleTitle: r["articletitle"] || "",
+            journalName: r["journalname"] || "",
+            ranking: String(r["ranking - updated"] || "").trim(),
+            utdJournal: String(r["utd journal"] || "").trim(),              // "Yes"/"No"
+            ftJournal: String(r["financial times journal"] || "").trim(),  // "Yes"/"No"
+          };
+        });
 
         populateDropdowns();
         renderTable(data);
@@ -265,11 +279,10 @@
         <td>${r.year}</td>
         <td>${r.articleTitle}</td>
         <td>${r.journalName}</td>
-        <td>
-          ${r.ranking ? `<span class="badge badge-blue">Rank ${r.ranking}</span>` : ""}
-          ${r.utdJournal === "Yes" ? `<span class="badge badge-green">UTD</span>` : ""}
-          ${r.ftJournal === "Yes" ? `<span class="badge badge-gold">FT</span>` : ""}
-        </td>`;
+        <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+        <td>${r.utdJournal === "Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal === "No" ? "No" : "")}</td>
+        <td>${r.ftJournal === "Yes" ? `<span class="badge badge-gold">Yes</span>` : (r.ftJournal === "No" ? "No" : "")}</td>
+      `;
       elements.resultsBody.appendChild(tr);
     });
     elements.resultsCount.textContent = `Showing ${rows.length} results`;
