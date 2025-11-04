@@ -34,14 +34,25 @@
     }
 
     /* Top black TTU-style bar */
-    .rawls-header {
-      background: #000;
-      color: #fff;
-      padding: 6px 24px;
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
+   .rawls-logo {
+  height: 38px;          /* adjust this number to fine-tune */
+  width: auto;
+  margin-right: 14px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 2px;     /* optional: subtle rounding */
+}
+
+.rawls-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 4px 0;
+}
+
 
     .rawls-header-inner {
       max-width: 1320px;
