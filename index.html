@@ -284,6 +284,9 @@
       margin-top: 16px;
       font-size: 0.85rem;
     }
+/* Adjust column widths for cleaner layout */
+th:nth-child(2), td:nth-child(2) { width: 140px; } /* Position */
+th:nth-child(3), td:nth-child(3) { width: 160px; } /* Area */
 
     th,
     td {
@@ -464,17 +467,19 @@
     <div style="overflow:auto; max-height:500px; border:1px solid #eee; border-radius:6px; margin-top: 14px;">
       <table>
         <thead>
-          <tr>
-            <th>Person</th>
-            <th>Position / Area</th>
-            <th>Year</th>
-            <th>Article Title</th>
-            <th>Journal</th>
-            <th>Ranking</th>
-            <th>UTD</th>
-            <th>Financial Times</th>
-          </tr>
-        </thead>
+  <tr>
+    <th>Person</th>
+    <th>Position</th>
+    <th>Area</th>
+    <th>Year</th>
+    <th>Article Title</th>
+    <th>Journal</th>
+    <th>Ranking</th>
+    <th>UTD</th>
+    <th>Financial Times</th>
+  </tr>
+</thead>
+
         <tbody id="resultsBody"></tbody>
       </table>
     </div>
@@ -629,7 +634,8 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r.personName}</td>
-        <td>${r.position || ""}<br><small>${r.area || ""}</small></td>
+     <td>${r.position || ""}</td>
+<td>${r.area || ""}</td>
         <td>${r.year}</td>
         <td>${r.articleTitle}</td>
         <td>${r.journalName}</td>
