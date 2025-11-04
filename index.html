@@ -306,9 +306,10 @@
         <span id="resultsCount">Loading publications...</span>
       </div>
       <div class="toolbar-right">
-        <span class="pill-label">Filter Results</span>
-        <button class="btn" id="clearFilters"><span>&#10006;</span> Clear filters</button>
-      </div>
+  <span class="pill-label">Filter Results</span>
+  <button class="btn" id="clearFilters"><span>&#10006;</span> Clear filters</button>
+  <button class="btn" id="exportExcel"><span>&#128190;</span> Export to Excel</button>
+</div>
     </div>
 
     <div class="filters">
@@ -408,6 +409,7 @@
 
   <script>
     let data = [];
+let currentRows = [];
 
     const elements = {
       personSearch: document.getElementById("personSearch"),
@@ -426,6 +428,8 @@
       resultsBody: document.getElementById("resultsBody"),
       resultsCount: document.getElementById("resultsCount"),
       clearFilters: document.getElementById("clearFilters"),
+      exportExcel: document.getElementById("exportExcel"),
+
     };
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -546,27 +550,55 @@
     }
 
     function renderTable(rows) {
-      elements.resultsBody.innerHTML = "";
-      rows.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${r.personName}</td>
-          <td>${r.position || ""}<br><small>${r.area || ""}</small></td>
-          <td>${r.year}</td>
-          <td>${r.articleTitle}</td>
-          <td>${r.journalName}</td>
-          <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
-          <td>${r.utdJournal === "Yes"
-              ? `<span class="badge badge-green">Yes</span>`
-              : (r.utdJournal === "No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-          <td>${r.ftJournal === "Yes"
-              ? `<span class="badge badge-green">Yes</span>`
-              : (r.ftJournal === "No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-        `;
-        elements.resultsBody.appendChild(tr);
-      });
-      elements.resultsCount.textContent = `Showing ${rows.length} results`;
-    }
+  currentRows = rows.slice(); // keep a copy of whatever is currently displayed
+
+  elements.resultsBody.innerHTML = "";
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.personName}</td>
+      <td>${r.position || ""}<br><small>${r.area || ""}</small></td>
+      <td>${r.year}</td>
+      <td>${r.articleTitle}</td>
+      <td>${r.journalName}</td>
+      <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+      <td>${r.utdJournal === "Yes"
+          ? `<span class="badge badge-green">Yes</span>`
+          : (r.utdJournal === "No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+      <td>${r.ftJournal === "Yes"
+          ? `<span class="badge badge-green">Yes</span>`
+          : (r.ftJournal === "No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+    `;
+    elements.resultsBody.appendChild(tr);
+  });
+  elements.resultsCount.textContent = `Showing ${rows.length} results`;
+}
+function exportFilteredToExcel() {
+  if (!currentRows || currentRows.length === 0) {
+    alert("There are no rows to export.");
+    return;
+  }
+
+  // Map to friendly column headers for Excel
+  const exportData = currentRows.map(r => ({
+    "Person": r.personName,
+    "Position": r.position,
+    "Area": r.area,
+    "Year": r.year,
+    "Article Title": r.articleTitle,
+    "Journal": r.journalName,
+    "Ranking": r.ranking,
+    "UTD Journal": r.utdJournal,
+    "Financial Times Journal": r.ftJournal,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Filtered Results");
+
+  XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
+}
+
 
     function applyFilters() {
       const pq = elements.personSearch.value.toLowerCase();
@@ -610,32 +642,37 @@
       renderTable(filtered);
     }
 
-    function attachListeners() {
-      [
-        elements.personSearch, elements.titleSearch, elements.journalSearch,
-        elements.areaSelect, elements.positionSelect, elements.yearSelect,
-        elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo,
-        elements.rank4, elements.rank5, elements.rank5star
-      ].forEach(el => el.addEventListener("input", applyFilters));
+   function attachListeners() {
+  [
+    elements.personSearch, elements.titleSearch, elements.journalSearch,
+    elements.areaSelect, elements.positionSelect, elements.yearSelect,
+    elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo,
+    elements.rank4, elements.rank5, elements.rank5star
+  ].forEach(el => el.addEventListener("input", applyFilters));
 
-      if (elements.clearFilters) {
-        elements.clearFilters.addEventListener("click", () => {
-          elements.personSearch.value = "";
-          elements.titleSearch.value = "";
-          elements.journalSearch.value = "";
-          elements.areaSelect.value = "";
-          elements.positionSelect.value = "";
-          elements.yearSelect.value = "";
-          elements.utdYes.checked = false;
-          elements.utdNo.checked = false;
-          elements.ftYes.checked = false;
-          elements.ftNo.checked = false;
-          elements.rank4.checked = false;
-          elements.rank5.checked = false;
-          elements.rank5star.checked = false;
-          renderTable(data);
-        });
-      }
+  if (elements.clearFilters) {
+    elements.clearFilters.addEventListener("click", () => {
+      elements.personSearch.value = "";
+      elements.titleSearch.value = "";
+      elements.journalSearch.value = "";
+      elements.areaSelect.value = "";
+      elements.positionSelect.value = "";
+      elements.yearSelect.value = "";
+      elements.utdYes.checked = false;
+      elements.utdNo.checked = false;
+      elements.ftYes.checked = false;
+      elements.ftNo.checked = false;
+      elements.rank4.checked = false;
+      elements.rank5.checked = false;
+      elements.rank5star.checked = false;
+      renderTable(data);
+    });
+  }
+
+  if (elements.exportExcel) {
+    elements.exportExcel.addEventListener("click", exportFilteredToExcel);
+  }
+}
     }
   </script>
 </body>
