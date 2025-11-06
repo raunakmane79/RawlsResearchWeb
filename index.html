@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rawls Faculty Publications Database</title>
 
-  <!-- Rawls / TTU-ish fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 
   <style>
     :root {
-      --rawls-red: #ba0c2f;          /* main Rawls red */
+      --rawls-red: #ba0c2f;
       --rawls-red-dark: #8c001a;
       --rawls-black: #1f1f1f;
       --rawls-bg: #f3f4f6;
@@ -33,7 +33,7 @@
       color: var(--rawls-black);
     }
 
-    /* --- TTU Rawls-style black header --- */
+    /* --- Header --- */
     .rawls-header {
       background: linear-gradient(to right, #000 60%, #111 100%);
       border-bottom: 4px solid #ba0c2f;
@@ -48,7 +48,6 @@
     .rawls-header-inner {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
       gap: 16px;
       max-width: 1320px;
       margin: 0 auto;
@@ -81,7 +80,7 @@
       text-transform: uppercase;
     }
 
-    /* --- Footer Section --- */
+    /* --- Footer --- */
     .rawls-footer {
       margin: 0;
       flex-shrink: 0;
@@ -129,7 +128,7 @@
       transform: translateY(-1px);
     }
 
-    /* Main card */
+    /* --- Main card --- */
     .app {
       background: var(--rawls-card-bg);
       padding: 24px 24px 20px;
@@ -185,17 +184,6 @@
       flex-wrap: wrap;
     }
 
-    .pill-label {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid #e0e0e0;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #666;
-      background: #fafafa;
-    }
-
     .btn {
       border-radius: 999px;
       border: 1px solid var(--rawls-border);
@@ -220,6 +208,7 @@
       transform: translateY(-0.5px);
     }
 
+    /* --- Filters --- */
     .filters {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -245,8 +234,7 @@
       color: #555;
     }
 
-    input[type="text"],
-    select {
+    input[type="text"] {
       padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid var(--rawls-border);
@@ -255,19 +243,11 @@
       transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     }
 
-    input[type="text"]:focus,
-    select:focus {
+    input[type="text"]:focus {
       outline: none;
       border-color: var(--rawls-red);
       box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18);
       background: #fff;
-    }
-
-    /* Small helper text for multi-select */
-    .filter-hint {
-      font-size: 0.7rem;
-      color: #777;
-      margin-top: 2px;
     }
 
     .checkbox-group {
@@ -278,7 +258,90 @@
       color: #444;
     }
 
-    /* Table */
+    /* --- Custom multi-select dropdown with checkboxes --- */
+    .multi-select {
+      position: relative;
+      font-size: 0.85rem;
+    }
+
+    .multi-select-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--rawls-border);
+      background: #fafafa;
+      cursor: pointer;
+      min-height: 32px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .multi-select.open .multi-select-header {
+      border-color: var(--rawls-red);
+      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18);
+      background: #fff;
+    }
+
+    .multi-select-label {
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .multi-select-placeholder {
+      color: #999;
+    }
+
+    .multi-select-arrow {
+      font-size: 0.7rem;
+      margin-left: 8px;
+    }
+
+    .multi-select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border: 1px solid #ddd;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 6px 0;
+      z-index: 20;
+      display: none;
+    }
+
+    .multi-select.open .multi-select-menu {
+      display: block;
+    }
+
+    .multi-select-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .multi-select-option:hover {
+      background: #f5f5f5;
+    }
+
+    .multi-select-option input {
+      margin: 0;
+    }
+
+    .filter-hint {
+      font-size: 0.7rem;
+      color: #777;
+    }
+
+    /* --- Table --- */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -290,8 +353,7 @@
     th:nth-child(2), td:nth-child(2) { width: 140px; }
     th:nth-child(3), td:nth-child(3) { width: 160px; }
 
-    th,
-    td {
+    th, td {
       padding: 10px 12px;
       border: 1px solid #eaeaea;
       text-align: left;
@@ -325,6 +387,7 @@
       background: #fff;
       max-height: 500px;
       overflow:auto;
+      margin-top: 8px;
     }
 
     #resultsCount {
@@ -348,11 +411,9 @@
       color: #333;
       border: 1px solid #ddd;
       padding: 2px 6px;
-      font-weight: 500;
     }
 
-    .badge-green,
-    .badge-gold {
+    .badge-green {
       background: #e8f5e9;
       color: #2e7d32;
       border: 1px solid rgba(46, 125, 50, 0.3);
@@ -411,31 +472,31 @@
       <input type="text" id="journalSearch" placeholder="Search by journal">
     </div>
 
-    <!-- AREA: now multi-select -->
+    <!-- AREA multi-select dropdown with checkboxes -->
     <div class="filter-group">
-      <label for="areaSelect">Area</label>
-      <select id="areaSelect" multiple size="5">
-        <option value="">All Areas</option>
-      </select>
-      <span class="filter-hint">Tip: Hold Ctrl (Cmd on Mac) to select multiple.</span>
+      <label>Area</label>
+      <div class="multi-select" id="areaMulti">
+        <!-- JS will populate -->
+      </div>
+      <span class="filter-hint">Choose one or more areas.</span>
     </div>
 
-    <!-- POSITION: now multi-select -->
+    <!-- POSITION multi-select dropdown with checkboxes -->
     <div class="filter-group">
-      <label for="positionSelect">Position</label>
-      <select id="positionSelect" multiple size="6">
-        <option value="">All Positions</option>
-      </select>
-      <span class="filter-hint">You can choose more than one position.</span>
+      <label>Position</label>
+      <div class="multi-select" id="positionMulti">
+        <!-- JS will populate -->
+      </div>
+      <span class="filter-hint">Choose one or more positions.</span>
     </div>
 
-    <!-- YEAR: now multi-select -->
+    <!-- YEAR multi-select dropdown with checkboxes -->
     <div class="filter-group">
       <label>Year</label>
-      <select id="yearSelect" multiple size="6">
-        <option value="">All Years</option>
-      </select>
-      <span class="filter-hint">Select one or more publication years.</span>
+      <div class="multi-select" id="yearMulti">
+        <!-- JS will populate -->
+      </div>
+      <span class="filter-hint">Filter by publication year.</span>
     </div>
 
     <div class="filter-group">
@@ -474,7 +535,7 @@
         <th>Year</th>
         <th>Article Title</th>
         <th>Journal</th>
-        <th>Rawls Journal List Rankings</th>
+        <th>Ranking</th>
         <th>UTD</th>
         <th>Financial Times</th>
       </tr>
@@ -492,9 +553,6 @@
     personSearch: document.getElementById("personSearch"),
     titleSearch: document.getElementById("titleSearch"),
     journalSearch: document.getElementById("journalSearch"),
-    areaSelect: document.getElementById("areaSelect"),
-    positionSelect: document.getElementById("positionSelect"),
-    yearSelect: document.getElementById("yearSelect"),
     utdYes: document.getElementById("utdYes"),
     utdNo: document.getElementById("utdNo"),
     ftYes: document.getElementById("ftYes"),
@@ -506,14 +564,21 @@
     resultsCount: document.getElementById("resultsCount"),
     clearFilters: document.getElementById("clearFilters"),
     exportExcel: document.getElementById("exportExcel"),
+    areaMulti: document.getElementById("areaMulti"),
+    positionMulti: document.getElementById("positionMulti"),
+    yearMulti: document.getElementById("yearMulti"),
   };
+
+  // store references for multi-select helpers
+  const multiSelectControls = {};
 
   document.addEventListener("DOMContentLoaded", () => {
     loadWorkbookFromServer();
     attachListeners();
   });
 
-  // Find the sheet that has the expected headers
+  /* -------- Excel Loading ---------- */
+
   function findSheetWithHeaders(workbook) {
     const targetHeaders = [
       "personname",
@@ -522,7 +587,7 @@
       "year",
       "articletitle",
       "journalname",
-      "Rawls Journal List Rankings",
+      "ranking - updated",
       "utd journal",
       "financial times journal",
     ];
@@ -549,7 +614,6 @@
     return bestSheet;
   }
 
-  // Normalize object keys
   function normalizeRow(row) {
     const norm = {};
     Object.keys(row).forEach(key => {
@@ -587,7 +651,7 @@
           };
         });
 
-        populateDropdowns();
+        populateMultiSelects();
         renderTable(data);
       })
       .catch(err => {
@@ -597,37 +661,103 @@
       });
   }
 
-  function populateDropdowns() {
-    const addOptions = (select, values, allLabel) => {
-      const prevValues = select.multiple
-        ? Array.from(select.selectedOptions).map(o => o.value)
-        : [select.value];
+  /* -------- Multi-select dropdown builder ---------- */
 
-      select.innerHTML = `<option value="">${allLabel}</option>`;
-      [...new Set(values.filter(v => v))]
-        .sort()
-        .forEach(v => {
-          const opt = document.createElement("option");
-          opt.value = v;
-          opt.textContent = v;
-          select.appendChild(opt);
-        });
+  function buildMultiSelect(container, values, placeholderText) {
+    const unique = [...new Set(values.filter(v => v))].sort();
 
-      // Restore previous selections if they still exist
-      if (select.multiple) {
-        Array.from(select.options).forEach(o => {
-          if (prevValues.includes(o.value)) o.selected = true;
-        });
+    container.innerHTML = `
+      <div class="multi-select-header">
+        <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
+        <span class="multi-select-arrow">▾</span>
+      </div>
+      <div class="multi-select-menu"></div>
+    `;
+
+    const header = container.querySelector(".multi-select-header");
+    const label = container.querySelector(".multi-select-label");
+    const menu = container.querySelector(".multi-select-menu");
+
+    unique.forEach(v => {
+      const item = document.createElement("label");
+      item.className = "multi-select-option";
+      item.innerHTML = `
+        <input type="checkbox" value="${v}">
+        <span>${v}</span>
+      `;
+      menu.appendChild(item);
+    });
+
+    function getValues() {
+      return Array.from(menu.querySelectorAll("input:checked")).map(i => i.value);
+    }
+
+    function updateLabel(triggerFilter) {
+      const selected = getValues();
+      if (!selected.length) {
+        label.textContent = placeholderText;
+        label.classList.add("multi-select-placeholder");
+      } else if (selected.length <= 2) {
+        label.textContent = selected.join(", ");
+        label.classList.remove("multi-select-placeholder");
       } else {
-        const canRestore = [...select.options].some(o => o.value === prevValues[0]);
-        if (canRestore) select.value = prevValues[0];
+        label.textContent = `${selected.length} selected`;
+        label.classList.remove("multi-select-placeholder");
       }
-    };
+      if (triggerFilter) applyFilters();
+    }
 
-    addOptions(elements.areaSelect, data.map(d => d.area), "All Areas");
-    addOptions(elements.positionSelect, data.map(d => d.position), "All Positions");
-    addOptions(elements.yearSelect, data.map(d => d.year), "All Years");
+    header.addEventListener("click", () => {
+      const isOpen = container.classList.contains("open");
+      closeAllMultiSelects();
+      if (!isOpen) container.classList.add("open");
+    });
+
+    menu.addEventListener("change", () => updateLabel(true));
+
+    // close when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target)) {
+        container.classList.remove("open");
+      }
+    });
+
+    function clear() {
+      menu.querySelectorAll("input:checked").forEach(i => (i.checked = false));
+      updateLabel(false);
+    }
+
+    // initial
+    updateLabel(false);
+
+    return { getValues, clear };
   }
+
+  function closeAllMultiSelects() {
+    document.querySelectorAll(".multi-select.open").forEach(el => {
+      el.classList.remove("open");
+    });
+  }
+
+  function populateMultiSelects() {
+    multiSelectControls.area = buildMultiSelect(
+      elements.areaMulti,
+      data.map(d => d.area),
+      "All Areas"
+    );
+    multiSelectControls.position = buildMultiSelect(
+      elements.positionMulti,
+      data.map(d => d.position),
+      "All Positions"
+    );
+    multiSelectControls.year = buildMultiSelect(
+      elements.yearMulti,
+      data.map(d => d.year),
+      "All Years"
+    );
+  }
+
+  /* -------- Table + Export ---------- */
 
   function renderTable(rows) {
     currentRows = rows.slice();
@@ -680,25 +810,16 @@
     XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
   }
 
-  // Helper for multi-select values
-  function getMultiSelectValues(select) {
-    if (!select.multiple) {
-      return select.value ? [select.value] : [];
-    }
-    const vals = Array.from(select.selectedOptions)
-      .map(o => o.value)
-      .filter(v => v !== "");
-    return vals;
-  }
+  /* -------- Filtering ---------- */
 
   function applyFilters() {
     const pq = elements.personSearch.value.toLowerCase();
     const tq = elements.titleSearch.value.toLowerCase();
     const jq = elements.journalSearch.value.toLowerCase();
 
-    const areaVals = getMultiSelectValues(elements.areaSelect);
-    const posVals = getMultiSelectValues(elements.positionSelect);
-    const yearVals = getMultiSelectValues(elements.yearSelect);
+    const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
+    const posVals = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
+    const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
 
     const utdY = elements.utdYes.checked, utdN = elements.utdNo.checked;
     const ftY = elements.ftYes.checked, ftN = elements.ftNo.checked;
@@ -736,42 +857,42 @@
     renderTable(filtered);
   }
 
-  function clearMultiSelect(select) {
-    if (select.multiple) {
-      Array.from(select.options).forEach(o => o.selected = false);
-    } else {
-      select.value = "";
-    }
+  function clearAllFilters() {
+    elements.personSearch.value = "";
+    elements.titleSearch.value = "";
+    elements.journalSearch.value = "";
+
+    if (multiSelectControls.area) multiSelectControls.area.clear();
+    if (multiSelectControls.position) multiSelectControls.position.clear();
+    if (multiSelectControls.year) multiSelectControls.year.clear();
+
+    elements.utdYes.checked = false;
+    elements.utdNo.checked = false;
+    elements.ftYes.checked = false;
+    elements.ftNo.checked = false;
+    elements.rank4.checked = false;
+    elements.rank5.checked = false;
+    elements.rank5star.checked = false;
+
+    renderTable(data);
   }
 
   function attachListeners() {
     [
-      elements.personSearch, elements.titleSearch, elements.journalSearch,
-      elements.areaSelect, elements.positionSelect, elements.yearSelect,
-      elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo,
-      elements.rank4, elements.rank5, elements.rank5star
+      elements.personSearch,
+      elements.titleSearch,
+      elements.journalSearch,
+      elements.utdYes,
+      elements.utdNo,
+      elements.ftYes,
+      elements.ftNo,
+      elements.rank4,
+      elements.rank5,
+      elements.rank5star
     ].forEach(el => el.addEventListener("input", applyFilters));
 
     if (elements.clearFilters) {
-      elements.clearFilters.addEventListener("click", () => {
-        elements.personSearch.value = "";
-        elements.titleSearch.value = "";
-        elements.journalSearch.value = "";
-
-        clearMultiSelect(elements.areaSelect);
-        clearMultiSelect(elements.positionSelect);
-        clearMultiSelect(elements.yearSelect);
-
-        elements.utdYes.checked = false;
-        elements.utdNo.checked = false;
-        elements.ftYes.checked = false;
-        elements.ftNo.checked = false;
-        elements.rank4.checked = false;
-        elements.rank5.checked = false;
-        elements.rank5star.checked = false;
-
-        renderTable(data);
-      });
+      elements.clearFilters.addEventListener("click", clearAllFilters);
     }
 
     if (elements.exportExcel) {
@@ -797,4 +918,5 @@
 
 </body>
 </html>
+
 
