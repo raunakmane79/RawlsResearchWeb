@@ -442,6 +442,24 @@
       color: #777;
       border: 1px solid #ddd;
     }
+    .name-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-width: 0;  /* prevents overflow into the next grid column */
+}
+
+.name-inputs input[type="text"] {
+  min-width: 0;  /* allow shrinking inside grid cell */
+}
+
+/* On larger screens, let Author block use two columns */
+@media (min-width: 900px) {
+  .filter-group.author-group {
+    grid-column: span 2;
+  }
+}
+
   </style>
 </head>
 
@@ -476,17 +494,17 @@
 
   <div class="filters">
     <!-- Author Name split into Last / First + Exact match -->
-    <div class="filter-group">
-      <label>Author Name</label>
-      <div class="name-inputs">
-        <input type="text" id="lastNameSearch" placeholder="Last name (e.g., Yan)">
-        <input type="text" id="firstNameSearch" placeholder="First name (e.g., Tingting)">
-      </div>
-      <label class="name-exact">
-        <input type="checkbox" id="matchExactName">
-        Match entire cell contents
-      </label>
-    </div>
+    <div class="filter-group author-group">
+  <label>Author Name</label>
+  <div class="name-inputs">
+    <input type="text" id="lastNameSearch" placeholder="Last name (e.g., Yan)">
+    <input type="text" id="firstNameSearch" placeholder="First name (e.g., Tingting)">
+  </div>
+  <label class="name-exact">
+    <input type="checkbox" id="matchExactName">
+    Match entire cell contents
+  </label>
+</div>
 
     <div class="filter-group">
       <label>Article Title</label>
