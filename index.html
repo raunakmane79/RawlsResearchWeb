@@ -670,24 +670,43 @@
       border-color: var(--rawls-red-dark);
       color: #fff;
     }
-    /* Base state = expanded (shaded) */
+    /* Enhanced TTU-styled advanced filter panel */
 .filters-advanced {
   margin-top: 0.75rem;
   padding: 1rem 1.5rem 1.25rem;
   border-radius: 12px;
-  background: rgba(186, 12, 47, 0.04); /* light TTU Rawls red */
-  box-shadow: 0 0 0 1px rgba(186, 12, 47, 0.10);
-  border-top: 1px dashed #e5e5e5;
-  max-height: 800px; /* or whatever fits your content */
-  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(186, 12, 47, 0.05) 0%,
+    rgba(186, 12, 47, 0.02) 100%
+  ); /* TTU crimson fade */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08),
+              0 0 0 1px rgba(186, 12, 47, 0.12);
+  border-top: 2px solid rgba(186, 12, 47, 0.25);
+  backdrop-filter: blur(4px);
   transition:
-    background 0.2s ease,
-    box-shadow 0.2s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease,
     max-height 0.25s ease,
     padding 0.25s ease;
+  max-height: 900px;
+  overflow: hidden;
 }
 
-/* Collapsed = hidden + no shading */
+/* Soft hover / open glow */
+.filters-advanced:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(186, 12, 47, 0.07) 0%,
+    rgba(186, 12, 47, 0.03) 100%
+  );
+  box-shadow: 0 4px 10px rgba(186, 12, 47, 0.1),
+              0 0 0 1px rgba(186, 12, 47, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Collapsed = hidden and flat */
 .filters-advanced.collapsed {
   max-height: 0;
   padding-top: 0;
@@ -696,6 +715,7 @@
   box-shadow: none;
   border-top: 1px dashed transparent;
 }
+
 
   </style>
 </head>
