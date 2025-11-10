@@ -267,16 +267,77 @@
       transform: translateY(-0.5px);
     }
 
-    /* --- Filters --- */
+    /* --- Filters container --- */
     .filters {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px 16px;
       margin-top: 12px;
-      padding: 12px 12px 4px;
+      padding: 14px 14px 10px;
       border-radius: 10px;
       border: 1px solid var(--rawls-border);
       background: linear-gradient(to bottom, #fafafa, #ffffff);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filters-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filters-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .advanced-toggle {
+      border-radius: 999px;
+      border: 1px solid var(--rawls-border);
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      background: #f8f8f8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #444;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+    }
+
+    .advanced-toggle:hover {
+      background: #ffffff;
+      border-color: var(--rawls-red);
+      transform: translateY(-0.5px);
+    }
+
+    .advanced-toggle-icon {
+      font-size: 0.8rem;
+      transition: transform 0.2s ease;
+    }
+
+    .advanced-toggle.open .advanced-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .filters-primary,
+    .filters-advanced {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 16px;
+    }
+
+    .filters-advanced {
+      padding-top: 10px;
+      border-top: 1px dashed var(--rawls-border);
+    }
+
+    .filters-advanced.collapsed {
+      display: none;
     }
 
     .filter-group {
@@ -344,7 +405,7 @@
     }
 
     @media (min-width: 900px) {
-      .filter-group.author-group {
+      .filters-primary .author-group {
         grid-column: span 2;
       }
     }
@@ -516,7 +577,7 @@
       border: 1px solid #ddd;
     }
 
-    /* --- Red theme for checkboxes (Texas Tech / Rawls Red) --- */
+    /* --- Red theme for checkboxes --- */
     input[type="checkbox"] {
       accent-color: #ba0c2f;
     }
@@ -656,98 +717,118 @@
     </div>
     <div class="toolbar-right">
       <button class="btn" id="clearFilters"><span>&#10006;</span> Clear filters</button>
-      <button class="btn" id="exportExcel"><span>&#128190;</span> Export to Excel</button>
+      <button class="btn" id="exportExcel"><span>&#128190;</span> Export</button>
     </div>
   </div>
 
   <div class="filters">
-    <!-- Author Name split into Last / First + Exact match -->
-    <div class="filter-group author-group">
-      <label>Author Name</label>
-      <div class="name-inputs">
-        <input type="text" id="lastNameSearch" placeholder="First name">
-        <input type="text" id="firstNameSearch" placeholder="Last name">
+    <div class="filters-header">
+      <div class="filters-title">Search publications</div>
+      <button class="advanced-toggle" id="advancedToggle">
+        <span class="advanced-toggle-icon">▾</span>
+        Advanced filters
+      </button>
+    </div>
+
+    <!-- Primary, high-frequency filters -->
+    
+
+      <!-- Keyword search across Title & Journal -->
+      <div class="filter-group">
+        <label>Keyword (Title / Journal)</label>
+        <input type="text" id="keywordSearch" placeholder="Search in title or journal">
       </div>
-      <div class="name-options">
-        <label class="name-option">
-          <input type="checkbox" id="masterNameSearch">
-          Master search
-        </label>
-        <label class="name-option">
-          <input type="checkbox" id="exactNameMatch">
-          Match entire cell contents
-        </label>
+<div class="filters-primary">
+      <!-- Author Name split into Last / First + Exact match -->
+      <div class="filter-group author-group">
+        <label>Author Name</label>
+        <div class="name-inputs">
+          <input type="text" id="lastNameSearch" placeholder="Last name">
+          <input type="text" id="firstNameSearch" placeholder="First name">
+        </div>
+        <div class="name-options">
+          <label class="name-option">
+            <input type="checkbox" id="masterNameSearch">
+            Master search
+          </label>
+          <label class="name-option">
+            <input type="checkbox" id="exactNameMatch">
+            Match entire cell contents
+          </label>
+        </div>
       </div>
-    </div>
-
-    <!-- Keyword search across Title & Journal -->
-    <div class="filter-group">
-      <label>Keyword (Title / Journal)</label>
-      <input type="text" id="keywordSearch" placeholder="Search in title or journal">
-    </div>
-
-    <div class="filter-group">
-      <label>Article Title</label>
-      <input type="text" id="titleSearch" placeholder="Search by title">
-    </div>
-
-    <div class="filter-group">
-      <label>Journal Name</label>
-      <input type="text" id="journalSearch" placeholder="Search by journal">
-    </div>
-
-    <!-- AREA multi-select dropdown with checkboxes -->
-    <div class="filter-group">
-      <label>Area</label>
-      <div class="multi-select" id="areaMulti">
-        <!-- JS will populate -->
-      </div>
-      <span class="filter-hint">Choose one or more areas.</span>
-    </div>
-
-    <!-- POSITION multi-select dropdown with checkboxes -->
-    <div class="filter-group">
-      <label>Position</label>
-      <div class="multi-select" id="positionMulti">
-        <!-- JS will populate -->
-      </div>
-      <span class="filter-hint">Choose one or more positions.</span>
-    </div>
-
-    <!-- YEAR multi-select dropdown with checkboxes -->
-    <div class="filter-group">
-      <label>Year</label>
-      <div class="multi-select" id="yearMulti">
-        <!-- JS will populate -->
-      </div>
-      <span class="filter-hint">Filter by publication year.</span>
-    </div>
-
-    <div class="filter-group">
-      <label>UTD Journal</label>
-      <div class="checkbox-group">
-        <label><input type="checkbox" id="utdYes"> Yes</label>
-        <label><input type="checkbox" id="utdNo"> No</label>
+      <!-- YEAR multi-select dropdown with checkboxes -->
+      <div class="filter-group">
+        <label>Year</label>
+        <div class="multi-select" id="yearMulti">
+          <!-- JS will populate -->
+        </div>
+        <span class="filter-hint">Filter by publication year.</span>
       </div>
     </div>
 
-    <div class="filter-group">
-      <label>Financial Times Journal</label>
-      <div class="checkbox-group">
-        <label><input type="checkbox" id="ftYes"> Yes</label>
-        <label><input type="checkbox" id="ftNo"> No</label>
-      </div>
-    </div>
+   <!-- Advanced filters (collapsed by default) -->
+<!-- Advanced filters (collapsed by default) -->
+<div class="filters-advanced collapsed" id="advancedPanel">
+  <div class="filter-group">
+    <label>Article Title</label>
+    <input type="text" id="titleSearch" placeholder="Search by title">
+  </div>
 
-    <div class="filter-group">
-      <label>Rawls Journal List Rankings</label>
-      <div class="checkbox-group">
-        <label><input type="checkbox" id="rank4"> 4</label>
-        <label><input type="checkbox" id="rank5"> 5</label>
-        <label><input type="checkbox" id="rank5star"> 5*</label>
-      </div>
+  <div class="filter-group">
+    <label>Journal Name</label>
+    <input type="text" id="journalSearch" placeholder="Search by journal">
+  </div>
+
+  <!-- AREA multi-select dropdown with checkboxes -->
+  <div class="filter-group">
+    <label>Area</label>
+    <div class="multi-select" id="areaMulti">
+      <!-- JS will populate -->
+    </div>
+    <span class="filter-hint">Choose one or more areas.</span>
+  </div>
+
+  <!-- POSITION multi-select dropdown with checkboxes -->
+  <div class="filter-group">
+    <label>Position</label>
+    <div class="multi-select" id="positionMulti">
+      <!-- JS will populate -->
+    </div>
+    <span class="filter-hint">Choose one or more positions.</span>
+  </div>
+
+  <!-- Rawls Journal List Rankings -->
+  <div class="filter-group">
+    <label>Rawls Journal List Rankings</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="rank4"> 4</label>
+      <label><input type="checkbox" id="rank5"> 5</label>
+      <label><input type="checkbox" id="rank5star"> 5*</label>
     </div>
   </div>
+
+  <!-- UTD Journal -->
+  <div class="filter-group">
+    <label>UTD Journal</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="utdYes"> Yes</label>
+      <label><input type="checkbox" id="utdNo"> No</label>
+    </div>
+  </div>
+
+  <!-- Financial Times Journal -->
+  <div class="filter-group">
+    <label>Financial Times Journal</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="ftYes"> Yes</label>
+      <label><input type="checkbox" id="ftNo"> No</label>
+    </div>
+  </div>
+</div>
+
+
+   
 
   <div class="table-container">
     <table>
@@ -820,6 +901,9 @@
     areaMulti: document.getElementById("areaMulti"),
     positionMulti: document.getElementById("positionMulti"),
     yearMulti: document.getElementById("yearMulti"),
+    // Advanced filters UI
+    advancedToggle: document.getElementById("advancedToggle"),
+    advancedPanel: document.getElementById("advancedPanel"),
     // Modal elements
     exportModal: document.getElementById("exportModal"),
     exportModalClose: document.getElementById("exportModalClose"),
@@ -1058,7 +1142,6 @@
     elements.resultsCount.textContent = `Showing ${rows.length} results`;
   }
 
-  // Helper to get a nice faculty display name
   function getFacultyName(row) {
     if (row.personName && row.personName.trim()) {
       return row.personName.trim();
@@ -1077,7 +1160,6 @@
 
   // --- Export helpers ---
 
-  // 1) Data as XLSX (only detailed rows)
   function exportDataAsXlsx() {
     if (!currentRows || currentRows.length === 0) {
       alert("There are no rows to export.");
@@ -1104,7 +1186,6 @@
     XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
   }
 
-  // 2) Data as CSV
   function exportDataAsCsv() {
     if (!currentRows || currentRows.length === 0) {
       alert("There are no rows to export.");
@@ -1140,7 +1221,6 @@
     URL.revokeObjectURL(url);
   }
 
-  // 3) Summary only (multiple sheets, no detailed rows)
   function exportSummaryOnly() {
     if (!currentRows || currentRows.length === 0) {
       alert("There are no rows to summarize.");
@@ -1440,6 +1520,14 @@
       elements.clearFilters.addEventListener("click", clearAllFilters);
     }
 
+    // Advanced filters toggle
+    if (elements.advancedToggle && elements.advancedPanel) {
+      elements.advancedToggle.addEventListener("click", () => {
+        elements.advancedPanel.classList.toggle("collapsed");
+        elements.advancedToggle.classList.toggle("open");
+      });
+    }
+
     // Open modal on export button click
     if (elements.exportExcel) {
       elements.exportExcel.addEventListener("click", openExportModal);
@@ -1500,4 +1588,3 @@
 
 </body>
 </html>
-
