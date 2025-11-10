@@ -723,6 +723,19 @@
   padding-top: 0;
   padding-bottom: 0;
 }
+/* Make advanced filters sit above the results table */
+.filters-advanced {
+  position: relative;
+  z-index: 20;   /* higher than table */
+}
+
+/* Your results table wrapper/card – keep this lower */
+.results-table-wrapper,
+.results-card,
+.results-container {
+  position: relative;
+  z-index: 1;
+}
 
 
   </style>
