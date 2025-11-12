@@ -724,53 +724,53 @@
     }
     /* Enhanced TTU-styled advanced filter panel */
 /* TTU-themed, elevated advanced filter panel */
+/* TTU-refined professional advanced filter panel */
 .filters-advanced {
   margin-top: 0.75rem;
   padding: 1rem 1.5rem 1.25rem;
   border-radius: 14px;
   background: linear-gradient(
     180deg,
-    rgba(186, 12, 47, 0.08) 0%,
-    rgba(186, 12, 47, 0.01) 100%
-  ); /* soft Rawls crimson wash */
-  border: 1px solid rgba(186, 12, 47, 0.25);
+    #ffffff 0%,
+    #fafafa 100%
+  ); /* clean neutral gradient */
+  border: 1px solid rgba(186, 12, 47, 0.25); /* subtle Rawls red accent */
   box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(255, 255, 255, 0.6);
+    0 4px 14px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
   position: relative;
-  overflow: visible;              /* <-- IMPORTANT: lets dropdown extend */
+  overflow: visible;
   transition:
     background 0.25s ease,
     box-shadow 0.25s ease,
     transform 0.2s ease;
+  z-index: 20; /* keep above table */
 }
 
-/* One consistent state for hover and when open */
+/* Hover/open state – subtle crimson glow, no pink fill */
 .filters-advanced:hover,
 .filters-advanced:not(.collapsed) {
   background: linear-gradient(
     180deg,
-    rgba(186, 12, 47, 0.07) 0%,
-    rgba(186, 12, 47, 0.03) 100%
+    #ffffff 0%,
+    #f7f7f7 100%
   );
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(186, 12, 47, 0.18);
+    0 6px 18px rgba(186, 12, 47, 0.15),
+    0 0 0 1px rgba(186, 12, 47, 0.25);
   transform: translateY(-1px);
 }
 
-
-/* Collapsed = hidden and flat */
+/* Collapsed (hidden) */
 .filters-advanced.collapsed {
   display: none;
   padding-top: 0;
   padding-bottom: 0;
 }
-/* Make advanced filters sit above the results table */
 .filters-advanced {
-  position: relative;
-  z-index: 20;   /* higher than table */
+  border-top: 3px solid var(--rawls-red);
 }
+
 
 /* Your results table wrapper/card – keep this lower */
 .results-table-wrapper,
