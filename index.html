@@ -4,26 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rawls Faculty Publications Database</title>
-<!-- Standard favicon -->
-<link rel="icon" href="favicon.ico" sizes="any">
 
-<!-- Modern PNG fallbacks -->
-<link rel="icon" type="image/png" sizes="32x32" href="TTU_seal-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="TTU_seal-16.png">
-<link rel="icon" type="image/png" sizes="192x192" href="TTU_seal-192.png">
-
-<!-- Apple touch icon -->
-<link rel="apple-touch-icon" href="TTU_seal-180.png">
-
-<!-- Optional theme color for mobile UI -->
-<meta name="theme-color" content="#ba0c2f">
-
+  <!-- Favicons -->
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="TTU_seal-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="TTU_seal-16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="TTU_seal-192.png">
+  <link rel="apple-touch-icon" href="TTU_seal-180.png">
+  <meta name="theme-color" content="#ba0c2f">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
+  <!-- XLSX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
@@ -35,799 +30,121 @@
       --rawls-card-bg: #ffffff;
       --rawls-border: #e0e0e0;
     }
-
-    * {
-      box-sizing: border-box;
-      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top left, #ffffff 0, #f3f4f6 45%, #e9ecf2 100%);
-      color: var(--rawls-black);
-    }
-
-    /* --- Header --- */
-    .rawls-header {
-      background: linear-gradient(to right, #000 60%, #111 100%);
-      border-bottom: 4px solid #ba0c2f;
-      color: #fff;
-      padding: 10px 28px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .rawls-header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      max-width: 1320px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-    }
-
-    .rawls-header-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      min-width: 0;
-    }
-
-    .rawls-logo {
-      height: 46px;
-      width: auto;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-
-    .rawls-header-brand {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.25;
-    }
-
-    .rawls-header-brand-main {
-      font-family: "Roboto Condensed", sans-serif;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: #fff;
-      letter-spacing: 0.02em;
-    }
-
-    .rawls-header-brand-sub {
-      font-size: 0.85rem;
-      color: #ccc;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    /* --- Header action buttons --- */
-    .rawls-header-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .header-btn {
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255,255,255,0.35);
-      color: #fff;
-      background: transparent;
-      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
-      white-space: nowrap;
-    }
-
-    .header-btn.primary {
-      background: var(--rawls-red);
-      border-color: var(--rawls-red);
-    }
-
-    .header-btn:hover {
-      transform: translateY(-1px);
-      border-color: #fff;
-      background: rgba(255,255,255,0.08);
-    }
-
-    .header-btn.primary:hover {
-      background: var(--rawls-red-dark);
-      border-color: var(--rawls-red-dark);
-    }
-
-    @media (max-width: 640px) {
-      .rawls-header-inner {
-        align-items: flex-start;
-      }
-      .rawls-header-actions {
-        width: 100%;
-        justify-content: flex-start;
-      }
-    }
-
-    /* --- Footer --- */
-    .rawls-footer {
-      margin: 0;
-      flex-shrink: 0;
-      background: #000;
-      border-top: 4px solid #ba0c2f;
-      color: #f0f0f0;
-      padding: 12px 28px;
-      font-size: 0.85rem;
-      margin-top: 40px;
-    }
-
-    .rawls-footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1320px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .linkedin-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #0077b5;
-      color: #fff;
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.85rem;
-      transition: background 0.2s ease, transform 0.15s ease;
-      box-shadow: 0 2px 6px rgba(0, 119, 181, 0.25);
-    }
-
-    .linkedin-btn img {
-      height: 16px;
-      width: 16px;
-      filter: brightness(0) invert(1);
-    }
-
-    .linkedin-btn:hover {
-      background: #005582;
-      transform: translateY(-1px);
-    }
-
-    /* --- Main card --- */
-    .app {
-      background: var(--rawls-card-bg);
-      padding: 24px 24px 20px;
-      margin: 24px auto;
-      border-radius: 12px;
-      max-width: 1320px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-      border-top: 5px solid var(--rawls-red);
-    }
-
-    .app-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      margin: 0;
-      font-family: "Roboto Condensed", system-ui, sans-serif;
-      font-weight: 700;
-      font-size: 1.8rem;
-      letter-spacing: 0.03em;
-      color: var(--rawls-red);
-    }
-
-    .app-subtitle {
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 6px;
-      margin-bottom: 6px;
-      flex-wrap: wrap;
-    }
-
-    .toolbar-left {
-      font-size: 0.85rem;
-      color: #555;
-    }
-
-    .toolbar-right {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      border-radius: 999px;
-      border: 1px solid var(--rawls-border);
-      padding: 5px 12px;
-      font-size: 0.8rem;
-      background: #f8f8f8;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
-    }
-
-    .btn span {
-      font-size: 1rem;
-      line-height: 1;
-    }
-
-    .btn:hover {
-      background: #ffffff;
-      border-color: var(--rawls-red);
-      transform: translateY(-0.5px);
-    }
-/* --- Toolbar buttons --- */
-.btn {
-  border-radius: 999px;
-  border: 1px solid var(--rawls-border);
-  padding: 5px 12px;
-  font-size: 0.8rem;
-  background: #f8f8f8;
-  color: #111;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-/* Hover = light red outline */
-.btn:hover {
-  background: #fff;
-  border-color: var(--rawls-red);
-  color: var(--rawls-red);
-  transform: translateY(-0.5px);
-}
-
-/* 🔴 Active (clicked) state */
-.btn:active,
-.btn.active {
-  background: var(--rawls-red);
-  border-color: var(--rawls-red-dark);
-  color: #fff;
-  box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25);
-  transform: scale(0.98);
-}
-
-/* Optional: pressed animation when you hold down the mouse */
-.btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.35);
-}
-
-    /* --- Filters container --- */
-    .filters {
-      margin-top: 12px;
-      padding: 14px 14px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--rawls-border);
-      background: linear-gradient(to bottom, #fafafa, #ffffff);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .filters-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .filters-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #555;
-    }
-
-    .advanced-toggle {
-      border-radius: 999px;
-      border: 1px solid var(--rawls-border);
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      background: #f8f8f8;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #444;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
-    }
-
-    .advanced-toggle:hover {
-      background: #ffffff;
-      border-color: var(--rawls-red);
-      transform: translateY(-0.5px);
-    }
-
-    .advanced-toggle-icon {
-      font-size: 0.8rem;
-      transition: transform 0.2s ease;
-    }
-
-    .advanced-toggle.open .advanced-toggle-icon {
-      transform: rotate(180deg);
-    }
-
-    .filters-primary,
-    .filters-advanced {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px 16px;
-    }
-
-    .filters-advanced {
-      padding-top: 10px;
-      border-top: 1px dashed var(--rawls-border);
-    }
-
-    .filters-advanced.collapsed {
-      display: none;
-    }
-
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #555;
-    }
-
-    input[type="text"] {
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--rawls-border);
-      font-size: 0.85rem;
-      background: #fafafa;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--rawls-red);
-      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18);
-      background: #fff;
-    }
-
-    .checkbox-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-size: 0.85rem;
-      color: #444;
-    }
-
-    .name-inputs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .name-inputs input[type="text"] {
-      min-width: 0;
-    }
-
-    .name-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 4px;
-      font-size: 0.8rem;
-      color: #555;
-    }
-
-    .name-option {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    @media (min-width: 900px) {
-      .filters-primary .author-group {
-        grid-column: span 2;
-      }
-    }
-
-    /* --- Custom multi-select dropdown with checkboxes --- */
-    .multi-select {
-      position: relative;
-      font-size: 0.85rem;
-    }
-
-    .multi-select-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--rawls-border);
-      background: #fafafa;
-      cursor: pointer;
-      min-height: 32px;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    }
-
-    .multi-select.open .multi-select-header {
-      border-color: var(--rawls-red);
-      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18);
-      background: #fff;
-    }
-
-    .multi-select-label {
-      color: #555;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .multi-select-placeholder {
-      color: #999;
-    }
-
-    .multi-select-arrow {
-      font-size: 0.7rem;
-      margin-left: 8px;
-    }
-
-    .multi-select-menu {
-      position: absolute;
-      left: 0;
-      right: 0;
-      margin-top: 4px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      border: 1px solid #ddd;
-      max-height: 220px;
-      overflow-y: auto;
-      padding: 6px 0;
-      z-index: 20;
-      display: none;
-    }
-
-    .multi-select.open .multi-select-menu {
-      display: block;
-    }
-
-    .multi-select-option {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-
-    .multi-select-option:hover {
-      background: #f5f5f5;
-    }
-
-    .multi-select-option input {
-      margin: 0;
-    }
-
-    .filter-hint {
-      font-size: 0.7rem;
-      color: #777;
-    }
-
-    /* --- Table --- */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid #e3e3e3;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th:nth-child(1), td:nth-child(1) { width: 140px; }
-    th:nth-child(2), td:nth-child(2) { width: 160px; }
-
-    th, td {
-      padding: 10px 12px;
-      border: 1px solid #eaeaea;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      background: #f8f8f8;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #444;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    tr:nth-child(even) {
-      background: #fcfcfc;
-    }
-
-    tr:hover {
-      background: #fafafa;
-    }
-
-    .table-container {
-      border-radius: 10px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
-      overflow: hidden;
-      border: 1px solid #e0e0e0;
-      background: #fff;
-      max-height: 500px;
-      overflow:auto;
-      margin-top: 8px;
-    }
-
-    #resultsCount {
-      font-weight: 500;
-      color: #444;
-    }
+    * { box-sizing: border-box; font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { margin: 0; background: radial-gradient(circle at top left, #ffffff 0, #f3f4f6 45%, #e9ecf2 100%); color: var(--rawls-black); }
+
+    /* Header */
+    .rawls-header { background: linear-gradient(to right, #000 60%, #111 100%); border-bottom: 4px solid #ba0c2f; color: #fff; padding: 10px 28px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 1000; }
+    .rawls-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1320px; margin: 0 auto; flex-wrap: wrap; }
+    .rawls-header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .rawls-logo { height: 46px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .rawls-header-brand { display: flex; flex-direction: column; line-height: 1.25; }
+    .rawls-header-brand-main { font-family: "Roboto Condensed", sans-serif; font-weight: 700; font-size: 1.2rem; color: #fff; letter-spacing: 0.02em; }
+    .rawls-header-brand-sub { font-size: 0.85rem; color: #ccc; letter-spacing: 0.05em; text-transform: uppercase; }
+    .rawls-header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .header-btn { border-radius: 999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.35); color: #fff; background: transparent; transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.05s; white-space: nowrap; }
+    .header-btn.primary { background: var(--rawls-red); border-color: var(--rawls-red); }
+    .header-btn:hover { transform: translateY(-1px); border-color: #fff; background: rgba(255,255,255,0.08); }
+    .header-btn.primary:hover { background: var(--rawls-red-dark); border-color: var(--rawls-red-dark); }
+    @media (max-width: 640px) { .rawls-header-inner { align-items: flex-start; } .rawls-header-actions { width: 100%; justify-content: flex-start; } }
+
+    /* Footer */
+    .rawls-footer { margin: 0; flex-shrink: 0; background: #000; border-top: 4px solid #ba0c2f; color: #f0f0f0; padding: 12px 28px; font-size: 0.85rem; margin-top: 40px; }
+    .rawls-footer-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1320px; margin: 0 auto; flex-wrap: wrap; gap: 12px; }
+    .linkedin-btn { display: inline-flex; align-items: center; gap: 8px; background: #0077b5; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 0.85rem; transition: background 0.2s, transform 0.15s; box-shadow: 0 2px 6px rgba(0, 119, 181, 0.25); }
+    .linkedin-btn img { height: 16px; width: 16px; filter: brightness(0) invert(1); }
+    .linkedin-btn:hover { background: #005582; transform: translateY(-1px); }
+
+    /* Card */
+    .app { background: var(--rawls-card-bg); padding: 24px 24px 20px; margin: 24px auto; border-radius: 12px; max-width: 1320px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); border-top: 5px solid var(--rawls-red); }
+    .app-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    h1 { margin: 0; font-family: "Roboto Condensed", system-ui, sans-serif; font-weight: 700; font-size: 1.8rem; letter-spacing: 0.03em; color: var(--rawls-red); }
+    .app-subtitle { font-size: 0.9rem; color: #555; }
+
+    /* Toolbar & buttons */
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+    .toolbar-left { font-size: 0.85rem; color: #555; }
+    .toolbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn { border-radius: 999px; border: 1px solid var(--rawls-border); padding: 5px 12px; font-size: 0.8rem; background: #f8f8f8; color: #111; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+    .btn:hover { background: #fff; border-color: var(--rawls-red); color: var(--rawls-red); transform: translateY(-0.5px); }
+    .btn:active, .btn.active { background: var(--rawls-red); border-color: var(--rawls-red-dark); color: #fff; box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25); transform: scale(0.98); }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.35); }
+
+    /* Filters wrapper */
+    .filters { margin-top: 12px; padding: 14px 14px 10px; border-radius: 10px; border: 1px solid var(--rawls-border); background: linear-gradient(to bottom, #fafafa, #ffffff); display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 100; }
+    .filters-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .filters-title { font-size: 0.9rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #555; }
+    .advanced-toggle { border-radius: 999px; border: 1px solid var(--rawls-border); padding: 4px 10px; font-size: 0.8rem; background: #f8f8f8; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; color: #444; transition: background 0.15s, border-color 0.15s, transform 0.05s; }
+    .advanced-toggle:hover { background: #ffffff; border-color: var(--rawls-red); transform: translateY(-0.5px); }
+    .advanced-toggle.open { background: var(--rawls-red); border-color: var(--rawls-red-dark); color: #fff; box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25); }
+    .advanced-toggle.open:hover { background: var(--rawls-red-dark); }
+    .advanced-toggle-icon { font-size: 0.8rem; transition: transform 0.2s ease; }
+    .advanced-toggle.open .advanced-toggle-icon { transform: rotate(180deg); }
+
+    .filters-primary, .filters-advanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+    .filters-advanced { margin-top: 0.75rem; padding: 1rem 1.5rem 1.25rem; border-radius: 14px; background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%); border: 1px solid rgba(186, 12, 47, 0.25); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5); position: relative; overflow: visible; transition: background 0.25s, box-shadow 0.25s, transform 0.2s; z-index: 20; border-top: 1px dashed var(--rawls-border); }
+    .filters-advanced:hover, .filters-advanced:not(.collapsed) { background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%); box-shadow: 0 6px 18px rgba(186, 12, 47, 0.15), 0 0 0 1px rgba(186, 12, 47, 0.25); transform: translateY(-1px); }
+    .filters-advanced.collapsed { display: none; padding-top: 0; padding-bottom: 0; }
+
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+    input[type="text"] { padding: 6px 8px; border-radius: 6px; border: 1px solid var(--rawls-border); font-size: 0.85rem; background: #fafafa; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+    input[type="text"]:focus { outline: none; border-color: var(--rawls-red); box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18); background: #fff; }
+    .checkbox-group { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.85rem; color: #444; }
+
+    .name-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
+    .name-options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; font-size: 0.8rem; color: #555; }
+    .name-option { display: inline-flex; align-items: center; gap: 6px; }
+    .filter-hint { font-size: 0.7rem; color: #777; }
+
+    /* Custom multi-select */
+    .multi-select { position: relative; font-size: 0.85rem; }
+    .multi-select-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--rawls-border); background: #fafafa; cursor: pointer; min-height: 32px; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+    .multi-select.open .multi-select-header { border-color: var(--rawls-red); box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18); background: #fff; }
+    .multi-select-label { color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .multi-select-placeholder { color: #999; }
+    .multi-select-arrow { font-size: 0.7rem; margin-left: 8px; }
+    .multi-select-menu { position: absolute; left: 0; right: 0; margin-top: 4px; background: #fff; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #ddd; max-height: 220px; overflow-y: auto; padding: 6px 0; z-index: 200; display: none; }
+    .multi-select.open .multi-select-menu { display: block; }
+    .multi-select-option { display: flex; align-items: center; gap: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.85rem; }
+    .multi-select-option:hover { background: #f5f5f5; }
+    .multi-select-option input { margin: 0; }
+
+    /* Table */
+    .table-container { border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; background: #fff; max-height: 500px; overflow:auto; margin-top: 8px; position: relative; z-index: 1; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid #e3e3e3; border-radius: 8px; overflow: hidden; }
+    th:nth-child(1), td:nth-child(1) { width: 140px; }  /* First Name */
+    th:nth-child(2), td:nth-child(2) { width: 160px; }  /* Last Name */
+    th, td { padding: 10px 12px; border: 1px solid #eaeaea; text-align: left; vertical-align: top; }
+    th { background: #f8f8f8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #444; position: sticky; top: 0; z-index: 10; }
+    tr:nth-child(even) { background: #fcfcfc; }
+    tr:hover { background: #fafafa; }
+    #resultsCount { font-weight: 500; color: #444; }
 
     /* Badges */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-right: 4px;
-      white-space: nowrap;
-    }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; white-space: nowrap; }
+    .badge-blue { background: #f8f8f8; color: #333; border: 1px solid #ddd; padding: 2px 6px; }
+    .badge-green { background: #e8f5e9; color: #2e7d32; border: 1px solid rgba(46, 125, 50, 0.3); }
+    .badge-no { background: #f3f4f6; color: #777; border: 1px solid #ddd; }
 
-    .badge-blue {
-      background: #f8f8f8;
-      color: #333;
-      border: 1px solid #ddd;
-      padding: 2px 6px;
-    }
+    /* Checkboxes */
+    input[type="checkbox"] { accent-color: #ba0c2f; }
+    input[type="checkbox"]:hover { box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.2); }
+    input[type="checkbox"]:focus { outline: none; box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.4); }
 
-    .badge-green {
-      background: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid rgba(46, 125, 50, 0.3);
-    }
-
-    .badge-no {
-      background: #f3f4f6;
-      color: #777;
-      border: 1px solid #ddd;
-    }
-
-    /* --- Red theme for checkboxes --- */
-    input[type="checkbox"] {
-      accent-color: #ba0c2f;
-    }
-
-    input[type="checkbox"]:hover {
-      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.2);
-    }
-
-    input[type="checkbox"]:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.4);
-    }
-
-    /* --- Export modal --- */
-    .export-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-
-    .export-modal.active {
-      display: flex;
-    }
-
-    .export-modal-content {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 18px 20px 16px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.25);
-      max-width: 340px;
-      width: 90%;
-    }
-
-    .export-modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .export-modal-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #111827;
-    }
-
-    .export-modal-close {
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 2px 4px;
-      color: #6b7280;
-    }
-
-    .export-modal-close:hover {
-      color: #111827;
-    }
-
-    .export-modal-body {
-      font-size: 0.85rem;
-      color: #4b5563;
-      margin-bottom: 10px;
-    }
-
-    .export-modal-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .export-option-btn {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .export-option-btn.primary {
-      background: var(--rawls-red);
-      border-color: var(--rawls-red);
-      color: #fff;
-    }
-
-    .export-option-btn.primary:hover {
-      background: var(--rawls-red-dark);
-      border-color: var(--rawls-red-dark);
-      color: #fff;
-    }
-    /* Enhanced TTU-styled advanced filter panel */
-/* TTU-themed, elevated advanced filter panel */
-/* TTU-refined professional advanced filter panel */
-.filters-advanced {
-  margin-top: 0.75rem;
-  padding: 1rem 1.5rem 1.25rem;
-  border-radius: 14px;
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #fafafa 100%
-  ); /* clean neutral gradient */
-  border: 1px solid rgba(186, 12, 47, 0.25); /* subtle Rawls red accent */
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.5);
-  position: relative;
-  overflow: visible;
-  transition:
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
-  z-index: 20; /* keep above table */
-}
-
-/* Hover/open state – subtle crimson glow, no pink fill */
-.filters-advanced:hover,
-.filters-advanced:not(.collapsed) {
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #f7f7f7 100%
-  );
-  box-shadow:
-    0 6px 18px rgba(186, 12, 47, 0.15),
-    0 0 0 1px rgba(186, 12, 47, 0.25);
-  transform: translateY(-1px);
-}
-
-/* Collapsed (hidden) */
-.filters-advanced.collapsed {
-  display: none;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-
-
-/* Your results table wrapper/card – keep this lower */
-.results-table-wrapper,
-.results-card,
-.results-container {
-  position: relative;
-  z-index: 1;
-}
-/* Make the whole filters section float above the table */
-.filters {
-  position: relative;
-  z-index: 100;
-}
-
-/* Ensure the checkbox menu always stacks above sticky <th> */
-.multi-select-menu {
-  z-index: 200;            /* higher than .filters and <th> */
-}
-
-/* Keep the table below the filters */
-.table-container {
-  position: relative;
-  z-index: 1;
-}
-
-/* Sticky header should not overtake dropdowns */
-th {
-  position: sticky;
-  top: 0;
-  z-index: 0;              /* lower than .multi-select-menu */
-}
-/* Default look (neutral) */
-.advanced-toggle {
-  border: 1px solid var(--rawls-border);
-  background: #f8f8f8;
-  color: #444;
-  transition: all 0.2s ease;
-}
-
-/* Hover highlight */
-.advanced-toggle:hover {
-  background: #ffffff;
-  border-color: var(--rawls-red);
-  color: var(--rawls-red);
-}
-
-/*  Active / clicked state */
-.advanced-toggle.open {
-  background: var(--rawls-red);
-  border-color: var(--rawls-red-dark);
-  color: #fff;
-  box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25);
-}
-
-.advanced-toggle.open:hover {
-  background: var(--rawls-red-dark);
-}
-
-
+    /* Export modal */
+    .export-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: none; align-items: center; justify-content: center; z-index: 2000; }
+    .export-modal.active { display: flex; }
+    .export-modal-content { background: #ffffff; border-radius: 14px; padding: 18px 20px 16px; box-shadow: 0 18px 40px rgba(0,0,0,0.25); max-width: 340px; width: 90%; }
+    .export-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .export-modal-title { font-size: 1rem; font-weight: 600; color: #111827; }
+    .export-modal-close { border: none; background: transparent; cursor: pointer; font-size: 1rem; padding: 2px 4px; color: #6b7280; }
+    .export-modal-close:hover { color: #111827; }
+    .export-modal-body { font-size: 0.85rem; color: #4b5563; margin-bottom: 10px; }
+    .export-modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .export-option-btn { width: 100%; justify-content: center; }
+    .export-option-btn.primary { background: var(--rawls-red); border-color: var(--rawls-red); color: #fff; }
+    .export-option-btn.primary:hover { background: var(--rawls-red-dark); border-color: var(--rawls-red-dark); color: #fff; }
   </style>
 </head>
 
@@ -838,27 +155,12 @@ th {
       <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
       <div class="rawls-header-brand">
         <span class="rawls-header-brand-main">Rawls College Research</span>
-        <span class="rawls-header-brand-sub">
-          Rawls College of Business · Texas Tech University
-        </span>
+        <span class="rawls-header-brand-sub">Rawls College of Business · Texas Tech University</span>
       </div>
     </div>
-
     <div class="rawls-header-actions">
-      <a
-        href="https://forms.office.com/r/ccUbG1hRZT"
-        target="_blank"
-        class="header-btn primary"
-      >
-        New Submission
-      </a>
-      <a
-        href="https://forms.office.com/r/CZ7cWYgSzP"
-        target="_blank"
-        class="header-btn"
-      >
-        Request Modification
-      </a>
+      <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+      <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
     </div>
   </div>
 </header>
@@ -870,9 +172,7 @@ th {
   </div>
 
   <div class="toolbar">
-    <div class="toolbar-left">
-      <span id="resultsCount">Loading publications...</span>
-    </div>
+    <div class="toolbar-left"><span id="resultsCount">Loading publications...</span></div>
     <div class="toolbar-right">
       <button class="btn" id="clearFilters"><span>&#10006;</span> Clear filters</button>
       <button class="btn" id="exportExcel"><span>&#128190;</span> Export</button>
@@ -883,106 +183,90 @@ th {
     <div class="filters-header">
       <div class="filters-title">Search publications</div>
       <button class="advanced-toggle" id="advancedToggle">
-        <span class="advanced-toggle-icon">▾</span>
-        Advanced filters
+        <span class="advanced-toggle-icon">▾</span> Advanced filters
       </button>
     </div>
 
-    <!-- Primary, high-frequency filters -->
-    
+    <!-- Keyword -->
+    <div class="filter-group">
+      <label>Keyword (Title / Journal)</label>
+      <input type="text" id="keywordSearch" placeholder="Search in title or journal">
+    </div>
 
-      <!-- Keyword search across Title & Journal -->
-      <div class="filter-group">
-        <label>Keyword (Title / Journal)</label>
-        <input type="text" id="keywordSearch" placeholder="Search in title or journal">
-      </div>
-<div class="filters-primary">
-      <!-- Author Name split into Last / First + Exact match -->
+    <div class="filters-primary">
+      <!-- Author -->
       <div class="filter-group author-group">
         <label>Author Name</label>
         <div class="name-inputs">
-          <input type="text" id="lastNameSearch" placeholder="First name">
-          <input type="text" id="firstNameSearch" placeholder="Last name">
+          <input type="text" id="firstNameSearch" placeholder="First name">
+          <input type="text" id="lastNameSearch"  placeholder="Last name">
         </div>
         <div class="name-options">
           <label class="name-option">
-            <input type="checkbox" id="exactNameMatch">
-            Match entire cell contents
+            <input type="checkbox" id="exactNameMatch"> Match entire cell contents
           </label>
+          <span class="filter-hint">Tips: use initials “j.” or “j d”, prefix “jo*”, typos tolerated.</span>
         </div>
       </div>
-      <!-- YEAR multi-select dropdown with checkboxes -->
+
+      <!-- Year -->
       <div class="filter-group">
         <label>Year of Publication</label>
-        <div class="multi-select" id="yearMulti">
-          <!-- JS will populate -->
-        </div>
+        <div class="multi-select" id="yearMulti"></div>
         <span class="filter-hint">Filter by publication year.</span>
       </div>
     </div>
 
-   <!-- Advanced filters (collapsed by default) -->
-<!-- Advanced filters (collapsed by default) -->
-<div class="filters-advanced collapsed" id="advancedPanel">
-  <div class="filter-group">
-    <label>Article Title</label>
-    <input type="text" id="titleSearch" placeholder="Search by title">
-  </div>
+    <!-- Advanced -->
+    <div class="filters-advanced collapsed" id="advancedPanel">
+      <div class="filter-group">
+        <label>Article Title</label>
+        <input type="text" id="titleSearch" placeholder="Search by title">
+      </div>
 
-  <div class="filter-group">
-    <label>Journal Name</label>
-    <input type="text" id="journalSearch" placeholder="Search by journal">
-  </div>
+      <div class="filter-group">
+        <label>Journal Name</label>
+        <input type="text" id="journalSearch" placeholder="Search by journal">
+      </div>
 
-  <!-- AREA multi-select dropdown with checkboxes -->
-  <div class="filter-group">
-    <label>Area</label>
-    <div class="multi-select" id="areaMulti">
-      <!-- JS will populate -->
-    </div>
-    <span class="filter-hint">Choose one or more areas.</span>
-  </div>
+      <div class="filter-group">
+        <label>Area</label>
+        <div class="multi-select" id="areaMulti"></div>
+        <span class="filter-hint">Choose one or more areas.</span>
+      </div>
 
-  <!-- POSITION multi-select dropdown with checkboxes -->
-  <div class="filter-group">
-    <label>Position</label>
-    <div class="multi-select" id="positionMulti">
-      <!-- JS will populate -->
-    </div>
-    <span class="filter-hint">Choose one or more positions.</span>
-  </div>
+      <div class="filter-group">
+        <label>Position</label>
+        <div class="multi-select" id="positionMulti"></div>
+        <span class="filter-hint">Choose one or more positions.</span>
+      </div>
 
-  <!-- Rawls Journal List Rankings -->
-  <div class="filter-group">
-    <label>Rawls Journal List Rankings</label>
-    <div class="checkbox-group">
-      <label><input type="checkbox" id="rank4"> 4</label>
-      <label><input type="checkbox" id="rank5"> 5</label>
-      <label><input type="checkbox" id="rank5star"> 5*</label>
-    </div>
-  </div>
+      <div class="filter-group">
+        <label>Rawls Journal List Rankings</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="rank4"> 4</label>
+          <label><input type="checkbox" id="rank5"> 5</label>
+          <label><input type="checkbox" id="rank5star"> 5*</label>
+        </div>
+      </div>
 
-  <!-- UTD Journal -->
-  <div class="filter-group">
-    <label>UTD Journal</label>
-    <div class="checkbox-group">
-      <label><input type="checkbox" id="utdYes"> Yes</label>
-      <label><input type="checkbox" id="utdNo"> No</label>
-    </div>
-  </div>
+      <div class="filter-group">
+        <label>UTD Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="utdYes"> Yes</label>
+          <label><input type="checkbox" id="utdNo"> No</label>
+        </div>
+      </div>
 
-  <!-- Financial Times Journal -->
-  <div class="filter-group">
-    <label>Financial Times Journal</label>
-    <div class="checkbox-group">
-      <label><input type="checkbox" id="ftYes"> Yes</label>
-      <label><input type="checkbox" id="ftNo"> No</label>
+      <div class="filter-group">
+        <label>Financial Times Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="ftYes"> Yes</label>
+          <label><input type="checkbox" id="ftNo"> No</label>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
-
-   
 
   <div class="table-container">
     <table>
@@ -1012,19 +296,11 @@ th {
       <div class="export-modal-title">Export search results</div>
       <button class="export-modal-close" id="exportModalClose" aria-label="Close export options">✕</button>
     </div>
-    <div class="export-modal-body">
-      Choose how you would like to export the current filtered results.
-    </div>
+    <div class="export-modal-body">Choose how you would like to export the current filtered results.</div>
     <div class="export-modal-actions">
-      <button class="btn export-option-btn primary" id="exportXlsx">
-        Export Data as XLSX
-      </button>
-      <button class="btn export-option-btn" id="exportCsv">
-        Export Data as CSV
-      </button>
-      <button class="btn export-option-btn" id="exportSummary">
-        Export Summary Only (XLSX)
-      </button>
+      <button class="btn export-option-btn primary" id="exportXlsx">Export Data as XLSX</button>
+      <button class="btn export-option-btn" id="exportCsv">Export Data as CSV</button>
+      <button class="btn export-option-btn" id="exportSummary">Export Summary Only (XLSX)</button>
     </div>
   </div>
 </div>
@@ -1032,7 +308,6 @@ th {
 <script>
   let data = [];
   let currentRows = [];
-
   const elements = {
     lastNameSearch: document.getElementById("lastNameSearch"),
     firstNameSearch: document.getElementById("firstNameSearch"),
@@ -1054,18 +329,71 @@ th {
     areaMulti: document.getElementById("areaMulti"),
     positionMulti: document.getElementById("positionMulti"),
     yearMulti: document.getElementById("yearMulti"),
-    // Advanced filters UI
     advancedToggle: document.getElementById("advancedToggle"),
     advancedPanel: document.getElementById("advancedPanel"),
-    // Modal elements
     exportModal: document.getElementById("exportModal"),
     exportModalClose: document.getElementById("exportModalClose"),
     exportXlsx: document.getElementById("exportXlsx"),
     exportCsv: document.getElementById("exportCsv"),
     exportSummary: document.getElementById("exportSummary"),
   };
-
   const multiSelectControls = {};
+
+  // ---------- Name matching helpers ----------
+  function fold(s) {
+    return String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\./g, "")
+      .trim()
+      .toLowerCase();
+  }
+  function isPrefixQuery(q){ return /\*$/.test(q); }
+  function stripWildcard(q){ return q.replace(/\*+$/,''); }
+  function levenshtein(a, b){
+    a = fold(a); b = fold(b);
+    const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+    const dp = Array.from({length:m+1},(_,i)=>Array(n+1).fill(0));
+    for(let i=0;i<=m;i++) dp[i][0]=i;
+    for(let j=0;j<=n;j++) dp[0][j]=j;
+    for(let i=1;i<=m;i++){
+      for(let j=1;j<=n;j++){
+        const cost = a[i-1]===b[j-1]?0:1;
+        dp[i][j]=Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost);
+      }
+    }
+    return dp[m][n];
+  }
+  function fuzzyOK(q, s){ const L=Math.max(q.length, s.length); const tol=L<=4?1:2; return levenshtein(q,s)<=tol; }
+  function matchesInitial(queryToken, name){ const q=fold(queryToken), n=fold(name); if(!q||!n) return false; if(q.length===1) return n[0]===q; return false; }
+  function matchesTwoInitials(query, first, last){
+    const parts = fold(query).split(/\s+/).filter(Boolean);
+    if(parts.length!==2) return false;
+    const [a,b] = parts, f=fold(first), l=fold(last);
+    return !!(a&&b&&f&&l) && f[0]===a[0] && l[0]===b[0];
+  }
+  function tokenMatchOneField(queryToken, candidate, exactMode){
+    const qRaw=String(queryToken||"").trim(), cRaw=String(candidate||"");
+    const q=fold(qRaw), c=fold(cRaw);
+    if(!q) return true; if(!c) return false;
+    if(exactMode){
+      if(q===c) return true;
+      if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
+      return false;
+    }
+    if(isPrefixQuery(qRaw)) return c.startsWith(fold(stripWildcard(qRaw)));
+    if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
+    if(c.includes(q)) return true;
+    return fuzzyOK(q,c);
+  }
+  function tokenMatchEitherName(queryToken, first, last, exactMode){
+    return tokenMatchOneField(queryToken, first, exactMode) ||
+           tokenMatchOneField(queryToken, last,  exactMode);
+  }
+  function parseNameTokens(input){
+    const raw = String(input||"").trim();
+    return raw ? raw.split(/[,\s]+/).filter(Boolean) : [];
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     loadWorkbookFromServer();
@@ -1073,90 +401,50 @@ th {
   });
 
   function findSheetWithHeaders(workbook) {
-    const targetHeaders = [
-      "position",
-      "area",
-      "year",
-      "articletitle",
-      "journalname",
-      "ranking - updated",
-      "utd journal",
-      "financial times journal",
-    ];
-
+    const targetHeaders = ["position","area","year","articletitle","journalname","ranking - updated","utd journal","financial times journal"];
     let bestSheet = workbook.SheetNames[0];
-
     workbook.SheetNames.forEach(name => {
       const sheet = workbook.Sheets[name];
-      const rows = XLSX.utils.sheet_to_json(sheet, {
-        header: 1,
-        range: 0,
-        blankrows: false,
-      });
-
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
       const headerRow = rows[0] || [];
-      const headerSet = new Set(
-        headerRow.map(h => String(h || "").trim().toLowerCase())
-      );
-
+      const headerSet = new Set(headerRow.map(h => String(h || "").trim().toLowerCase()));
       const matchesAll = targetHeaders.every(h => headerSet.has(h));
       if (matchesAll) bestSheet = name;
     });
-
     return bestSheet;
   }
 
   function normalizeRow(row) {
     const norm = {};
-    Object.keys(row).forEach(key => {
-      const nk = String(key || "").trim().toLowerCase();
-      norm[nk] = row[key];
-    });
+    Object.keys(row).forEach(key => { const nk = String(key || "").trim().toLowerCase(); norm[nk] = row[key]; });
     return norm;
   }
 
   function loadWorkbookFromServer() {
     fetch("Database.xlsx")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to load Database.xlsx");
-        return res.arrayBuffer();
-      })
+      .then(res => { if (!res.ok) throw new Error("Failed to load Database.xlsx"); return res.arrayBuffer(); })
       .then(buf => {
         const workbook = XLSX.read(buf, { type: "array" });
-
         const sheetName = findSheetWithHeaders(workbook);
         const sheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
         data = json.map(row => {
           const r = normalizeRow(row);
-          data = data.map(r => ({
-  ...r,
-  _firstFold: fold(r.firstName),
-  _lastFold:  fold(r.lastName),
-}));
-
-
           let first = r["firstname"] || r["first name"] || r["first"] || "";
           let last  = r["lastname"] || r["last name"] || r["last"]  || "";
           let personName = r["personname"] || "";
 
           if ((!first && !last) && personName) {
             const parts = String(personName).split(",");
-            if (parts.length >= 2) {
-              last = parts[0].trim();
-              first = parts[1].trim();
-            }
+            if (parts.length >= 2) { last = parts[0].trim(); first = parts[1].trim(); }
           }
-
-          if (!personName) {
-            personName = [last, first].filter(Boolean).join(", ");
-          }
+          if (!personName) { personName = [last, first].filter(Boolean).join(", "); }
 
           return {
             firstName: first,
             lastName: last,
-            personName: personName,
+            personName,
             position: r["position"] || "",
             area: r["area"] || "",
             year: String(r["year"] || "").trim(),
@@ -1168,19 +456,20 @@ th {
           };
         });
 
+        // Optional precomputed folds
+        data = data.map(v => ({ ...v, _firstFold: fold(v.firstName), _lastFold: fold(v.lastName) }));
+
         populateMultiSelects();
         renderTable(data);
       })
       .catch(err => {
         console.error("Error loading workbook:", err);
-        elements.resultsCount.textContent =
-          "Error loading Database.xlsx. Open DevTools → Console for details.";
+        elements.resultsCount.textContent = "Error loading Database.xlsx. Open DevTools → Console for details.";
       });
   }
 
   function buildMultiSelect(container, values, placeholderText) {
     const unique = [...new Set(values.filter(v => v))].sort();
-
     container.innerHTML = `
       <div class="multi-select-header">
         <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
@@ -1188,7 +477,6 @@ th {
       </div>
       <div class="multi-select-menu"></div>
     `;
-
     const header = container.querySelector(".multi-select-header");
     const label = container.querySelector(".multi-select-label");
     const menu = container.querySelector(".multi-select-menu");
@@ -1196,29 +484,20 @@ th {
     unique.forEach(v => {
       const item = document.createElement("label");
       item.className = "multi-select-option";
-      item.innerHTML = `
-        <input type="checkbox" value="${v}">
-        <span>${v}</span>
-      `;
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.value = v;
+      const sp = document.createElement("span");
+      sp.textContent = v;
+      item.appendChild(cb); item.appendChild(sp);
       menu.appendChild(item);
     });
 
-    function getValues() {
-      return Array.from(menu.querySelectorAll("input:checked")).map(i => i.value);
-    }
-
+    function getValues() { return Array.from(menu.querySelectorAll("input:checked")).map(i => i.value); }
     function updateLabel(triggerFilter) {
       const selected = getValues();
-      if (!selected.length) {
-        label.textContent = placeholderText;
-        label.classList.add("multi-select-placeholder");
-      } else if (selected.length <= 2) {
-        label.textContent = selected.join(", ");
-        label.classList.remove("multi-select-placeholder");
-      } else {
-        label.textContent = `${selected.length} selected`;
-        label.classList.remove("multi-select-placeholder");
-      }
+      if (!selected.length) { label.textContent = placeholderText; label.classList.add("multi-select-placeholder"); }
+      else if (selected.length <= 2) { label.textContent = selected.join(", "); label.classList.remove("multi-select-placeholder"); }
+      else { label.textContent = `${selected.length} selected`; label.classList.remove("multi-select-placeholder"); }
       if (triggerFilter) applyFilters();
     }
 
@@ -1227,659 +506,266 @@ th {
       closeAllMultiSelects();
       if (!isOpen) container.classList.add("open");
     });
-
     menu.addEventListener("change", () => updateLabel(true));
+    document.addEventListener("click", (e) => { if (!container.contains(e.target)) container.classList.remove("open"); });
 
-    document.addEventListener("click", (e) => {
-      if (!container.contains(e.target)) {
-        container.classList.remove("open");
-      }
-    });
-
-    function clear() {
-      menu.querySelectorAll("input:checked").forEach(i => (i.checked = false));
-      updateLabel(false);
-    }
-
+    function clear() { menu.querySelectorAll("input:checked").forEach(i => (i.checked = false)); updateLabel(false); }
     updateLabel(false);
-
     return { getValues, clear };
   }
-
-  function closeAllMultiSelects() {
-    document.querySelectorAll(".multi-select.open").forEach(el => {
-      el.classList.remove("open");
-    });
-  }
-
+  function closeAllMultiSelects() { document.querySelectorAll(".multi-select.open").forEach(el => el.classList.remove("open")); }
   function populateMultiSelects() {
-    multiSelectControls.area = buildMultiSelect(
-      elements.areaMulti,
-      data.map(d => d.area),
-      "All Areas"
-    );
-    multiSelectControls.position = buildMultiSelect(
-      elements.positionMulti,
-      data.map(d => d.position),
-      "All Positions"
-    );
-    multiSelectControls.year = buildMultiSelect(
-      elements.yearMulti,
-      data.map(d => d.year),
-      "All Years"
-    );
+    multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d => d.area), "All Areas");
+    multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d => d.position), "All Positions");
+    multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d => d.year), "All Years");
   }
 
   function renderTable(rows) {
     currentRows = rows.slice();
-
-    elements.resultsBody.innerHTML = "";
+    const frag = document.createDocumentFragment();
     rows.forEach(r => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${r.lastName || ""}</td>
         <td>${r.firstName || ""}</td>
+        <td>${r.lastName || ""}</td>
         <td>${r.position || ""}</td>
         <td>${r.area || ""}</td>
         <td>${r.year || ""}</td>
         <td>${r.articleTitle || ""}</td>
         <td>${r.journalName || ""}</td>
         <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
-        <td>${
-          r.utdJournal === "Yes"
-            ? `<span class="badge badge-green">Yes</span>`
-            : (r.utdJournal === "No" ? `<span class="badge badge-no">No</span>` : "")
-        }</td>
-        <td>${
-          r.ftJournal === "Yes"
-            ? `<span class="badge badge-green">Yes</span>`
-            : (r.ftJournal === "No" ? `<span class="badge badge-no">No</span>` : "")
-        }</td>
+        <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+        <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
       `;
-      elements.resultsBody.appendChild(tr);
+      frag.appendChild(tr);
     });
+    elements.resultsBody.innerHTML = "";
+    elements.resultsBody.appendChild(frag);
     elements.resultsCount.textContent = `Showing ${rows.length} results`;
   }
 
   function getFacultyName(row) {
-    if (row.personName && row.personName.trim()) {
-      return row.personName.trim();
-    }
+    if (row.personName && row.personName.trim()) return row.personName.trim();
     const parts = [];
     if (row.lastName) parts.push(row.lastName);
-    if (row.firstName) {
-      if (parts.length) {
-        parts.push(row.firstName);
-      } else {
-        parts.push(row.firstName);
-      }
-    }
+    if (row.firstName) parts.push(row.firstName);
     return parts.join(", ");
   }
 
-  // --- Export helpers ---
-
+  // Export helpers
   function exportDataAsXlsx() {
-    if (!currentRows || currentRows.length === 0) {
-      alert("There are no rows to export.");
-      return;
-    }
-
+    if (!currentRows || currentRows.length === 0) { alert("There are no rows to export."); return; }
     const exportData = currentRows.map(r => ({
-      "Last Name": r.lastName,
-      "First Name": r.firstName,
-      "Faculty (Display)": getFacultyName(r),
-      "Position": r.position,
-      "Area": r.area,
-      "Year": r.year,
-      "Article Title": r.articleTitle,
-      "Journal": r.journalName,
-      "Ranking": r.ranking,
-      "UTD Journal": r.utdJournal,
-      "Financial Times Journal": r.ftJournal,
+      "Last Name": r.lastName, "First Name": r.firstName, "Faculty (Display)": getFacultyName(r),
+      "Position": r.position, "Area": r.area, "Year": r.year,
+      "Article Title": r.articleTitle, "Journal": r.journalName,
+      "Ranking": r.ranking, "UTD Journal": r.utdJournal, "Financial Times Journal": r.ftJournal,
     }));
-
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Filtered_Results");
     XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
   }
-
   function exportDataAsCsv() {
-    if (!currentRows || currentRows.length === 0) {
-      alert("There are no rows to export.");
-      return;
-    }
-
+    if (!currentRows || currentRows.length === 0) { alert("There are no rows to export."); return; }
     const exportData = currentRows.map(r => ({
-      "Last Name": r.lastName,
-      "First Name": r.firstName,
-      "Faculty (Display)": getFacultyName(r),
-      "Position": r.position,
-      "Area": r.area,
-      "Year": r.year,
-      "Article Title": r.articleTitle,
-      "Journal": r.journalName,
-      "Ranking": r.ranking,
-      "UTD Journal": r.utdJournal,
-      "Financial Times Journal": r.ftJournal,
+      "Last Name": r.lastName, "First Name": r.firstName, "Faculty (Display)": getFacultyName(r),
+      "Position": r.position, "Area": r.area, "Year": r.year,
+      "Article Title": r.articleTitle, "Journal": r.journalName,
+      "Ranking": r.ranking, "UTD Journal": r.utdJournal, "Financial Times Journal": r.ftJournal,
     }));
-
     const ws = XLSX.utils.json_to_sheet(exportData);
     const csv = XLSX.utils.sheet_to_csv(ws);
-
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
-    link.href = url;
-    link.download = "Rawls_Publications_Filtered.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    link.href = url; link.download = "Rawls_Publications_Filtered.csv";
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
     URL.revokeObjectURL(url);
   }
-
   function exportSummaryOnly() {
-    if (!currentRows || currentRows.length === 0) {
-      alert("There are no rows to summarize.");
-      return;
-    }
-
+    if (!currentRows || currentRows.length === 0) { alert("There are no rows to summarize."); return; }
     const wb = XLSX.utils.book_new();
 
-    // Overview
-    const facultySet = new Set();
-    const yearSet = new Set();
-    const areaSet = new Set();
-
-    currentRows.forEach(r => {
-      const faculty = getFacultyName(r);
-      if (faculty) facultySet.add(faculty);
-      if (r.year) yearSet.add(r.year);
-      if (r.area) areaSet.add(r.area);
-    });
-
+    const facultySet = new Set(), yearSet = new Set(), areaSet = new Set();
+    currentRows.forEach(r => { const f=getFacultyName(r); if(f) facultySet.add(f); if(r.year) yearSet.add(r.year); if(r.area) areaSet.add(r.area); });
     const overview = [
       { Metric: "Total articles (filtered)", Value: currentRows.length },
       { Metric: "Distinct faculty (filtered)", Value: facultySet.size },
       { Metric: "Distinct years (filtered)", Value: yearSet.size },
       { Metric: "Distinct areas (filtered)", Value: areaSet.size },
     ];
-    const wsOverview = XLSX.utils.json_to_sheet(overview);
-    XLSX.utils.book_append_sheet(wb, wsOverview, "Summary_Overview");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(overview), "Summary_Overview");
 
-    // Articles per faculty
     const facultySummary = {};
-    currentRows.forEach(r => {
-      const f = getFacultyName(r);
-      if (!f) return;
-      facultySummary[f] = (facultySummary[f] || 0) + 1;
-    });
-    const facultyRows = Object.keys(facultySummary)
-      .sort()
-      .map(name => ({
-        "Faculty": name,
-        "Total Articles": facultySummary[name],
-      }));
-    const wsByFaculty = XLSX.utils.json_to_sheet(facultyRows);
-    XLSX.utils.book_append_sheet(wb, wsByFaculty, "By_Faculty");
+    currentRows.forEach(r => { const f=getFacultyName(r); if(!f) return; facultySummary[f]=(facultySummary[f]||0)+1; });
+    const facultyRows = Object.keys(facultySummary).sort().map(name => ({ "Faculty": name, "Total Articles": facultySummary[name] }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyRows), "By_Faculty");
 
-    // Articles per year
     const yearSummary = {};
-    currentRows.forEach(r => {
-      const y = r.year || "";
-      if (!y) return;
-      yearSummary[y] = (yearSummary[y] || 0) + 1;
-    });
-    const yearRows = Object.keys(yearSummary)
-      .sort()
-      .map(y => ({
-        "Year": y,
-        "Total Articles": yearSummary[y],
-      }));
-    const wsByYear = XLSX.utils.json_to_sheet(yearRows);
-    XLSX.utils.book_append_sheet(wb, wsByYear, "By_Year");
+    currentRows.forEach(r => { const y=r.year||""; if(!y) return; yearSummary[y]=(yearSummary[y]||0)+1; });
+    const yearRows = Object.keys(yearSummary).sort().map(y => ({ "Year": y, "Total Articles": yearSummary[y] }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(yearRows), "By_Year");
 
-    // Articles per area & year
     const areaYearSummary = {};
     currentRows.forEach(r => {
-      const a = r.area || "";
-      const y = r.year || "";
-      if (!a || !y) return;
-      if (!areaYearSummary[a]) areaYearSummary[a] = {};
-      if (!areaYearSummary[a][y]) areaYearSummary[a][y] = 0;
+      const a=r.area||"", y=r.year||""; if(!a||!y) return;
+      if(!areaYearSummary[a]) areaYearSummary[a]={};
+      if(!areaYearSummary[a][y]) areaYearSummary[a][y]=0;
       areaYearSummary[a][y]++;
     });
     const areaYearRows = [];
-    Object.keys(areaYearSummary)
-      .sort()
-      .forEach(a => {
-        Object.keys(areaYearSummary[a])
-          .sort()
-          .forEach(y => {
-            areaYearRows.push({
-              "Area": a,
-              "Year": y,
-              "Total Articles": areaYearSummary[a][y],
-            });
-          });
-      });
-    const wsByAreaYear = XLSX.utils.json_to_sheet(areaYearRows);
-    XLSX.utils.book_append_sheet(wb, wsByAreaYear, "By_Area_Year");
+    Object.keys(areaYearSummary).sort().forEach(a => Object.keys(areaYearSummary[a]).sort().forEach(y => areaYearRows.push({ "Area": a, "Year": y, "Total Articles": areaYearSummary[a][y] })));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(areaYearRows), "By_Area_Year");
 
-    // Articles per faculty & year
     const facultyYearSummary = {};
     currentRows.forEach(r => {
-      const f = getFacultyName(r);
-      const y = r.year || "";
-      if (!f || !y) return;
-      if (!facultyYearSummary[f]) facultyYearSummary[f] = {};
-      if (!facultyYearSummary[f][y]) facultyYearSummary[f][y] = 0;
+      const f=getFacultyName(r), y=r.year||""; if(!f||!y) return;
+      if(!facultyYearSummary[f]) facultyYearSummary[f]={};
+      if(!facultyYearSummary[f][y]) facultyYearSummary[f][y]=0;
       facultyYearSummary[f][y]++;
     });
     const facultyYearRows = [];
-    Object.keys(facultyYearSummary)
-      .sort()
-      .forEach(f => {
-        Object.keys(facultyYearSummary[f])
-          .sort()
-          .forEach(y => {
-            facultyYearRows.push({
-              "Faculty": f,
-              "Year": y,
-              "Total Articles": facultyYearSummary[f][y],
-            });
-          });
-      });
-    const wsByFacYear = XLSX.utils.json_to_sheet(facultyYearRows);
-    XLSX.utils.book_append_sheet(wb, wsByFacYear, "By_Faculty_Year");
+    Object.keys(facultyYearSummary).sort().forEach(f => Object.keys(facultyYearSummary[f]).sort().forEach(y => facultyYearRows.push({ "Faculty": f, "Year": y, "Total Articles": facultyYearSummary[f][y] })));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyYearRows), "By_Faculty_Year");
 
-    // Articles per category (5*, 5, UTD, FT) & per year & per area & per faculty
     const catSummary = {};
     currentRows.forEach(r => {
-      const categories = [];
-      if (r.ranking === "5*") categories.push("5*");
-      if (r.ranking === "5") categories.push("5");
-      if (r.utdJournal === "Yes") categories.push("UTD");
-      if (r.ftJournal === "Yes") categories.push("FT");
-
-      const a = r.area || "";
-      const y = r.year || "";
-      const f = getFacultyName(r);
-
-      if (!a || !y || !f || categories.length === 0) return;
-
-      categories.forEach(cat => {
-        const key = `${cat}||${a}||${y}||${f}`;
-        catSummary[key] = (catSummary[key] || 0) + 1;
-      });
+      const cats = [];
+      if (r.ranking === "5*") cats.push("5*");
+      if (r.ranking === "5")  cats.push("5");
+      if (r.utdJournal === "Yes") cats.push("UTD");
+      if (r.ftJournal  === "Yes") cats.push("FT");
+      const a=r.area||"", y=r.year||"", f=getFacultyName(r);
+      if (!a||!y||!f||cats.length===0) return;
+      cats.forEach(cat => { const key = `${cat}||${a}||${y}||${f}`; catSummary[key]=(catSummary[key]||0)+1; });
     });
-
-    const catRows = Object.keys(catSummary)
-      .sort()
-      .map(key => {
-        const [cat, area, year, faculty] = key.split("||");
-        return {
-          "Category (5*,5,UTD,FT)": cat,
-          "Area": area,
-          "Year": year,
-          "Faculty": faculty,
-          "Total Articles": catSummary[key],
-        };
-      });
-    const wsByCat = XLSX.utils.json_to_sheet(catRows);
-    XLSX.utils.book_append_sheet(wb, wsByCat, "By_Category_Area_Year_Fac");
+    const catRows = Object.keys(catSummary).sort().map(key => {
+      const [cat, area, year, faculty] = key.split("||");
+      return { "Category (5*,5,UTD,FT)": cat, "Area": area, "Year": year, "Faculty": faculty, "Total Articles": catSummary[key] };
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), "By_Category_Area_Year_Fac");
 
     XLSX.writeFile(wb, "Rawls_Publications_Summary.xlsx");
   }
-// ---------- Name matching helpers ----------
-function fold(s) {
-  return String(s || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // strip diacritics
-    .replace(/\./g, "")              // remove dots for initials like "J."
-    .trim()
-    .toLowerCase();
-}
 
-function isPrefixQuery(q) {
-  return /\*$/.test(q); // ends with '*'
-}
+  function applyFilters(){
+    const firstQ = elements.firstNameSearch.value;
+    const lastQ  = elements.lastNameSearch.value;
+    const exact  = elements.exactNameMatch.checked;
 
-function stripWildcard(q) {
-  return q.replace(/\*+$/,'');
-}
+    const firstTokens = parseNameTokens(firstQ);
+    const lastTokens  = parseNameTokens(lastQ);
 
-function levenshtein(a, b) { // Damerau not required; plain is fine and fast for short names
-  a = fold(a); b = fold(b);
-  const m = a.length, n = b.length;
-  if (m === 0) return n;
-  if (n === 0) return m;
-  const dp = Array.from({length: m+1}, (_,i)=>new Array(n+1).fill(0));
-  for (let i=0;i<=m;i++) dp[i][0]=i;
-  for (let j=0;j<=n;j++) dp[0][j]=j;
-  for (let i=1;i<=m;i++) {
-    for (let j=1;j<=n;j++) {
-      const cost = a[i-1] === b[j-1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i-1][j] + 1,      // deletion
-        dp[i][j-1] + 1,      // insertion
-        dp[i-1][j-1] + cost  // substitution
-      );
-    }
-  }
-  return dp[m][n];
-}
+    const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
+    const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
+    const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
 
-// Decide allowable typo distance by token length
-function fuzzyOK(q, s) {
-  const L = Math.max(q.length, s.length);
-  const dist = levenshtein(q, s);
-  const tol = L <= 4 ? 1 : 2; // small names = tighter tolerance
-  return dist <= tol;
-}
-
-// "J." or "J" = initial match (prefix of name)
-function matchesInitial(queryToken, name) {
-  const q = fold(queryToken);
-  const n = fold(name);
-  if (!q || !n) return false;
-  // single-letter initial (after fold removes dot)
-  if (q.length === 1) return n[0] === q;
-  return false;
-}
-
-// "J D" pattern = first + last initials
-function matchesTwoInitials(query, first, last) {
-  const parts = fold(query).split(/\s+/).filter(Boolean);
-  if (parts.length !== 2) return false;
-  const [a, b] = parts;
-  const f = fold(first), l = fold(last);
-  if (!a || !b || !f || !l) return false;
-  return f[0] === a[0] && l[0] === b[0];
-}
-
-// Core token-to-name test (no AND/OR yet)
-function tokenMatchOneField(queryToken, candidate, exactMode) {
-  const qRaw = String(queryToken || "").trim();
-  const cRaw = String(candidate || "");
-  const q = fold(qRaw), c = fold(cRaw);
-  if (!q) return true;         // empty query token doesn't filter out
-  if (!c) return false;
-
-  // Exact mode: equal or exact initial (e.g., "J." vs "John")
-  if (exactMode) {
-    if (q === c) return true;            // exact same string after fold
-    if (matchesInitial(qRaw, cRaw)) {    // "J." equals names starting with J
-      return c.startsWith(q);
-    }
-    return false;
-  }
-
-  // Wildcard/prefix: "jo*" matches "john", "jonas"
-  if (isPrefixQuery(qRaw)) {
-    const base = fold(stripWildcard(qRaw));
-    return c.startsWith(base);
-  }
-
-  // Initial alone ("j" or "j.") is a prefix match
-  if (matchesInitial(qRaw, cRaw)) return c.startsWith(q);
-
-  // Otherwise: substring OR fuzzy
-  if (c.includes(q)) return true;
-  return fuzzyOK(q, c);
-}
-
-// Query token can match EITHER first or last (built-in "master search")
-function tokenMatchEitherName(queryToken, first, last, exactMode) {
-  return (
-    tokenMatchOneField(queryToken, first, exactMode) ||
-    tokenMatchOneField(queryToken, last, exactMode)
-  );
-}
-
-// A name box may contain multiple tokens (comma/space separated). Treat them as AND across tokens.
-function parseNameTokens(input) {
-  const raw = String(input || "").trim();
-  if (!raw) return [];
-  // allow comma or space separation; keep "j d" as two tokens (we special-case two-initials elsewhere)
-  return raw.split(/[,\s]+/).filter(Boolean);
-}
-
-  const firstQ = elements.firstNameSearch.value;
-const lastQ  = elements.lastNameSearch.value;
-const exactMatch = elements.exactNameMatch.checked;
-
-// Pre-parse once
-const firstTokens = parseNameTokens(firstQ);
-const lastTokens  = parseNameTokens(lastQ);
-
-const filtered = data.filter(d => {
-  const first = d.firstName || "";
-  const last  = d.lastName  || "";
-
-  // Handle special case: "J D" -> initials pair match
-  const initialsPair =
-    (firstQ && matchesTwoInitials(firstQ, first, last)) ||
-    (lastQ  && matchesTwoInitials(lastQ,  first, last));
-
-  if (!initialsPair) {
-    // For each non-empty token in the first-name box, the token must match EITHER first or last
-    for (const t of firstTokens) {
-      if (!tokenMatchEitherName(t, first, last, exactMatch)) return false;
-    }
-    // For each non-empty token in the last-name box, the token must match EITHER first or last
-    for (const t of lastTokens) {
-      if (!tokenMatchEitherName(t, first, last, exactMatch)) return false;
-    }
-  }
-
+    const utdY = elements.utdYes.checked, utdN = elements.utdNo.checked;
+    const ftY  = elements.ftYes.checked,  ftN  = elements.ftNo.checked;
+    const r4 = elements.rank4.checked, r5 = elements.rank5.checked, r5s = elements.rank5star.checked;
 
     const kq = elements.keywordSearch.value.toLowerCase();
     const tq = elements.titleSearch.value.toLowerCase();
     const jq = elements.journalSearch.value.toLowerCase();
 
-    const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
-    const posVals = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
-    const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
+    const rows = data.filter(d => {
+      const first = d.firstName || "";
+      const last  = d.lastName  || "";
 
-    const utdY = elements.utdYes.checked, utdN = elements.utdNo.checked;
-    const ftY = elements.ftYes.checked, ftN = elements.ftNo.checked;
-    const r4 = elements.rank4.checked, r5 = elements.rank5.checked, r5s = elements.rank5star.checked;
+      const initialsPair =
+        (firstQ && matchesTwoInitials(firstQ, first, last)) ||
+        (lastQ  && matchesTwoInitials(lastQ,  first, last));
 
-    const filtered = data.filter(d => {
-      const ln = (d.lastName || "").toLowerCase();
-      const fn = (d.firstName || "").toLowerCase();
-
-      if (lnq) {
-        if (masterSearch) {
-          if (exactMatch) {
-            if (ln !== lnq && fn !== lnq) return false;
-          } else {
-            if (!ln.includes(lnq) && !fn.includes(lnq)) return false;
-          }
-        } else {
-          if (exactMatch) {
-            if (ln !== lnq) return false;
-          } else {
-            if (!ln.includes(lnq)) return false;
-          }
-        }
-      }
-
-      if (fnq) {
-        if (masterSearch) {
-          if (exactMatch) {
-            if (fn !== fnq && ln !== fnq) return false;
-          } else {
-            if (!fn.includes(fnq) && !ln.includes(fnq)) return false;
-          }
-        } else {
-          if (exactMatch) {
-            if (fn !== fnq) return false;
-          } else {
-            if (!fn.includes(fnq)) return false;
-          }
-        }
+      if (!initialsPair) {
+        for (const t of firstTokens) if (!tokenMatchEitherName(t, first, last, exact)) return false;
+        for (const t of lastTokens)  if (!tokenMatchEitherName(t, first, last, exact)) return false;
       }
 
       if (kq) {
         const inTitle = (d.articleTitle || "").toLowerCase().includes(kq);
-        const inJournal = (d.journalName || "").toLowerCase().includes(kq);
-        if (!inTitle && !inJournal) return false;
+        const inJour  = (d.journalName  || "").toLowerCase().includes(kq);
+        if (!inTitle && !inJour) return false;
       }
-
-      if (tq && !d.articleTitle.toLowerCase().includes(tq)) return false;
-      if (jq && !d.journalName.toLowerCase().includes(jq)) return false;
+      if (tq && !String(d.articleTitle||"").toLowerCase().includes(tq)) return false;
+      if (jq && !String(d.journalName ||"").toLowerCase().includes(jq)) return false;
 
       if (areaVals.length && !areaVals.includes(d.area)) return false;
-      if (posVals.length && !posVals.includes(d.position)) return false;
+      if (posVals.length  && !posVals.includes(d.position)) return false;
       if (yearVals.length && !yearVals.includes(String(d.year))) return false;
 
-      if ((utdY || utdN) &&
-          !((utdY && d.utdJournal === "Yes") || (utdN && d.utdJournal === "No"))) {
-        return false;
-      }
-
-      if ((ftY || ftN) &&
-          !((ftY && d.ftJournal === "Yes") || (ftN && d.ftJournal === "No"))) {
-        return false;
-      }
-
-      if ((r4 || r5 || r5s) &&
-          !((r4 && d.ranking === "4") ||
-            (r5 && d.ranking === "5") ||
-            (r5s && d.ranking === "5*"))) {
-        return false;
-      }
+      if ((utdY || utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
+      if ((ftY  || ftN)  && !((ftY  && d.ftJournal==="Yes")  || (ftN  && d.ftJournal==="No")))  return false;
+      if ((r4 || r5 || r5s) && !((r4 && d.ranking==="4") || (r5 && d.ranking==="5") || (r5s && d.ranking==="5*"))) return false;
 
       return true;
     });
 
-    renderTable(filtered);
+    renderTable(rows);
   }
 
-  function clearAllFilters() {
-    elements.lastNameSearch.value = "";
+  function clearAllFilters(){
     elements.firstNameSearch.value = "";
-    elements.masterNameSearch.checked = false;
+    elements.lastNameSearch.value  = "";
     elements.exactNameMatch.checked = false;
 
     elements.keywordSearch.value = "";
-    elements.titleSearch.value = "";
+    elements.titleSearch.value   = "";
     elements.journalSearch.value = "";
 
-    if (multiSelectControls.area) multiSelectControls.area.clear();
+    if (multiSelectControls.area)     multiSelectControls.area.clear();
     if (multiSelectControls.position) multiSelectControls.position.clear();
-    if (multiSelectControls.year) multiSelectControls.year.clear();
+    if (multiSelectControls.year)     multiSelectControls.year.clear();
 
-    elements.utdYes.checked = false;
-    elements.utdNo.checked = false;
-    elements.ftYes.checked = false;
-    elements.ftNo.checked = false;
-    elements.rank4.checked = false;
-    elements.rank5.checked = false;
-    elements.rank5star.checked = false;
+    elements.utdYes.checked = elements.utdNo.checked = false;
+    elements.ftYes.checked  = elements.ftNo.checked  = false;
+    elements.rank4.checked  = elements.rank5.checked = elements.rank5star.checked = false;
 
     renderTable(data);
   }
 
-  function openExportModal() {
-    elements.exportModal.classList.add("active");
-  }
-
-  function closeExportModal() {
-    elements.exportModal.classList.remove("active");
-  }
-
   function attachListeners() {
-    [
-      elements.lastNameSearch,
-      elements.firstNameSearch,
-      elements.masterNameSearch,
-      elements.exactNameMatch,
-      elements.keywordSearch,
-      elements.titleSearch,
-      elements.journalSearch,
-      elements.utdYes,
-      elements.utdNo,
-      elements.ftYes,
-      elements.ftNo,
-      elements.rank4,
-      elements.rank5,
-      elements.rank5star
-    ].forEach(el => el.addEventListener("input", applyFilters));
+    // Debounce typing-heavy inputs
+    const debounce = (fn, ms=120) => { let t; return () => { clearTimeout(t); t=setTimeout(fn, ms); }; };
+    const debouncedApply = debounce(applyFilters, 120);
 
-    if (elements.clearFilters) {
-      elements.clearFilters.addEventListener("click", clearAllFilters);
-    }
+    [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
+      .forEach(el => el.addEventListener("input", debouncedApply));
 
-    // Advanced filters toggle
+    [elements.exactNameMatch, elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo, elements.rank4, elements.rank5, elements.rank5star]
+      .forEach(el => el.addEventListener("input", applyFilters));
+
+    if (elements.clearFilters) elements.clearFilters.addEventListener("click", clearAllFilters);
+
     if (elements.advancedToggle && elements.advancedPanel) {
       elements.advancedToggle.addEventListener("click", () => {
-        elements.advancedPanel.classList.toggle("collapsed");
-        elements.advancedToggle.classList.toggle("open");
+        const open = elements.advancedPanel.classList.toggle("collapsed") === false;
+        elements.advancedToggle.classList.toggle("open", open);
+        elements.advancedToggle.setAttribute("aria-expanded", String(open));
       });
     }
 
-    // Open modal on export button click
-    if (elements.exportExcel) {
-      elements.exportExcel.addEventListener("click", openExportModal);
-    }
+    // Export modal
+    if (elements.exportExcel) elements.exportExcel.addEventListener("click", () => elements.exportModal.classList.add("active"));
+    if (elements.exportModalClose) elements.exportModalClose.addEventListener("click", () => elements.exportModal.classList.remove("active"));
+    if (elements.exportModal) elements.exportModal.addEventListener("click", (e) => { if (e.target === elements.exportModal) elements.exportModal.classList.remove("active"); });
+    if (elements.exportXlsx)    elements.exportXlsx.addEventListener("click", () => { exportDataAsXlsx();    elements.exportModal.classList.remove("active"); });
+    if (elements.exportCsv)     elements.exportCsv.addEventListener("click",  () => { exportDataAsCsv();     elements.exportModal.classList.remove("active"); });
+    if (elements.exportSummary) elements.exportSummary.addEventListener("click", () => { exportSummaryOnly(); elements.exportModal.classList.remove("active"); });
 
-    // Modal close button
-    if (elements.exportModalClose) {
-      elements.exportModalClose.addEventListener("click", closeExportModal);
-    }
-
-    // Close when clicking outside content
-    if (elements.exportModal) {
-      elements.exportModal.addEventListener("click", (e) => {
-        if (e.target === elements.exportModal) {
-          closeExportModal();
-        }
-      });
-    }
-
-    // Export option buttons
-    if (elements.exportXlsx) {
-      elements.exportXlsx.addEventListener("click", () => {
-        exportDataAsXlsx();
-        closeExportModal();
-      });
-    }
-
-    if (elements.exportCsv) {
-      elements.exportCsv.addEventListener("click", () => {
-        exportDataAsCsv();
-        closeExportModal();
-      });
-    }
-
-    if (elements.exportSummary) {
-      elements.exportSummary.addEventListener("click", () => {
-        exportSummaryOnly();
-        closeExportModal();
-      });
-    }
+    // ESC to close modal
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") elements.exportModal.classList.remove("active"); });
   }
 </script>
 
 <footer class="rawls-footer">
   <div class="rawls-footer-inner">
     <span>© 2025 Rawls College Research</span>
-    <a
-      href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
-      target="_blank"
-      class="linkedin-btn"
-      aria-label="Visit Rawls College Research on LinkedIn"
-    >
+    <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/" target="_blank" class="linkedin-btn" aria-label="Visit Rawls College Research on LinkedIn">
       <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn logo">
       Follow us on LinkedIn
     </a>
   </div>
 </footer>
-
 </body>
 </html>
