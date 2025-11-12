@@ -693,29 +693,20 @@
     transform 0.2s ease;
 }
 
-.filters-advanced:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(186, 12, 47, 0.1) 0%,
-    rgba(186, 12, 47, 0.02) 100%
-  );
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(186, 12, 47, 0.25);
-  transform: translateY(-1px);    /* slight lift */
-}
-
-/* Soft hover / open glow */
-.filters-advanced:hover {
+/* One consistent state for hover and when open */
+.filters-advanced:hover,
+.filters-advanced:not(.collapsed) {
   background: linear-gradient(
     180deg,
     rgba(186, 12, 47, 0.07) 0%,
     rgba(186, 12, 47, 0.03) 100%
   );
-  box-shadow: 0 4px 10px rgba(186, 12, 47, 0.1),
-              0 0 0 1px rgba(186, 12, 47, 0.15);
-  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(186, 12, 47, 0.18);
+  transform: translateY(-1px);
 }
+
 
 /* Collapsed = hidden and flat */
 .filters-advanced.collapsed {
@@ -735,6 +726,29 @@
 .results-container {
   position: relative;
   z-index: 1;
+}
+/* Make the whole filters section float above the table */
+.filters {
+  position: relative;
+  z-index: 100;
+}
+
+/* Ensure the checkbox menu always stacks above sticky <th> */
+.multi-select-menu {
+  z-index: 200;            /* higher than .filters and <th> */
+}
+
+/* Keep the table below the filters */
+.table-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sticky header should not overtake dropdowns */
+th {
+  position: sticky;
+  top: 0;
+  z-index: 0;              /* lower than .multi-select-menu */
 }
 
 
