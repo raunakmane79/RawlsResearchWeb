@@ -764,6 +764,32 @@ th {
   top: 0;
   z-index: 0;              /* lower than .multi-select-menu */
 }
+/* Default look (neutral) */
+.advanced-toggle {
+  border: 1px solid var(--rawls-border);
+  background: #f8f8f8;
+  color: #444;
+  transition: all 0.2s ease;
+}
+
+/* Hover highlight */
+.advanced-toggle:hover {
+  background: #ffffff;
+  border-color: var(--rawls-red);
+  color: var(--rawls-red);
+}
+
+/*  Active / clicked state */
+.advanced-toggle.open {
+  background: var(--rawls-red);
+  border-color: var(--rawls-red-dark);
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25);
+}
+
+.advanced-toggle.open:hover {
+  background: var(--rawls-red-dark);
+}
 
 
   </style>
