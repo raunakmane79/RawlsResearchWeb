@@ -341,6 +341,7 @@
 <script>
   let data = [];
   let currentRows = [];
+
   const elements = {
     lastNameSearch: document.getElementById("lastNameSearch"),
     firstNameSearch: document.getElementById("firstNameSearch"),
@@ -370,6 +371,7 @@
     exportCsv: document.getElementById("exportCsv"),
     exportSummary: document.getElementById("exportSummary"),
   };
+
   const multiSelectControls = {};
 
   // ---------- Name matching helpers ----------
@@ -381,67 +383,101 @@
       .trim()
       .toLowerCase();
   }
-  function isPrefixQuery(q){ return /\*$/.test(q); }
-  function stripWildcard(q){ return q.replace(/\*+$/,''); }
-  function levenshtein(a, b){
+  function isPrefixQuery(q) { return /\*$/.test(q); }
+  function stripWildcard(q) { return q.replace(/\*+$/, ""); }
+
+  function levenshtein(a, b) {
     a = fold(a); b = fold(b);
-    const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
-    const dp = Array.from({length:m+1},(_,i)=>Array(n+1).fill(0));
-    for(let i=0;i<=m;i++) dp[i][0]=i;
-    for(let j=0;j<=n;j++) dp[0][j]=j;
-    for(let i=1;i<=m;i++){
-      for(let j=1;j<=n;j++){
-        const cost = a[i-1]===b[j-1]?0:1;
-        dp[i][j]=Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost);
+    const m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+
+    const dp = Array.from({ length: m + 1 }, (_, i) => Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1,
+          dp[i - 1][j - 1] + cost
+        );
       }
     }
     return dp[m][n];
   }
-  function fuzzyOK(q, s){ const L=Math.max(q.length, s.length); const tol=L<=4?1:2; return levenshtein(q,s)<=tol; }
-  function matchesInitial(queryToken, name){ const q=fold(queryToken), n=fold(name); if(!q||!n) return false; if(q.length===1) return n[0]===q; return false; }
-  function matchesTwoInitials(query, first, last){
-    const parts = fold(query).split(/\s+/).filter(Boolean);
-    if(parts.length!==2) return false;
-    const [a,b] = parts, f=fold(first), l=fold(last);
-    return !!(a&&b&&f&&l) && f[0]===a[0] && l[0]===b[0];
+
+  function fuzzyOK(q, s) {
+    const L = Math.max(q.length, s.length);
+    const tol = L <= 4 ? 1 : 2;
+    return levenshtein(q, s) <= tol;
   }
-  function tokenMatchOneField(queryToken, candidate, exactMode){
-    const qRaw=String(queryToken||"").trim(), cRaw=String(candidate||"");
-    const q=fold(qRaw), c=fold(cRaw);
-    if(!q) return true; if(!c) return false;
-    if(exactMode){
-      if(q===c) return true;
-      if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
+
+  function matchesInitial(queryToken, name) {
+    const q = fold(queryToken), n = fold(name);
+    if (!q || !n) return false;
+    if (q.length === 1) return n[0] === q;
+    return false;
+  }
+
+  function matchesTwoInitials(query, first, last) {
+    const parts = fold(query).split(/\s+/).filter(Boolean);
+    if (parts.length !== 2) return false;
+    const [a, b] = parts, f = fold(first), l = fold(last);
+    return !!(a && b && f && l) && f[0] === a[0] && l[0] === b[0];
+  }
+
+  function tokenMatchOneField(queryToken, candidate, exactMode) {
+    const qRaw = String(queryToken || "").trim();
+    const cRaw = String(candidate || "");
+    const q = fold(qRaw), c = fold(cRaw);
+
+    if (!q) return true;
+    if (!c) return false;
+
+    if (exactMode) {
+      if (q === c) return true;
+      if (matchesInitial(qRaw, cRaw)) return c.startsWith(q);
       return false;
     }
-    if(isPrefixQuery(qRaw)) return c.startsWith(fold(stripWildcard(qRaw)));
-    if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
-    if(c.includes(q)) return true;
-    return fuzzyOK(q,c);
+
+    if (isPrefixQuery(qRaw)) return c.startsWith(fold(stripWildcard(qRaw)));
+    if (matchesInitial(qRaw, cRaw)) return c.startsWith(q);
+    if (c.includes(q)) return true;
+    return fuzzyOK(q, c);
   }
-  function tokenMatchEitherName(queryToken, first, last, exactMode){
+
+  function tokenMatchEitherName(queryToken, first, last, exactMode) {
     return tokenMatchOneField(queryToken, first, exactMode) ||
-           tokenMatchOneField(queryToken, last,  exactMode);
+           tokenMatchOneField(queryToken, last, exactMode);
   }
-  function parseNameTokens(input){
-    const raw = String(input||"").trim();
+
+  function parseNameTokens(input) {
+    const raw = String(input || "").trim();
     return raw ? raw.split(/[,\s]+/).filter(Boolean) : [];
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadWorkbookFromServer();
-    attachListeners();
-  });
+  // ---------- URL helper ----------
+  function safeUrl(u) {
+    const s = String(u || "").trim();
+    if (!s) return "";
+    if (/^https?:\/\//i.test(s)) return s;
+    return "";
+  }
 
+  // ---------- Workbook helpers ----------
   function findSheetWithHeaders(workbook) {
-   const targetHeaders = [
-  "lastname","firstname","start date at rawls","end date at rawls","position","area",
-  "pubdate","year","articletitle","journalname",
-  "ranking - updated","utd journal","financial times journal",
-  "author rank","article link"
-];
+    const targetHeaders = [
+      "lastname", "firstname", "start date at rawls", "end date at rawls", "position", "area",
+      "pubdate", "year", "articletitle", "journalname",
+      "ranking - updated", "utd journal", "financial times journal",
+      "author rank", "article link"
+    ];
 
     let bestSheet = workbook.SheetNames[0];
+
     workbook.SheetNames.forEach(name => {
       const sheet = workbook.Sheets[name];
       const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
@@ -450,18 +486,25 @@
       const matchesAll = targetHeaders.every(h => headerSet.has(h));
       if (matchesAll) bestSheet = name;
     });
+
     return bestSheet;
   }
 
   function normalizeRow(row) {
     const norm = {};
-    Object.keys(row).forEach(key => { const nk = String(key || "").trim().toLowerCase(); norm[nk] = row[key]; });
+    Object.keys(row).forEach(key => {
+      const nk = String(key || "").trim().toLowerCase();
+      norm[nk] = row[key];
+    });
     return norm;
   }
 
   function loadWorkbookFromServer() {
     fetch("Database.xlsx")
-      .then(res => { if (!res.ok) throw new Error("Failed to load Database.xlsx"); return res.arrayBuffer(); })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load Database.xlsx");
+        return res.arrayBuffer();
+      })
       .then(buf => {
         const workbook = XLSX.read(buf, { type: "array" });
         const sheetName = findSheetWithHeaders(workbook);
@@ -470,35 +513,38 @@
 
         data = json.map(row => {
           const r = normalizeRow(row);
+
           let first = r["firstname"] || r["first name"] || r["first"] || "";
-          let last  = r["lastname"] || r["last name"] || r["last"]  || "";
+          let last  = r["lastname"]  || r["last name"]  || r["last"]  || "";
           let personName = r["personname"] || "";
 
           if ((!first && !last) && personName) {
             const parts = String(personName).split(",");
-            if (parts.length >= 2) { last = parts[0].trim(); first = parts[1].trim(); }
+            if (parts.length >= 2) {
+              last = parts[0].trim();
+              first = parts[1].trim();
+            }
           }
-          if (!personName) { personName = [last, first].filter(Boolean).join(", "); }
+          if (!personName) personName = [last, first].filter(Boolean).join(", ");
 
-         return {
-  firstName: first,
-  lastName: last,
-  personName,
-  startDateAtRawls: r["start date at rawls"] || "",
-  endDateAtRawls: r["end date at rawls"] || "",
-  position: r["position"] || "",
-  area: r["area"] || "",
-  pubdate: r["pubdate"] || "",
-  year: String(r["year"] || "").trim(),
-  articleTitle: r["articletitle"] || "",
-  journalName: r["journalname"] || "",
-  ranking: String(r["ranking - updated"] || "").trim(),
-  utdJournal: String(r["utd journal"] || "").trim(),
-  ftJournal: String(r["financial times journal"] || "").trim(),
-  authorRank: r["author rank"] || "",
-  articleLink: r["article link"] || "",
-};
-
+          return {
+            firstName: first,
+            lastName: last,
+            personName,
+            startDateAtRawls: r["start date at rawls"] || "",
+            endDateAtRawls: r["end date at rawls"] || "",
+            position: r["position"] || "",
+            area: r["area"] || "",
+            pubdate: r["pubdate"] || "",
+            year: String(r["year"] || "").trim(),
+            articleTitle: r["articletitle"] || "",
+            journalName: r["journalname"] || "",
+            ranking: String(r["ranking - updated"] || "").trim(),
+            utdJournal: String(r["utd journal"] || "").trim(),
+            ftJournal: String(r["financial times journal"] || "").trim(),
+            authorRank: r["author rank"] || "",
+            articleLink: r["article link"] || "",
+          };
         });
 
         // Optional precomputed folds
@@ -509,12 +555,15 @@
       })
       .catch(err => {
         console.error("Error loading workbook:", err);
-        elements.resultsCount.textContent = "Error loading Database.xlsx. Open DevTools → Console for details.";
+        elements.resultsCount.textContent =
+          "Error loading Database.xlsx. Open DevTools → Console for details.";
       });
   }
 
+  // ---------- Multi-select ----------
   function buildMultiSelect(container, values, placeholderText) {
     const unique = [...new Set(values.filter(v => v))].sort();
+
     container.innerHTML = `
       <div class="multi-select-header">
         <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
@@ -522,6 +571,7 @@
       </div>
       <div class="multi-select-menu"></div>
     `;
+
     const header = container.querySelector(".multi-select-header");
     const label = container.querySelector(".multi-select-label");
     const menu = container.querySelector(".multi-select-menu");
@@ -530,19 +580,31 @@
       const item = document.createElement("label");
       item.className = "multi-select-option";
       const cb = document.createElement("input");
-      cb.type = "checkbox"; cb.value = v;
+      cb.type = "checkbox";
+      cb.value = v;
       const sp = document.createElement("span");
       sp.textContent = v;
-      item.appendChild(cb); item.appendChild(sp);
+      item.appendChild(cb);
+      item.appendChild(sp);
       menu.appendChild(item);
     });
 
-    function getValues() { return Array.from(menu.querySelectorAll("input:checked")).map(i => i.value); }
+    function getValues() {
+      return Array.from(menu.querySelectorAll("input:checked")).map(i => i.value);
+    }
+
     function updateLabel(triggerFilter) {
       const selected = getValues();
-      if (!selected.length) { label.textContent = placeholderText; label.classList.add("multi-select-placeholder"); }
-      else if (selected.length <= 2) { label.textContent = selected.join(", "); label.classList.remove("multi-select-placeholder"); }
-      else { label.textContent = `${selected.length} selected`; label.classList.remove("multi-select-placeholder"); }
+      if (!selected.length) {
+        label.textContent = placeholderText;
+        label.classList.add("multi-select-placeholder");
+      } else if (selected.length <= 2) {
+        label.textContent = selected.join(", ");
+        label.classList.remove("multi-select-placeholder");
+      } else {
+        label.textContent = `${selected.length} selected`;
+        label.classList.remove("multi-select-placeholder");
+      }
       if (triggerFilter) applyFilters();
     }
 
@@ -551,158 +613,74 @@
       closeAllMultiSelects();
       if (!isOpen) container.classList.add("open");
     });
-    menu.addEventListener("change", () => updateLabel(true));
-    document.addEventListener("click", (e) => { if (!container.contains(e.target)) container.classList.remove("open"); });
 
-    function clear() { menu.querySelectorAll("input:checked").forEach(i => (i.checked = false)); updateLabel(false); }
+    menu.addEventListener("change", () => updateLabel(true));
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target)) container.classList.remove("open");
+    });
+
+    function clear() {
+      menu.querySelectorAll("input:checked").forEach(i => (i.checked = false));
+      updateLabel(false);
+    }
+
     updateLabel(false);
     return { getValues, clear };
   }
-  function closeAllMultiSelects() { document.querySelectorAll(".multi-select.open").forEach(el => el.classList.remove("open")); }
+
+  function closeAllMultiSelects() {
+    document.querySelectorAll(".multi-select.open").forEach(el => el.classList.remove("open"));
+  }
+
   function populateMultiSelects() {
     multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d => d.area), "All Areas");
     multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d => d.position), "All Positions");
     multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d => d.year), "All Years");
   }
 
+  // ---------- Table render (with link button) ----------
   function renderTable(rows) {
     currentRows = rows.slice();
     const frag = document.createDocumentFragment();
+
     rows.forEach(r => {
       const tr = document.createElement("tr");
+      const url = safeUrl(r.articleLink);
+
       tr.innerHTML = `
-        <td>${r.firstName || ""}</td>
         <td>${r.lastName || ""}</td>
+        <td>${r.firstName || ""}</td>
+        <td>${r.startDateAtRawls || ""}</td>
+        <td>${r.endDateAtRawls || ""}</td>
         <td>${r.position || ""}</td>
         <td>${r.area || ""}</td>
+        <td>${r.pubdate || ""}</td>
         <td>${r.year || ""}</td>
         <td>${r.articleTitle || ""}</td>
         <td>${r.journalName || ""}</td>
         <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
         <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
         <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+        <td>${r.authorRank || ""}</td>
+        <td>
+          ${
+            url
+              ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>`
+              : `<span class="link-btn disabled">No link</span>`
+          }
+        </td>
       `;
+
       frag.appendChild(tr);
     });
+
     elements.resultsBody.innerHTML = "";
     elements.resultsBody.appendChild(frag);
     elements.resultsCount.textContent = `Showing ${rows.length} results`;
   }
 
-  function safeUrl(u) {
-  const s = String(u || "").trim();
-  if (!s) return "";
-  // allow http(s) only
-  if (/^https?:\/\//i.test(s)) return s;
-  return "";
-}
-
-  function getFacultyName(row) {
-    if (row.personName && row.personName.trim()) return row.personName.trim();
-    const parts = [];
-    if (row.lastName) parts.push(row.lastName);
-    if (row.firstName) parts.push(row.firstName);
-    return parts.join(", ");
-  }
-
-  // Export helpers
-  function exportDataAsXlsx() {
-    if (!currentRows || currentRows.length === 0) { alert("There are no rows to export."); return; }
-    const exportData = currentRows.map(r => ({
-      "Last Name": r.lastName, "First Name": r.firstName, "Faculty (Display)": getFacultyName(r),
-      "Position": r.position, "Area": r.area, "Year": r.year,
-      "Article Title": r.articleTitle, "Journal": r.journalName,
-      "Ranking": r.ranking, "UTD Journal": r.utdJournal, "Financial Times Journal": r.ftJournal,
-    }));
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Filtered_Results");
-    XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
-  }
-  function exportDataAsCsv() {
-    if (!currentRows || currentRows.length === 0) { alert("There are no rows to export."); return; }
-    const exportData = currentRows.map(r => ({
-      "Last Name": r.lastName, "First Name": r.firstName, "Faculty (Display)": getFacultyName(r),
-      "Position": r.position, "Area": r.area, "Year": r.year,
-      "Article Title": r.articleTitle, "Journal": r.journalName,
-      "Ranking": r.ranking, "UTD Journal": r.utdJournal, "Financial Times Journal": r.ftJournal,
-    }));
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const csv = XLSX.utils.sheet_to_csv(ws);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url; link.download = "Rawls_Publications_Filtered.csv";
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-  function exportSummaryOnly() {
-    if (!currentRows || currentRows.length === 0) { alert("There are no rows to summarize."); return; }
-    const wb = XLSX.utils.book_new();
-
-    const facultySet = new Set(), yearSet = new Set(), areaSet = new Set();
-    currentRows.forEach(r => { const f=getFacultyName(r); if(f) facultySet.add(f); if(r.year) yearSet.add(r.year); if(r.area) areaSet.add(r.area); });
-    const overview = [
-      { Metric: "Total articles (filtered)", Value: currentRows.length },
-      { Metric: "Distinct faculty (filtered)", Value: facultySet.size },
-      { Metric: "Distinct years (filtered)", Value: yearSet.size },
-      { Metric: "Distinct areas (filtered)", Value: areaSet.size },
-    ];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(overview), "Summary_Overview");
-
-    const facultySummary = {};
-    currentRows.forEach(r => { const f=getFacultyName(r); if(!f) return; facultySummary[f]=(facultySummary[f]||0)+1; });
-    const facultyRows = Object.keys(facultySummary).sort().map(name => ({ "Faculty": name, "Total Articles": facultySummary[name] }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyRows), "By_Faculty");
-
-    const yearSummary = {};
-    currentRows.forEach(r => { const y=r.year||""; if(!y) return; yearSummary[y]=(yearSummary[y]||0)+1; });
-    const yearRows = Object.keys(yearSummary).sort().map(y => ({ "Year": y, "Total Articles": yearSummary[y] }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(yearRows), "By_Year");
-
-    const areaYearSummary = {};
-    currentRows.forEach(r => {
-      const a=r.area||"", y=r.year||""; if(!a||!y) return;
-      if(!areaYearSummary[a]) areaYearSummary[a]={};
-      if(!areaYearSummary[a][y]) areaYearSummary[a][y]=0;
-      areaYearSummary[a][y]++;
-    });
-    const areaYearRows = [];
-    Object.keys(areaYearSummary).sort().forEach(a => Object.keys(areaYearSummary[a]).sort().forEach(y => areaYearRows.push({ "Area": a, "Year": y, "Total Articles": areaYearSummary[a][y] })));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(areaYearRows), "By_Area_Year");
-
-    const facultyYearSummary = {};
-    currentRows.forEach(r => {
-      const f=getFacultyName(r), y=r.year||""; if(!f||!y) return;
-      if(!facultyYearSummary[f]) facultyYearSummary[f]={};
-      if(!facultyYearSummary[f][y]) facultyYearSummary[f][y]=0;
-      facultyYearSummary[f][y]++;
-    });
-    const facultyYearRows = [];
-    Object.keys(facultyYearSummary).sort().forEach(f => Object.keys(facultyYearSummary[f]).sort().forEach(y => facultyYearRows.push({ "Faculty": f, "Year": y, "Total Articles": facultyYearSummary[f][y] })));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyYearRows), "By_Faculty_Year");
-
-    const catSummary = {};
-    currentRows.forEach(r => {
-      const cats = [];
-      if (r.ranking === "5*") cats.push("5*");
-      if (r.ranking === "5")  cats.push("5");
-      if (r.utdJournal === "Yes") cats.push("UTD");
-      if (r.ftJournal  === "Yes") cats.push("FT");
-      const a=r.area||"", y=r.year||"", f=getFacultyName(r);
-      if (!a||!y||!f||cats.length===0) return;
-      cats.forEach(cat => { const key = `${cat}||${a}||${y}||${f}`; catSummary[key]=(catSummary[key]||0)+1; });
-    });
-    const catRows = Object.keys(catSummary).sort().map(key => {
-      const [cat, area, year, faculty] = key.split("||");
-      return { "Category (5*,5,UTD,FT)": cat, "Area": area, "Year": year, "Faculty": faculty, "Total Articles": catSummary[key] };
-    });
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), "By_Category_Area_Year_Fac");
-
-    XLSX.writeFile(wb, "Rawls_Publications_Summary.xlsx");
-  }
-
-  function applyFilters(){
+  // ---------- Filtering ----------
+  function applyFilters() {
     const firstQ = elements.firstNameSearch.value;
     const lastQ  = elements.lastNameSearch.value;
     const exact  = elements.exactNameMatch.checked;
@@ -724,11 +702,11 @@
 
     const rows = data.filter(d => {
       const first = d.firstName || "";
-      const last  = d.lastName  || "";
+      const last  = d.lastName || "";
 
       const initialsPair =
         (firstQ && matchesTwoInitials(firstQ, first, last)) ||
-        (lastQ  && matchesTwoInitials(lastQ,  first, last));
+        (lastQ  && matchesTwoInitials(lastQ, first, last));
 
       if (!initialsPair) {
         for (const t of firstTokens) if (!tokenMatchEitherName(t, first, last, exact)) return false;
@@ -737,68 +715,57 @@
 
       if (kq) {
         const inTitle = (d.articleTitle || "").toLowerCase().includes(kq);
-        const inJour  = (d.journalName  || "").toLowerCase().includes(kq);
+        const inJour  = (d.journalName || "").toLowerCase().includes(kq);
         if (!inTitle && !inJour) return false;
       }
-      if (tq && !String(d.articleTitle||"").toLowerCase().includes(tq)) return false;
-      if (jq && !String(d.journalName ||"").toLowerCase().includes(jq)) return false;
+
+      if (tq && !String(d.articleTitle || "").toLowerCase().includes(tq)) return false;
+      if (jq && !String(d.journalName || "").toLowerCase().includes(jq)) return false;
 
       if (areaVals.length && !areaVals.includes(d.area)) return false;
       if (posVals.length  && !posVals.includes(d.position)) return false;
       if (yearVals.length && !yearVals.includes(String(d.year))) return false;
 
-      if ((utdY || utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
-      if ((ftY  || ftN)  && !((ftY  && d.ftJournal==="Yes")  || (ftN  && d.ftJournal==="No")))  return false;
-      if ((r4 || r5 || r5s) && !((r4 && d.ranking==="4") || (r5 && d.ranking==="5") || (r5s && d.ranking==="5*"))) return false;
+      if ((utdY || utdN) && !((utdY && d.utdJournal === "Yes") || (utdN && d.utdJournal === "No"))) return false;
+      if ((ftY  || ftN)  && !((ftY  && d.ftJournal  === "Yes") || (ftN  && d.ftJournal  === "No"))) return false;
+      if ((r4 || r5 || r5s) && !((r4 && d.ranking === "4") || (r5 && d.ranking === "5") || (r5s && d.ranking === "5*"))) return false;
 
       return true;
     });
 
-   function renderTable(rows) {
-  currentRows = rows.slice();
-  const frag = document.createDocumentFragment();
+    renderTable(rows);
+  }
 
-  rows.forEach(r => {
-    const tr = document.createElement("tr");
-    const url = safeUrl(r.articleLink);
+  // ---------- Clear filters ----------
+  function clearAllFilters() {
+    elements.firstNameSearch.value = "";
+    elements.lastNameSearch.value = "";
+    elements.exactNameMatch.checked = false;
 
-    tr.innerHTML = `
-      <td>${r.lastName || ""}</td>
-      <td>${r.firstName || ""}</td>
-      <td>${r.startDateAtRawls || ""}</td>
-      <td>${r.endDateAtRawls || ""}</td>
-      <td>${r.position || ""}</td>
-      <td>${r.area || ""}</td>
-      <td>${r.pubdate || ""}</td>
-      <td>${r.year || ""}</td>
-      <td>${r.articleTitle || ""}</td>
-      <td>${r.journalName || ""}</td>
-      <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
-      <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-      <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-      <td>${r.authorRank || ""}</td>
-      <td>
-        ${
-          url
-          ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>`
-          : `<span class="link-btn disabled">No link</span>`
-        }
-      </td>
-    `;
-    frag.appendChild(tr);
-  });
+    elements.keywordSearch.value = "";
+    elements.titleSearch.value = "";
+    elements.journalSearch.value = "";
 
-  elements.resultsBody.innerHTML = "";
-  elements.resultsBody.appendChild(frag);
-  elements.resultsCount.textContent = `Showing ${rows.length} results`;
-}
+    if (multiSelectControls.area) multiSelectControls.area.clear();
+    if (multiSelectControls.position) multiSelectControls.position.clear();
+    if (multiSelectControls.year) multiSelectControls.year.clear();
+
+    elements.utdYes.checked = elements.utdNo.checked = false;
+    elements.ftYes.checked = elements.ftNo.checked = false;
+    elements.rank4.checked = elements.rank5.checked = elements.rank5star.checked = false;
 
     renderTable(data);
   }
 
+  // ---------- Listeners ----------
   function attachListeners() {
-    // Debounce typing-heavy inputs
-    const debounce = (fn, ms=120) => { let t; return () => { clearTimeout(t); t=setTimeout(fn, ms); }; };
+    const debounce = (fn, ms = 120) => {
+      let t;
+      return () => {
+        clearTimeout(t);
+        t = setTimeout(fn, ms);
+      };
+    };
     const debouncedApply = debounce(applyFilters, 120);
 
     [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
@@ -820,14 +787,24 @@
     // Export modal
     if (elements.exportExcel) elements.exportExcel.addEventListener("click", () => elements.exportModal.classList.add("active"));
     if (elements.exportModalClose) elements.exportModalClose.addEventListener("click", () => elements.exportModal.classList.remove("active"));
-    if (elements.exportModal) elements.exportModal.addEventListener("click", (e) => { if (e.target === elements.exportModal) elements.exportModal.classList.remove("active"); });
-    if (elements.exportXlsx)    elements.exportXlsx.addEventListener("click", () => { exportDataAsXlsx();    elements.exportModal.classList.remove("active"); });
-    if (elements.exportCsv)     elements.exportCsv.addEventListener("click",  () => { exportDataAsCsv();     elements.exportModal.classList.remove("active"); });
+    if (elements.exportModal) elements.exportModal.addEventListener("click", (e) => {
+      if (e.target === elements.exportModal) elements.exportModal.classList.remove("active");
+    });
+
+    if (elements.exportXlsx) elements.exportXlsx.addEventListener("click", () => { exportDataAsXlsx(); elements.exportModal.classList.remove("active"); });
+    if (elements.exportCsv) elements.exportCsv.addEventListener("click", () => { exportDataAsCsv(); elements.exportModal.classList.remove("active"); });
     if (elements.exportSummary) elements.exportSummary.addEventListener("click", () => { exportSummaryOnly(); elements.exportModal.classList.remove("active"); });
 
-    // ESC to close modal
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") elements.exportModal.classList.remove("active"); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") elements.exportModal.classList.remove("active");
+    });
   }
+
+  // ---------- Init ----------
+  document.addEventListener("DOMContentLoaded", () => {
+    loadWorkbookFromServer();
+    attachListeners();
+  });
 </script>
 
 <footer class="rawls-footer">
