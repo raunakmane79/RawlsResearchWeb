@@ -468,24 +468,34 @@
   }
 
   // ---------- Workbook helpers ----------
-  function findSheetWithHeaders(workbook) {
-    const targetHeaders = [
-      "lastname", "firstname", "start date at rawls", "end date at rawls", "position", "area",
-      "pubdate", "year", "articletitle", "journalname",
-      "ranking - updated", "utd journal", "financial times journal",
-      "author rank", "article link"
-    ];
+  function canon(s){
+  return String(s||"").trim().toLowerCase().replace(/\s+/g," ");
+}
 
-    let bestSheet = workbook.SheetNames[0];
+function findSheetWithHeaders(workbook) {
+  const targetHeaders = [
+    "lastname","firstname","start date at rawls","end date at rawls","position","area",
+    "pubdate","year","articletitle","journalname",
+    "ranking - updated","utd journal","financial times journal",
+    "author rank","openaccessurl"
+  ];
 
-    workbook.SheetNames.forEach(name => {
-      const sheet = workbook.Sheets[name];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
-      const headerRow = rows[0] || [];
-      const headerSet = new Set(headerRow.map(h => String(h || "").trim().toLowerCase()));
-      const matchesAll = targetHeaders.every(h => headerSet.has(h));
-      if (matchesAll) bestSheet = name;
-    });
+  let bestSheet = workbook.SheetNames[0];
+  let bestScore = -1;
+
+  workbook.SheetNames.forEach(name => {
+    const sheet = workbook.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
+    const headerRow = rows[0] || [];
+    const headerSet = new Set(headerRow.map(canon));
+
+    const score = targetHeaders.filter(h => headerSet.has(h)).length;
+    if (score > bestScore) { bestScore = score; bestSheet = name; }
+  });
+
+  console.log("Chosen sheet:", bestSheet, "header match score:", bestScore);
+  return bestSheet;
+}
 
     return bestSheet;
   }
