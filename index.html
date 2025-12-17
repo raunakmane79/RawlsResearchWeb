@@ -493,7 +493,7 @@
   function loadWorkbookFromServer() {
     // IMPORTANT: In GitHub Pages, the file must be named exactly "Database.xlsx"
     // and be in the same folder as this HTML.
-    fetch("./Database.xlsx")
+    fetch("Database.xlsx")
       .then(res => {
         if (!res.ok) throw new Error("Failed to load Database.xlsx (check filename + location in repo)");
         return res.arrayBuffer();
