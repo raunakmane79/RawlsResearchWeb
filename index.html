@@ -145,6 +145,34 @@
     .export-option-btn { width: 100%; justify-content: center; }
     .export-option-btn.primary { background: var(--rawls-red); border-color: var(--rawls-red); color: #fff; }
     .export-option-btn.primary:hover { background: var(--rawls-red-dark); border-color: var(--rawls-red-dark); color: #fff; }
+
+
+    .link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rawls-border);
+  background: #fff;
+  color: var(--rawls-red);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.link-btn:hover {
+  background: var(--rawls-red);
+  border-color: var(--rawls-red);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.link-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
   </style>
 </head>
 
@@ -270,20 +298,25 @@
 
   <div class="table-container">
     <table>
-      <thead>
-        <tr>
-          <th>Last Name</th>
-          <th>First Name</th>
-          <th>Position</th>
-          <th>Area</th>
-          <th>Year</th>
-          <th>Article Title</th>
-          <th>Journal</th>
-          <th>Rawls Journal List Ranking</th>
-          <th>UTD</th>
-          <th>Financial Times</th>
-        </tr>
-      </thead>
+     <thead>
+  <tr>
+    <th>Last Name</th>
+    <th>First Name</th>
+    <th>Start Date at Rawls</th>
+    <th>End Date at Rawls</th>
+    <th>Position</th>
+    <th>Area</th>
+    <th>Pub Date</th>
+    <th>Year</th>
+    <th>Article Title</th>
+    <th>Journal</th>
+    <th>Rawls Journal List Ranking</th>
+    <th>UTD</th>
+    <th>Financial Times</th>
+    <th>Author Rank</th>
+    <th>Article Link</th>
+  </tr>
+</thead>
       <tbody id="resultsBody"></tbody>
     </table>
   </div>
@@ -401,7 +434,13 @@
   });
 
   function findSheetWithHeaders(workbook) {
-    const targetHeaders = ["position","area","year","articletitle","journalname","ranking - updated","utd journal","financial times journal"];
+   const targetHeaders = [
+  "lastname","firstname","start date at rawls","end date at rawls","position","area",
+  "pubdate","year","articletitle","journalname",
+  "ranking - updated","utd journal","financial times journal",
+  "author rank","article link"
+];
+
     let bestSheet = workbook.SheetNames[0];
     workbook.SheetNames.forEach(name => {
       const sheet = workbook.Sheets[name];
@@ -441,19 +480,25 @@
           }
           if (!personName) { personName = [last, first].filter(Boolean).join(", "); }
 
-          return {
-            firstName: first,
-            lastName: last,
-            personName,
-            position: r["position"] || "",
-            area: r["area"] || "",
-            year: String(r["year"] || "").trim(),
-            articleTitle: r["articletitle"] || "",
-            journalName: r["journalname"] || "",
-            ranking: String(r["ranking - updated"] || "").trim(),
-            utdJournal: String(r["utd journal"] || "").trim(),
-            ftJournal: String(r["financial times journal"] || "").trim(),
-          };
+         return {
+  firstName: first,
+  lastName: last,
+  personName,
+  startDateAtRawls: r["start date at rawls"] || "",
+  endDateAtRawls: r["end date at rawls"] || "",
+  position: r["position"] || "",
+  area: r["area"] || "",
+  pubdate: r["pubdate"] || "",
+  year: String(r["year"] || "").trim(),
+  articleTitle: r["articletitle"] || "",
+  journalName: r["journalname"] || "",
+  ranking: String(r["ranking - updated"] || "").trim(),
+  utdJournal: String(r["utd journal"] || "").trim(),
+  ftJournal: String(r["financial times journal"] || "").trim(),
+  authorRank: r["author rank"] || "",
+  articleLink: r["article link"] || "",
+};
+
         });
 
         // Optional precomputed folds
@@ -543,6 +588,14 @@
     elements.resultsBody.appendChild(frag);
     elements.resultsCount.textContent = `Showing ${rows.length} results`;
   }
+
+  function safeUrl(u) {
+  const s = String(u || "").trim();
+  if (!s) return "";
+  // allow http(s) only
+  if (/^https?:\/\//i.test(s)) return s;
+  return "";
+}
 
   function getFacultyName(row) {
     if (row.personName && row.personName.trim()) return row.personName.trim();
@@ -701,25 +754,44 @@
       return true;
     });
 
-    renderTable(rows);
-  }
+   function renderTable(rows) {
+  currentRows = rows.slice();
+  const frag = document.createDocumentFragment();
 
-  function clearAllFilters(){
-    elements.firstNameSearch.value = "";
-    elements.lastNameSearch.value  = "";
-    elements.exactNameMatch.checked = false;
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    const url = safeUrl(r.articleLink);
 
-    elements.keywordSearch.value = "";
-    elements.titleSearch.value   = "";
-    elements.journalSearch.value = "";
+    tr.innerHTML = `
+      <td>${r.lastName || ""}</td>
+      <td>${r.firstName || ""}</td>
+      <td>${r.startDateAtRawls || ""}</td>
+      <td>${r.endDateAtRawls || ""}</td>
+      <td>${r.position || ""}</td>
+      <td>${r.area || ""}</td>
+      <td>${r.pubdate || ""}</td>
+      <td>${r.year || ""}</td>
+      <td>${r.articleTitle || ""}</td>
+      <td>${r.journalName || ""}</td>
+      <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+      <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+      <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+      <td>${r.authorRank || ""}</td>
+      <td>
+        ${
+          url
+          ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>`
+          : `<span class="link-btn disabled">No link</span>`
+        }
+      </td>
+    `;
+    frag.appendChild(tr);
+  });
 
-    if (multiSelectControls.area)     multiSelectControls.area.clear();
-    if (multiSelectControls.position) multiSelectControls.position.clear();
-    if (multiSelectControls.year)     multiSelectControls.year.clear();
-
-    elements.utdYes.checked = elements.utdNo.checked = false;
-    elements.ftYes.checked  = elements.ftNo.checked  = false;
-    elements.rank4.checked  = elements.rank5.checked = elements.rank5star.checked = false;
+  elements.resultsBody.innerHTML = "";
+  elements.resultsBody.appendChild(frag);
+  elements.resultsCount.textContent = `Showing ${rows.length} results`;
+}
 
     renderTable(data);
   }
