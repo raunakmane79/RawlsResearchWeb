@@ -451,151 +451,113 @@
     return "";
   }
 
-  // ---------- Workbook helpers (ROBUST HEADER MATCH) ----------
-  function canon(str) {
+// ---------- Workbook helpers (ROBUST HEADER MATCH) ----------
+
+// Normalize header names safely
+function canon(str) {
   return String(str || "")
     .toLowerCase()
     .replace(/\s+/g, " ")
     .replace(/[^a-z0-9 ]/g, "")
     .trim();
 }
-const normalizedHeaders = headers.map(h => canon(h));
-const match = targetHeaders.every(h => normalizedHeaders.includes(h));
 
-function normalizeRow(row) {
-  const norm = {};
-  Object.keys(row).forEach(key => {
-    norm[canon(key)] = row[key];
+// Find the correct sheet automatically
+function findSheetWithHeaders(workbook) {
+  const targetHeaders = [
+    "lastname",
+    "firstname",
+    "start date at rawls",
+    "end date at rawls",
+    "position",
+    "area",
+    "publication date",
+    "year",
+    "article title",
+    "journal name",
+    "journal ranking",
+    "utd journal",
+    "financial times journal",
+    "author rank",
+    "article link"
+  ];
+
+  let bestSheet = workbook.SheetNames[0];
+  let bestScore = -1;
+
+  workbook.SheetNames.forEach(name => {
+    const sheet = workbook.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0 });
+    const headers = (rows[0] || []).map(canon);
+    const score = targetHeaders.filter(h => headers.includes(h)).length;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestSheet = name;
+    }
   });
-  return norm;
+
+  console.log("Using sheet:", bestSheet, "score:", bestScore);
+  return bestSheet;
 }
-const r = normalizeRow(row);
 
-return {
-  lastName: r["lastname"] || "",
-  firstName: r["firstname"] || "",
-  startDate: r["start date at rawls"] || "",
-  endDate: r["end date at rawls"] || "",
-  position: r["position"] || "",
-  area: r["area"] || "",
-  pubDate: r["pubdate"] || "",
-  year: r["year"] || "",
-  articleTitle: r["articletitle"] || "",
-  journalName: r["journalname"] || "",
-  ranking: r["ranking updated"] || "",
-  utd: r["utd journal"] || "",
-  financialTimes: r["financial times journal"] || "",
-  authorRank: r["author rank"] || "",
-  articleLink: r["article link"] || ""
-};
+// Normalize row keys
+function normalizeRow(row) {
+  const out = {};
+  Object.keys(row).forEach(k => {
+    out[canon(k)] = row[k];
+  });
+  return out;
+}
 
+// ---------- Load Excel ----------
+function loadWorkbookFromServer() {
+  fetch("Database.xlsx")
+    .then(res => {
+      if (!res.ok) throw new Error("Database.xlsx not found");
+      return res.arrayBuffer();
+    })
+    .then(buf => {
+      const workbook = XLSX.read(buf, { type: "array" });
+      const sheetName = findSheetWithHeaders(workbook);
+      const sheet = workbook.Sheets[sheetName];
 
-  function findSheetWithHeaders(workbook) {
-    // Your uploaded sheet uses "OpenAccessURL" for the link column.
-const targetHeaders = [
-  "lastname",
-  "firstname",
-  "start date at rawls",
-  "end date at rawls",
-  "position",
-  "area",
-  "pubdate",
-  "year",
-  "articletitle",
-  "journalname",
-  "ranking updated",
-  "utd journal",
-  "financial times journal",
-  "author rank",
-  "article link"
-];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
+      data = rawRows.map(row => {
+        const r = normalizeRow(row);
 
-
-    let bestSheet = workbook.SheetNames[0];
-    let bestScore = -1;
-
-    workbook.SheetNames.forEach(name => {
-      const sheet = workbook.Sheets[name];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
-      const headerRow = rows[0] || [];
-      const headerSet = new Set(headerRow.map(canon));
-      const score = targetHeaders.filter(h => headerSet.has(h)).length;
-      if (score > bestScore) { bestScore = score; bestSheet = name; }
-    });
-
-    console.log("Chosen sheet:", bestSheet, "header match score:", bestScore);
-    return bestSheet;
-  }
-
-  function normalizeRow(row) {
-    const norm = {};
-    Object.keys(row).forEach(key => {
-      const nk = String(key || "").trim().toLowerCase();
-      norm[nk] = row[key];
-    });
-    return norm;
-  }
-
-  function loadWorkbookFromServer() {
-    // IMPORTANT: In GitHub Pages, the file must be named exactly "Database.xlsx"
-    // and be in the same folder as this HTML.
-    fetch("Database.xlsx")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to load Database.xlsx (check filename + location in repo)");
-        return res.arrayBuffer();
-      })
-      .then(buf => {
-        const workbook = XLSX.read(buf, { type: "array" });
-        const sheetName = findSheetWithHeaders(workbook);
-        const sheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-        console.log("Parsed rows:", json.length);
-
-        data = json.map(row => {
-          const r = normalizeRow(row);
-
-          let first = r["firstname"] || r["first name"] || r["first"] || "";
-          let last  = r["lastname"]  || r["last name"]  || r["last"]  || "";
-          let personName = r["personname"] || "";
-
-          if ((!first && !last) && personName) {
-            const parts = String(personName).split(",");
-            if (parts.length >= 2) { last = parts[0].trim(); first = parts[1].trim(); }
-          }
-          if (!personName) personName = [last, first].filter(Boolean).join(", ");
-
-          return {
-            firstName: first,
-            lastName: last,
-            personName,
-            startDateAtRawls: r["start date at rawls"] || "",
-            endDateAtRawls: r["end date at rawls"] || "",
-            position: r["position"] || "",
-            area: r["area"] || "",
-            pubdate: r["pubdate"] || "",
-            year: String(r["year"] || "").trim(),
-            articleTitle: r["articletitle"] || "",
-            journalName: r["journalname"] || "",
-            ranking: String(r["ranking - updated"] || "").trim(),
-            utdJournal: String(r["utd journal"] || "").trim(),
-            ftJournal: String(r["financial times journal"] || "").trim(),
-            authorRank: r["author rank"] || "",
-            // FIX: your sheet uses OpenAccessURL (but keep fallback too)
-         articleLink: r["article link"] || r["openaccessurl"] || "",
-          };
-        });
-
-        populateMultiSelects();
-        renderTable(data);
-      })
-      .catch(err => {
-        console.error("Error loading workbook:", err);
-        elements.resultsCount.textContent =
-          "Error loading Database.xlsx. Open DevTools → Console for details.";
+        return {
+          lastName: r["lastname"] || "",
+          firstName: r["firstname"] || "",
+          startDateAtRawls: r["start date at rawls"] || "",
+          endDateAtRawls: r["end date at rawls"] || "",
+          position: r["position"] || "",
+          area: r["area"] || "",
+          pubdate: r["publication date"] || "",
+          year: String(r["year"] || "").trim(),
+          articleTitle: r["article title"] || "",
+          journalName: r["journal name"] || "",
+          ranking: String(r["journal ranking"] || "").trim(),
+          utdJournal: String(r["utd journal"] || "").trim(),
+          ftJournal: String(r["financial times journal"] || "").trim(),
+          authorRank: r["author rank"] || "",
+          articleLink: r["article link"] || ""
+        };
       });
-  }
+
+      console.log("Loaded rows:", data.length);
+      console.log("Sample row:", data[0]);
+
+      populateMultiSelects();
+      renderTable(data);
+    })
+    .catch(err => {
+      console.error(err);
+      elements.resultsCount.textContent =
+        "❌ Error loading Database.xlsx — check console";
+    });
+}
 
   // ---------- Multi-select ----------
   function buildMultiSelect(container, values, placeholderText) {
