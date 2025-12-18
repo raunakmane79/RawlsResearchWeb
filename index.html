@@ -473,7 +473,7 @@ function findSheetWithHeaders(workbook) {
     "area",
     "publication date",
     "year",
-    "Article Title",
+    "article title",
     "journal name",
     "journal ranking",
     "utd journal",
@@ -547,7 +547,8 @@ function loadWorkbookFromServer() {
   journalName: r["journal name"] || "",
 
   // ✅ THIS was the main bug
-  ranking: String(r["journal rank"] || "").trim(),
+ranking: String(r["journal ranking"] || "").trim(),
+
 
   utdJournal: String(r["utd journal"] || "").trim(),
   ftJournal: String(r["financial times journal"] || "").trim(),
