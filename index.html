@@ -452,18 +452,64 @@
   }
 
   // ---------- Workbook helpers (ROBUST HEADER MATCH) ----------
-  function canon(s){
-    return String(s||"").trim().toLowerCase().replace(/\s+/g," ");
-  }
+  function canon(str) {
+  return String(str || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[^a-z0-9 ]/g, "")
+    .trim();
+}
+const normalizedHeaders = headers.map(h => canon(h));
+const match = targetHeaders.every(h => normalizedHeaders.includes(h));
+
+function normalizeRow(row) {
+  const norm = {};
+  Object.keys(row).forEach(key => {
+    norm[canon(key)] = row[key];
+  });
+  return norm;
+}
+const r = normalizeRow(row);
+
+return {
+  lastName: r["lastname"] || "",
+  firstName: r["firstname"] || "",
+  startDate: r["start date at rawls"] || "",
+  endDate: r["end date at rawls"] || "",
+  position: r["position"] || "",
+  area: r["area"] || "",
+  pubDate: r["pubdate"] || "",
+  year: r["year"] || "",
+  articleTitle: r["articletitle"] || "",
+  journalName: r["journalname"] || "",
+  ranking: r["ranking updated"] || "",
+  utd: r["utd journal"] || "",
+  financialTimes: r["financial times journal"] || "",
+  authorRank: r["author rank"] || "",
+  articleLink: r["article link"] || ""
+};
+
 
   function findSheetWithHeaders(workbook) {
     // Your uploaded sheet uses "OpenAccessURL" for the link column.
 const targetHeaders = [
-  "lastname","firstname","start date at rawls","end date at rawls","position","area",
-  "pubdate","year","articletitle","journalname",
-  "ranking - updated","utd journal","financial times journal",
-  "author rank","article link"
+  "lastname",
+  "firstname",
+  "start date at rawls",
+  "end date at rawls",
+  "position",
+  "area",
+  "pubdate",
+  "year",
+  "articletitle",
+  "journalname",
+  "ranking updated",
+  "utd journal",
+  "financial times journal",
+  "author rank",
+  "article link"
 ];
+
 
 
     let bestSheet = workbook.SheetNames[0];
@@ -853,6 +899,8 @@ const targetHeaders = [
 
     XLSX.writeFile(wb, "Rawls_Publications_Summary.xlsx");
   }
+console.log("Loaded rows:", data.length);
+console.log(data[0]);
 
   // ---------- Listeners ----------
   function attachListeners() {
