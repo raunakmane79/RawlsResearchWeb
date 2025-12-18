@@ -5,595 +5,954 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rawls Faculty Publications Database</title>
 
-  <!-- Favicons (optional, keep yours if you have them) -->
-  <meta name="theme-color" content="#ba0c2f" />
+  <!-- Favicons -->
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="TTU_seal-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="TTU_seal-16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="TTU_seal-192.png">
+  <link rel="apple-touch-icon" href="TTU_seal-180.png">
+  <meta name="theme-color" content="#ba0c2f">
 
-  <!-- Google Font -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- XLSX Library -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- XLSX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
-    :root{
-      --rawls-red:#ba0c2f;
-      --bg:#f3f5f7;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --shadow: 0 10px 30px rgba(0,0,0,.08);
-      --radius: 14px;
+    :root {
+      --rawls-red: #ba0c2f;
+      --rawls-red-dark: #8c001a;
+      --rawls-black: #1f1f1f;
+      --rawls-bg: #f3f4f6;
+      --rawls-card-bg: #ffffff;
+      --rawls-border: #e0e0e0;
     }
+    * { box-sizing: border-box; font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { margin: 0; background: radial-gradient(circle at top left, #ffffff 0, #f3f4f6 45%, #e9ecf2 100%); color: var(--rawls-black); }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-      background: linear-gradient(#111 0px, #111 95px, var(--bg) 95px);
-      color:var(--text);
-    }
+    /* Header */
+    .rawls-header { background: linear-gradient(to right, #000 60%, #111 100%); border-bottom: 4px solid #ba0c2f; color: #fff; padding: 10px 28px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 1000; }
+    .rawls-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1320px; margin: 0 auto; flex-wrap: wrap; }
+    .rawls-header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .rawls-logo { height: 46px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .rawls-header-brand { display: flex; flex-direction: column; line-height: 1.25; }
+    .rawls-header-brand-main { font-family: "Roboto Condensed", sans-serif; font-weight: 700; font-size: 1.2rem; color: #fff; letter-spacing: 0.02em; }
+    .rawls-header-brand-sub { font-size: 0.85rem; color: #ccc; letter-spacing: 0.05em; text-transform: uppercase; }
+    .rawls-header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .header-btn { border-radius: 999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.35); color: #fff; background: transparent; transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.05s; white-space: nowrap; }
+    .header-btn.primary { background: var(--rawls-red); border-color: var(--rawls-red); }
+    .header-btn:hover { transform: translateY(-1px); border-color: #fff; background: rgba(255,255,255,0.08); }
+    .header-btn.primary:hover { background: var(--rawls-red-dark); border-color: var(--rawls-red-dark); }
+    @media (max-width: 640px) { .rawls-header-inner { align-items: flex-start; } .rawls-header-actions { width: 100%; justify-content: flex-start; } }
 
-    /* Top bar */
-    .topbar{
-      height:95px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 24px;
-      color:#fff;
-    }
-    .brand{
-      display:flex; gap:14px; align-items:center;
-      font-weight:700;
-      letter-spacing:.2px;
-    }
-    .brand small{display:block; font-weight:400; opacity:.9; margin-top:2px}
-    .actions{display:flex; gap:12px}
-    .btn{
-      border:1px solid rgba(255,255,255,.25);
-      background:transparent;
-      color:#fff;
-      padding:10px 14px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:600;
-    }
-    .btn.primary{
-      background:var(--rawls-red);
-      border-color:transparent;
-    }
+    /* Footer */
+    .rawls-footer { margin: 0; flex-shrink: 0; background: #000; border-top: 4px solid #ba0c2f; color: #f0f0f0; padding: 12px 28px; font-size: 0.85rem; margin-top: 40px; }
+    .rawls-footer-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1320px; margin: 0 auto; flex-wrap: wrap; gap: 12px; }
+    .linkedin-btn { display: inline-flex; align-items: center; gap: 8px; background: #0077b5; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 0.85rem; transition: background 0.2s, transform 0.15s; box-shadow: 0 2px 6px rgba(0, 119, 181, 0.25); }
+    .linkedin-btn img { height: 16px; width: 16px; filter: brightness(0) invert(1); }
+    .linkedin-btn:hover { background: #005582; transform: translateY(-1px); }
 
-    /* Page container */
-    .wrap{
-      max-width:1200px;
-      margin: 28px auto 80px;
-      padding: 0 18px;
-    }
+    /* Card */
+    .app { background: var(--rawls-card-bg); padding: 24px 24px 20px; margin: 24px auto; border-radius: 12px; max-width: 1320px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); border-top: 5px solid var(--rawls-red); }
+    .app-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    h1 { margin: 0; font-family: "Roboto Condensed", system-ui, sans-serif; font-weight: 700; font-size: 1.8rem; letter-spacing: 0.03em; color: var(--rawls-red); }
+    .app-subtitle { font-size: 0.9rem; color: #555; }
 
-    .card{
-      background:var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border:1px solid rgba(0,0,0,.04);
-      overflow:hidden;
-    }
+    /* Toolbar & buttons */
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+    .toolbar-left { font-size: 0.85rem; color: #555; }
+    .toolbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn { border-radius: 999px; border: 1px solid var(--rawls-border); padding: 5px 12px; font-size: 0.8rem; background: #f8f8f8; color: #111; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+    .btn:hover { background: #fff; border-color: var(--rawls-red); color: var(--rawls-red); transform: translateY(-0.5px); }
+    .btn:active, .btn.active { background: var(--rawls-red); border-color: var(--rawls-red-dark); color: #fff; box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25); transform: scale(0.98); }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.35); }
 
-    .cardHeader{
-      padding: 28px 28px 8px;
-      border-top:6px solid var(--rawls-red);
-    }
-    h1{
-      margin:0;
-      color:var(--rawls-red);
-      font-size: 40px;
-      letter-spacing:.2px;
-    }
-    .subtitleRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      margin-top:12px;
-      color:var(--muted);
-      font-weight:500;
-    }
+    /* Filters wrapper */
+    .filters { margin-top: 12px; padding: 14px 14px 10px; border-radius: 10px; border: 1px solid var(--rawls-border); background: linear-gradient(to bottom, #fafafa, #ffffff); display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 100; }
+    .filters-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .filters-title { font-size: 0.9rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #555; }
+    .advanced-toggle { border-radius: 999px; border: 1px solid var(--rawls-border); padding: 4px 10px; font-size: 0.8rem; background: #f8f8f8; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; color: #444; transition: background 0.15s, border-color 0.15s, transform 0.05s; }
+    .advanced-toggle:hover { background: #ffffff; border-color: var(--rawls-red); transform: translateY(-0.5px); }
+    .advanced-toggle.open { background: var(--rawls-red); border-color: var(--rawls-red-dark); color: #fff; box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.25); }
+    .advanced-toggle.open:hover { background: var(--rawls-red-dark); }
+    .advanced-toggle-icon { font-size: 0.8rem; transition: transform 0.2s ease; }
+    .advanced-toggle.open .advanced-toggle-icon { transform: rotate(180deg); }
 
-    .toolbar{
-      padding: 12px 28px 18px;
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-      align-items:center;
-    }
-    .toolBtn{
-      border:1px solid var(--border);
-      background:#f9fafb;
-      color:var(--text);
-      padding:9px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:600;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
+    .filters-primary, .filters-advanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+    .filters-advanced { margin-top: 0.75rem; padding: 1rem 1.5rem 1.25rem; border-radius: 14px; background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%); border: 1px solid rgba(186, 12, 47, 0.25); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5); position: relative; overflow: visible; transition: background 0.25s, box-shadow 0.25s, transform 0.2s; z-index: 20; border-top: 1px dashed var(--rawls-border); }
+    .filters-advanced:hover, .filters-advanced:not(.collapsed) { background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%); box-shadow: 0 6px 18px rgba(186, 12, 47, 0.15), 0 0 0 1px rgba(186, 12, 47, 0.25); transform: translateY(-1px); }
+    .filters-advanced.collapsed { display: none; padding-top: 0; padding-bottom: 0; }
 
-    .filters{
-      padding: 16px 28px 22px;
-    }
-    .filterBox{
-      border:1px solid var(--border);
-      border-radius: 12px;
-      padding:16px;
-      background:#fff;
-    }
-    .filterTitle{
-      font-weight:800;
-      letter-spacing:.12em;
-      color:#374151;
-      font-size:14px;
-    }
-    .label{
-      margin-top:12px;
-      font-size:12px;
-      color:#374151;
-      font-weight:800;
-      letter-spacing:.12em;
-    }
-    .row{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-      margin-top:8px;
-    }
-    .row.two{
-      grid-template-columns: 1fr 1fr 1fr;
-      gap:12px;
-    }
-    input, select{
-      width:100%;
-      border:1px solid var(--border);
-      border-radius:10px;
-      padding:10px 12px;
-      font-size:14px;
-      outline:none;
-      background:#fff;
-    }
-    input:focus, select:focus{border-color:#c7cbd1; box-shadow:0 0 0 3px rgba(186,12,47,.10);}
-    .checkRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-top:10px;
-      color:#111827;
-      font-weight:600;
-      font-size:13px;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
-    .checkRow input{width:auto}
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+    input[type="text"] { padding: 6px 8px; border-radius: 6px; border: 1px solid var(--rawls-border); font-size: 0.85rem; background: #fafafa; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+    input[type="text"]:focus { outline: none; border-color: var(--rawls-red); box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18); background: #fff; }
+    .checkbox-group { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.85rem; color: #444; }
+
+    .name-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
+    .name-options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; font-size: 0.8rem; color: #555; }
+    .name-option { display: inline-flex; align-items: center; gap: 6px; }
+    .filter-hint { font-size: 0.7rem; color: #777; }
+
+    /* Custom multi-select */
+    .multi-select { position: relative; font-size: 0.85rem; }
+    .multi-select-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--rawls-border); background: #fafafa; cursor: pointer; min-height: 32px; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+    .multi-select.open .multi-select-header { border-color: var(--rawls-red); box-shadow: 0 0 0 2px rgba(186, 12, 47, 0.18); background: #fff; }
+    .multi-select-label { color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .multi-select-placeholder { color: #999; }
+    .multi-select-arrow { font-size: 0.7rem; margin-left: 8px; }
+    .multi-select-menu { position: absolute; left: 0; right: 0; margin-top: 4px; background: #fff; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #ddd; max-height: 220px; overflow-y: auto; padding: 6px 0; z-index: 200; display: none; }
+    .multi-select.open .multi-select-menu { display: block; }
+    .multi-select-option { display: flex; align-items: center; gap: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.85rem; }
+    .multi-select-option:hover { background: #f5f5f5; }
+    .multi-select-option input { margin: 0; }
 
     /* Table */
-    .tableWrap{
-      border-top:1px solid var(--border);
-      background:#fff;
-    }
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      font-size:13px;
-    }
-    thead th{
-      position:sticky;
-      top:0;
-      background:#fbfbfc;
-      border-bottom:1px solid var(--border);
-      color:#111827;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      font-size:11px;
-      padding:12px 10px;
-      text-align:left;
-    }
-    tbody td{
-      border-bottom:1px solid var(--border);
-      padding:12px 10px;
-      color:#111827;
-      vertical-align:top;
-    }
-    tbody tr:hover{background:#fafafa}
-    .linkBtn{
-      border:1px solid var(--border);
-      background:#fff;
-      padding:7px 10px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:700;
-    }
-    .pill{
-      display:inline-block;
-      padding:3px 10px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:#f9fafb;
-      font-weight:700;
-      color:#374151;
-      font-size:12px;
-    }
+    .table-container { border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e0e0e0; background: #fff; max-height: 500px; overflow:auto; margin-top: 8px; position: relative; z-index: 1; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid #e3e3e3; border-radius: 8px; overflow: hidden; }
+    th, td { padding: 10px 12px; border: 1px solid #eaeaea; text-align: left; vertical-align: top; }
+    th { background: #f8f8f8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #444; position: sticky; top: 0; z-index: 10; }
+    tr:nth-child(even) { background: #fcfcfc; }
+    tr:hover { background: #fafafa; }
+    #resultsCount { font-weight: 500; color: #444; }
 
-    .footer{
-      margin-top:40px;
-      background:#111;
-      color:#fff;
-      padding:16px 24px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-weight:600;
-    }
+    /* Badges */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; white-space: nowrap; }
+    .badge-blue { background: #f8f8f8; color: #333; border: 1px solid #ddd; padding: 2px 6px; }
+    .badge-green { background: #e8f5e9; color: #2e7d32; border: 1px solid rgba(46, 125, 50, 0.3); }
+    .badge-no { background: #f3f4f6; color: #777; border: 1px solid #ddd; }
 
-    @media (max-width: 920px){
-      .row.two{grid-template-columns: 1fr;}
-      .toolbar{justify-content:flex-start; flex-wrap:wrap}
-      h1{font-size:30px}
-      .topbar{padding:0 14px}
-      .wrap{padding:0 12px}
+    /* Export modal */
+    .export-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: none; align-items: center; justify-content: center; z-index: 2000; }
+    .export-modal.active { display: flex; }
+    .export-modal-content { background: #ffffff; border-radius: 14px; padding: 18px 20px 16px; box-shadow: 0 18px 40px rgba(0,0,0,0.25); max-width: 340px; width: 90%; }
+    .export-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .export-modal-title { font-size: 1rem; font-weight: 600; color: #111827; }
+    .export-modal-close { border: none; background: transparent; cursor: pointer; font-size: 1rem; padding: 2px 4px; color: #6b7280; }
+    .export-modal-close:hover { color: #111827; }
+    .export-modal-body { font-size: 0.85rem; color: #4b5563; margin-bottom: 10px; }
+    .export-modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .export-option-btn { width: 100%; justify-content: center; }
+    .export-option-btn.primary { background: var(--rawls-red); border-color: var(--rawls-red); color: #fff; }
+    .export-option-btn.primary:hover { background: var(--rawls-red-dark); border-color: var(--rawls-red-dark); color: #fff; }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--rawls-border);
+      background: #fff;
+      color: var(--rawls-red);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .link-btn:hover {
+      background: var(--rawls-red);
+      border-color: var(--rawls-red);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .link-btn.disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
   </style>
 </head>
 
 <body>
-
-  <div class="topbar">
-    <div class="brand">
-      <div>
-        <div style="font-size:20px;">Rawls College Research</div>
-        <small>RAWLS COLLEGE OF BUSINESS · TEXAS TECH UNIVERSITY</small>
+<header class="rawls-header">
+  <div class="rawls-header-inner">
+    <div class="rawls-header-left">
+      <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
+      <div class="rawls-header-brand">
+        <span class="rawls-header-brand-main">Rawls College Research</span>
+        <span class="rawls-header-brand-sub">Rawls College of Business · Texas Tech University</span>
       </div>
     </div>
-    <div class="actions">
-      <button class="btn primary" onclick="window.open('#','_blank')">New Submission</button>
-      <button class="btn" onclick="window.open('#','_blank')">Request Modification</button>
+    <div class="rawls-header-actions">
+      <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+      <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+  <div class="app-header">
+    <h1>Rawls Faculty Publications Database</h1>
+    <div class="app-subtitle">Research Built on Rawls.</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left"><span id="resultsCount">Loading publications...</span></div>
+    <div class="toolbar-right">
+      <button class="btn" id="clearFilters"><span>&#10006;</span> Clear filters</button>
+      <button class="btn" id="exportExcel"><span>&#128190;</span> Export</button>
     </div>
   </div>
 
-  <div class="wrap">
-    <div class="card">
-      <div class="cardHeader">
-        <h1>Rawls Faculty Publications Database</h1>
-        <div class="subtitleRow">
-          <div id="resultsCount">Loading database…</div>
-          <div>Research Built on Rawls.</div>
+  <div class="filters">
+    <div class="filters-header">
+      <div class="filters-title">Search publications</div>
+      <button class="advanced-toggle" id="advancedToggle">
+        <span class="advanced-toggle-icon">▾</span> Advanced filters
+      </button>
+    </div>
+
+    <!-- Keyword -->
+    <div class="filter-group">
+      <label>Keyword (Title / Journal)</label>
+      <input type="text" id="keywordSearch" placeholder="Search in title or journal">
+    </div>
+
+    <div class="filters-primary">
+      <!-- Author -->
+      <div class="filter-group author-group">
+        <label>Author Name</label>
+        <div class="name-inputs">
+          <input type="text" id="firstNameSearch" placeholder="First name">
+          <input type="text" id="lastNameSearch"  placeholder="Last name">
+        </div>
+        <div class="name-options">
+          <label class="name-option">
+            <input type="checkbox" id="exactNameMatch"> Match entire cell contents
+          </label>
         </div>
       </div>
 
-      <div class="toolbar">
-        <button class="toolBtn" id="clearFilters">✕ Clear filters</button>
-        <button class="toolBtn" id="exportExcel">⤓ Export</button>
+      <!-- Year -->
+      <div class="filter-group">
+        <label>Year of Publication</label>
+        <div class="multi-select" id="yearMulti"></div>
+        <span class="filter-hint">Filter by publication year.</span>
+      </div>
+    </div>
+
+    <!-- Advanced -->
+    <div class="filters-advanced collapsed" id="advancedPanel">
+      <div class="filter-group">
+        <label>Article Title</label>
+        <input type="text" id="titleSearch" placeholder="Search by title">
       </div>
 
-      <div class="filters">
-        <div class="filterBox">
-          <div class="filterTitle">SEARCH PUBLICATIONS</div>
+      <div class="filter-group">
+        <label>Journal Name</label>
+        <input type="text" id="journalSearch" placeholder="Search by journal">
+      </div>
 
-          <div class="label">KEYWORD (TITLE / JOURNAL)</div>
-          <div class="row">
-            <input id="keywordSearch" placeholder="Search in title or journal" />
-          </div>
+      <div class="filter-group">
+        <label>Area</label>
+        <div class="multi-select" id="areaMulti"></div>
+        <span class="filter-hint">Choose one or more areas.</span>
+      </div>
 
-          <div class="row two">
-            <div>
-              <div class="label">AUTHOR NAME</div>
-              <input id="firstNameSearch" placeholder="First name" />
-            </div>
-            <div>
-              <div class="label" style="opacity:0;">.</div>
-              <input id="lastNameSearch" placeholder="Last name" />
-            </div>
-            <div>
-              <div class="label">YEAR OF PUBLICATION</div>
-              <select id="yearSearch">
-                <option value="">All Years</option>
-              </select>
-              <div style="margin-top:6px;color:var(--muted);font-size:12px;">Filter by publication year.</div>
-            </div>
-          </div>
+      <div class="filter-group">
+        <label>Position</label>
+        <div class="multi-select" id="positionMulti"></div>
+        <span class="filter-hint">Choose one or more positions.</span>
+      </div>
 
-          <div class="checkRow">
-            <input type="checkbox" id="exactNameMatch" />
-            <label for="exactNameMatch">Match entire cell contents</label>
-          </div>
+      <div class="filter-group">
+        <label>Rawls Journal List Rankings</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="rank4"> 4</label>
+          <label><input type="checkbox" id="rank5"> 5</label>
+          <label><input type="checkbox" id="rank5star"> 5*</label>
         </div>
       </div>
 
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Last Name</th>
-              <th>First Name</th>
-              <th>Start Date at Rawls</th>
-              <th>End Date at Rawls</th>
-              <th>Position</th>
-              <th>Area</th>
-              <th>Pub Date</th>
-              <th>Year</th>
-              <th>Article Title</th>
-              <th>Journal</th>
-              <th>Rawls Journal List Ranking</th>
-              <th>UTD</th>
-              <th>Financial Times</th>
-              <th>Author Rank</th>
-              <th>Article Link</th>
-            </tr>
-          </thead>
-          <tbody id="resultsBody"></tbody>
-        </table>
+      <div class="filter-group">
+        <label>UTD Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="utdYes"> Yes</label>
+          <label><input type="checkbox" id="utdNo"> No</label>
+        </div>
       </div>
 
+      <div class="filter-group">
+        <label>Financial Times Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="ftYes"> Yes</label>
+          <label><input type="checkbox" id="ftNo"> No</label>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="footer">
-    <div>© 2025 Rawls College Research</div>
-    <div><button class="btn primary" onclick="window.open('https://www.linkedin.com','_blank')">Follow us on LinkedIn</button></div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Start Date at Rawls</th>
+          <th>End Date at Rawls</th>
+          <th>Position</th>
+          <th>Area</th>
+          <th>Pub Date</th>
+          <th>Year</th>
+          <th>Article Title</th>
+          <th>Journal</th>
+          <th>Rawls Journal List Ranking</th>
+          <th>UTD</th>
+          <th>Financial Times</th>
+          <th>Author Rank</th>
+          <th>Article Link</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
   </div>
+</div>
+
+<!-- Export options modal -->
+<div class="export-modal" id="exportModal">
+  <div class="export-modal-content">
+    <div class="export-modal-header">
+      <div class="export-modal-title">Export search results</div>
+      <button class="export-modal-close" id="exportModalClose" aria-label="Close export options">✕</button>
+    </div>
+    <div class="export-modal-body">Choose how you would like to export the current filtered results.</div>
+    <div class="export-modal-actions">
+      <button class="btn export-option-btn primary" id="exportXlsx">Export Data as XLSX</button>
+      <button class="btn export-option-btn" id="exportCsv">Export Data as CSV</button>
+      <button class="btn export-option-btn" id="exportSummary">Export Summary Only (XLSX)</button>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ---------------------- Robust Excel Loader ---------------------- */
+  let data = [];
+  let currentRows = [];
 
-let data = [];
-let currentRows = [];
+  const elements = {
+    lastNameSearch: document.getElementById("lastNameSearch"),
+    firstNameSearch: document.getElementById("firstNameSearch"),
+    exactNameMatch: document.getElementById("exactNameMatch"),
+    keywordSearch: document.getElementById("keywordSearch"),
+    titleSearch: document.getElementById("titleSearch"),
+    journalSearch: document.getElementById("journalSearch"),
+    utdYes: document.getElementById("utdYes"),
+    utdNo: document.getElementById("utdNo"),
+    ftYes: document.getElementById("ftYes"),
+    ftNo: document.getElementById("ftNo"),
+    rank4: document.getElementById("rank4"),
+    rank5: document.getElementById("rank5"),
+    rank5star: document.getElementById("rank5star"),
+    resultsBody: document.getElementById("resultsBody"),
+    resultsCount: document.getElementById("resultsCount"),
+    clearFilters: document.getElementById("clearFilters"),
+    exportExcel: document.getElementById("exportExcel"),
+    areaMulti: document.getElementById("areaMulti"),
+    positionMulti: document.getElementById("positionMulti"),
+    yearMulti: document.getElementById("yearMulti"),
+    advancedToggle: document.getElementById("advancedToggle"),
+    advancedPanel: document.getElementById("advancedPanel"),
+    exportModal: document.getElementById("exportModal"),
+    exportModalClose: document.getElementById("exportModalClose"),
+    exportXlsx: document.getElementById("exportXlsx"),
+    exportCsv: document.getElementById("exportCsv"),
+    exportSummary: document.getElementById("exportSummary"),
+  };
 
-const els = {
-  keywordSearch: document.getElementById("keywordSearch"),
-  firstNameSearch: document.getElementById("firstNameSearch"),
-  lastNameSearch: document.getElementById("lastNameSearch"),
-  yearSearch: document.getElementById("yearSearch"),
-  exactNameMatch: document.getElementById("exactNameMatch"),
-  resultsBody: document.getElementById("resultsBody"),
-  resultsCount: document.getElementById("resultsCount"),
-  clearFilters: document.getElementById("clearFilters"),
-  exportExcel: document.getElementById("exportExcel"),
-};
+  const multiSelectControls = {};
 
-function canon(str) {
+  // ---------- Name matching helpers ----------
+  function fold(s) {
+    return String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\./g, "")
+      .trim()
+      .toLowerCase();
+  }
+  function isPrefixQuery(q) { return /\*$/.test(q); }
+  function stripWildcard(q) { return q.replace(/\*+$/, ""); }
+
+  function levenshtein(a, b) {
+    a = fold(a); b = fold(b);
+    const m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    const dp = Array.from({ length: m + 1 }, (_, i) => Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+      }
+    }
+    return dp[m][n];
+  }
+
+  function fuzzyOK(q, s) {
+    const L = Math.max(q.length, s.length);
+    const tol = L <= 4 ? 1 : 2;
+    return levenshtein(q, s) <= tol;
+  }
+
+  function matchesInitial(queryToken, name) {
+    const q = fold(queryToken), n = fold(name);
+    if (!q || !n) return false;
+    if (q.length === 1) return n[0] === q;
+    return false;
+  }
+
+  function matchesTwoInitials(query, first, last) {
+    const parts = fold(query).split(/\s+/).filter(Boolean);
+    if (parts.length !== 2) return false;
+    const [a, b] = parts, f = fold(first), l = fold(last);
+    return !!(a && b && f && l) && f[0] === a[0] && l[0] === b[0];
+  }
+
+  function tokenMatchOneField(queryToken, candidate, exactMode) {
+    const qRaw = String(queryToken || "").trim();
+    const cRaw = String(candidate || "");
+    const q = fold(qRaw), c = fold(cRaw);
+
+    if (!q) return true;
+    if (!c) return false;
+
+    if (exactMode) {
+      if (q === c) return true;
+      if (matchesInitial(qRaw, cRaw)) return c.startsWith(q);
+      return false;
+    }
+
+    if (isPrefixQuery(qRaw)) return c.startsWith(fold(stripWildcard(qRaw)));
+    if (matchesInitial(qRaw, cRaw)) return c.startsWith(q);
+    if (c.includes(q)) return true;
+    return fuzzyOK(q, c);
+  }
+
+  function tokenMatchEitherName(queryToken, first, last, exactMode) {
+    return tokenMatchOneField(queryToken, first, exactMode) ||
+           tokenMatchOneField(queryToken, last, exactMode);
+  }
+
+  function parseNameTokens(input) {
+    const raw = String(input || "").trim();
+    return raw ? raw.split(/[,\s]+/).filter(Boolean) : [];
+  }
+
+  // ---------- URL helper ----------
+  function safeUrl(u) {
+    const s = String(u || "").trim();
+    if (!s) return "";
+    if (/^https?:\/\//i.test(s)) return s;
+    return "";
+  }
+
+  // ---------- Workbook helpers (ROBUST HEADER MATCH) ----------
+  function canon(str) {
   return String(str || "")
     .toLowerCase()
-    .replace(/\u00a0/g, " ")          // non-breaking spaces
     .replace(/\s+/g, " ")
-    .replace(/[^a-z0-9 ]/g, "")      // remove punctuation (hyphens etc.)
+    .replace(/[^a-z0-9 ]/g, "")
     .trim();
 }
+const normalizedHeaders = headers.map(h => canon(h));
+const match = targetHeaders.every(h => normalizedHeaders.includes(h));
 
 function normalizeRow(row) {
   const norm = {};
-  Object.keys(row).forEach(k => norm[canon(k)] = row[k]);
+  Object.keys(row).forEach(key => {
+    norm[canon(key)] = row[key];
+  });
   return norm;
 }
+const r = normalizeRow(row);
 
-function findBestSheet(workbook) {
-  // canonical headers we need (matches YOUR backend excel columns)
-  const target = [
-    "lastname","firstname","start date at rawls","end date at rawls","position","area",
-    "pubdate","year","articletitle","journalname",
-    "ranking updated","utd journal","financial times journal",
-    "author rank","article link"
-  ];
+return {
+  lastName: r["lastname"] || "",
+  firstName: r["firstname"] || "",
+  startDate: r["start date at rawls"] || "",
+  endDate: r["end date at rawls"] || "",
+  position: r["position"] || "",
+  area: r["area"] || "",
+  pubDate: r["pubdate"] || "",
+  year: r["year"] || "",
+  articleTitle: r["articletitle"] || "",
+  journalName: r["journalname"] || "",
+  ranking: r["ranking updated"] || "",
+  utd: r["utd journal"] || "",
+  financialTimes: r["financial times journal"] || "",
+  authorRank: r["author rank"] || "",
+  articleLink: r["article link"] || ""
+};
 
-  let best = workbook.SheetNames[0];
-  let bestScore = -1;
 
-  for (const name of workbook.SheetNames) {
-    const sheet = workbook.Sheets[name];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
-    const header = rows[0] || [];
-    const set = new Set(header.map(canon));
-    const score = target.filter(h => set.has(h)).length;
-    if (score > bestScore) { bestScore = score; best = name; }
+  function findSheetWithHeaders(workbook) {
+    // Your uploaded sheet uses "OpenAccessURL" for the link column.
+const targetHeaders = [
+  "lastname",
+  "firstname",
+  "start date at rawls",
+  "end date at rawls",
+  "position",
+  "area",
+  "pubdate",
+  "year",
+  "articletitle",
+  "journalname",
+  "ranking updated",
+  "utd journal",
+  "financial times journal",
+  "author rank",
+  "article link"
+];
+
+
+
+    let bestSheet = workbook.SheetNames[0];
+    let bestScore = -1;
+
+    workbook.SheetNames.forEach(name => {
+      const sheet = workbook.Sheets[name];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
+      const headerRow = rows[0] || [];
+      const headerSet = new Set(headerRow.map(canon));
+      const score = targetHeaders.filter(h => headerSet.has(h)).length;
+      if (score > bestScore) { bestScore = score; bestSheet = name; }
+    });
+
+    console.log("Chosen sheet:", bestSheet, "header match score:", bestScore);
+    return bestSheet;
   }
-  console.log("Chosen sheet:", best, "score:", bestScore);
-  return best;
-}
 
-async function loadWorkbook() {
-  // IMPORTANT: must match your file name exactly in the same folder as index.html
-  const fileName = "Database.xlsx";
+  function normalizeRow(row) {
+    const norm = {};
+    Object.keys(row).forEach(key => {
+      const nk = String(key || "").trim().toLowerCase();
+      norm[nk] = row[key];
+    });
+    return norm;
+  }
 
-  const res = await fetch(fileName, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to fetch ${fileName}. Status: ${res.status}`);
+  function loadWorkbookFromServer() {
+    // IMPORTANT: In GitHub Pages, the file must be named exactly "Database.xlsx"
+    // and be in the same folder as this HTML.
+    fetch("Database.xlsx")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load Database.xlsx (check filename + location in repo)");
+        return res.arrayBuffer();
+      })
+      .then(buf => {
+        const workbook = XLSX.read(buf, { type: "array" });
+        const sheetName = findSheetWithHeaders(workbook);
+        const sheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-  const arrayBuffer = await res.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        console.log("Parsed rows:", json.length);
 
-  const sheetName = findBestSheet(workbook);
-  const sheet = workbook.Sheets[sheetName];
+        data = json.map(row => {
+          const r = normalizeRow(row);
 
-  // Parse into objects
-  const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+          let first = r["firstname"] || r["first name"] || r["first"] || "";
+          let last  = r["lastname"]  || r["last name"]  || r["last"]  || "";
+          let personName = r["personname"] || "";
 
-  data = rawRows.map(row => {
-    const r = normalizeRow(row);
+          if ((!first && !last) && personName) {
+            const parts = String(personName).split(",");
+            if (parts.length >= 2) { last = parts[0].trim(); first = parts[1].trim(); }
+          }
+          if (!personName) personName = [last, first].filter(Boolean).join(", ");
 
-    return {
-      lastName: String(r["lastname"] || "").trim(),
-      firstName: String(r["firstname"] || "").trim(),
-      startDate: String(r["start date at rawls"] || "").trim(),
-      endDate: String(r["end date at rawls"] || "").trim(),
-      position: String(r["position"] || "").trim(),
-      area: String(r["area"] || "").trim(),
-      pubDate: String(r["pubdate"] || "").trim(),
-      year: String(r["year"] || "").trim(),
-      articleTitle: String(r["articletitle"] || "").trim(),
-      journalName: String(r["journalname"] || "").trim(),
-      ranking: String(r["ranking updated"] || "").trim(),
-      utd: String(r["utd journal"] || "").trim(),
-      financialTimes: String(r["financial times journal"] || "").trim(),
-      authorRank: String(r["author rank"] || "").trim(),
-      articleLink: String(r["article link"] || "").trim(),
-    };
-  }).filter(r => Object.values(r).some(v => String(v).trim() !== ""));
+          return {
+            firstName: first,
+            lastName: last,
+            personName,
+            startDateAtRawls: r["start date at rawls"] || "",
+            endDateAtRawls: r["end date at rawls"] || "",
+            position: r["position"] || "",
+            area: r["area"] || "",
+            pubdate: r["pubdate"] || "",
+            year: String(r["year"] || "").trim(),
+            articleTitle: r["articletitle"] || "",
+            journalName: r["journalname"] || "",
+            ranking: String(r["ranking - updated"] || "").trim(),
+            utdJournal: String(r["utd journal"] || "").trim(),
+            ftJournal: String(r["financial times journal"] || "").trim(),
+            authorRank: r["author rank"] || "",
+            // FIX: your sheet uses OpenAccessURL (but keep fallback too)
+         articleLink: r["article link"] || r["openaccessurl"] || "",
+          };
+        });
 
-  console.log("Loaded rows:", data.length, data[0]);
+        populateMultiSelects();
+        renderTable(data);
+      })
+      .catch(err => {
+        console.error("Error loading workbook:", err);
+        elements.resultsCount.textContent =
+          "Error loading Database.xlsx. Open DevTools → Console for details.";
+      });
+  }
 
-  populateYearDropdown();
-  applyFilters();
-}
+  // ---------- Multi-select ----------
+  function buildMultiSelect(container, values, placeholderText) {
+    const unique = [...new Set(values.filter(v => v))].sort();
 
-/* ---------------------- UI / Filters ---------------------- */
-
-function populateYearDropdown() {
-  const years = Array.from(new Set(data.map(d => d.year).filter(Boolean)))
-    .sort((a,b) => Number(b) - Number(a));
-
-  els.yearSearch.innerHTML = `<option value="">All Years</option>` +
-    years.map(y => `<option value="${escapeHtml(y)}">${escapeHtml(y)}</option>`).join("");
-}
-
-function escapeHtml(s) {
-  return String(s || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function normText(s){ return String(s || "").toLowerCase().trim(); }
-
-function matchesText(value, query, exact) {
-  const v = normText(value);
-  const q = normText(query);
-  if (!q) return true;
-  if (exact) return v === q;
-  return v.includes(q);
-}
-
-function applyFilters() {
-  const kw = els.keywordSearch.value.trim();
-  const fn = els.firstNameSearch.value.trim();
-  const ln = els.lastNameSearch.value.trim();
-  const year = els.yearSearch.value.trim();
-  const exact = els.exactNameMatch.checked;
-
-  currentRows = data.filter(r => {
-    const keywordOk = !kw || (
-      normText(r.articleTitle).includes(normText(kw)) ||
-      normText(r.journalName).includes(normText(kw))
-    );
-
-    const firstOk = matchesText(r.firstName, fn, exact);
-    const lastOk  = matchesText(r.lastName, ln, exact);
-    const yearOk  = !year || String(r.year).trim() === year;
-
-    return keywordOk && firstOk && lastOk && yearOk;
-  });
-
-  renderTable(currentRows);
-  els.resultsCount.textContent = `Showing ${currentRows.length} results`;
-}
-
-function renderTable(rows) {
-  els.resultsBody.innerHTML = rows.map(r => {
-    const linkCell = r.articleLink
-      ? `<button class="linkBtn" data-link="${escapeHtml(r.articleLink)}">Open</button>`
-      : `<span class="pill">N/A</span>`;
-
-    return `
-      <tr>
-        <td>${escapeHtml(r.lastName)}</td>
-        <td>${escapeHtml(r.firstName)}</td>
-        <td>${escapeHtml(r.startDate)}</td>
-        <td>${escapeHtml(r.endDate)}</td>
-        <td>${escapeHtml(r.position)}</td>
-        <td>${escapeHtml(r.area)}</td>
-        <td>${escapeHtml(r.pubDate)}</td>
-        <td>${escapeHtml(r.year)}</td>
-        <td>${escapeHtml(r.articleTitle)}</td>
-        <td>${escapeHtml(r.journalName)}</td>
-        <td>${escapeHtml(r.ranking)}</td>
-        <td>${escapeHtml(r.utd)}</td>
-        <td>${escapeHtml(r.financialTimes)}</td>
-        <td>${escapeHtml(r.authorRank)}</td>
-        <td>${linkCell}</td>
-      </tr>
+    container.innerHTML = `
+      <div class="multi-select-header">
+        <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
+        <span class="multi-select-arrow">▾</span>
+      </div>
+      <div class="multi-select-menu"></div>
     `;
-  }).join("");
-}
 
-// Article link button handler (delegation)
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".linkBtn");
-  if (!btn) return;
-  const url = btn.getAttribute("data-link") || "";
-  if (!url) return;
-  window.open(url, "_blank", "noopener,noreferrer");
-});
+    const header = container.querySelector(".multi-select-header");
+    const label = container.querySelector(".multi-select-label");
+    const menu = container.querySelector(".multi-select-menu");
 
-/* ---------------------- Buttons ---------------------- */
+    unique.forEach(v => {
+      const item = document.createElement("label");
+      item.className = "multi-select-option";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.value = v;
+      const sp = document.createElement("span");
+      sp.textContent = v;
+      item.appendChild(cb);
+      item.appendChild(sp);
+      menu.appendChild(item);
+    });
 
-els.clearFilters.addEventListener("click", () => {
-  els.keywordSearch.value = "";
-  els.firstNameSearch.value = "";
-  els.lastNameSearch.value = "";
-  els.yearSearch.value = "";
-  els.exactNameMatch.checked = false;
-  applyFilters();
-});
+    function getValues() {
+      return Array.from(menu.querySelectorAll("input:checked")).map(i => i.value);
+    }
 
-els.exportExcel.addEventListener("click", () => {
-  const exportRows = currentRows.map(r => ({
-    "Lastname": r.lastName,
-    "Firstname": r.firstName,
-    "Start Date at Rawls": r.startDate,
-    "End date at Rawls": r.endDate,
-    "Position": r.position,
-    "Area": r.area,
-    "pubdate": r.pubDate,
-    "year": r.year,
-    "articletitle": r.articleTitle,
-    "journalname": r.journalName,
-    "Ranking - Updated": r.ranking,
-    "UTD Journal": r.utd,
-    "Financial Times Journal": r.financialTimes,
-    "Author Rank": r.authorRank,
-    "Article Link": r.articleLink
-  }));
+    function updateLabel(triggerFilter) {
+      const selected = getValues();
+      if (!selected.length) {
+        label.textContent = placeholderText;
+        label.classList.add("multi-select-placeholder");
+      } else if (selected.length <= 2) {
+        label.textContent = selected.join(", ");
+        label.classList.remove("multi-select-placeholder");
+      } else {
+        label.textContent = `${selected.length} selected`;
+        label.classList.remove("multi-select-placeholder");
+      }
+      if (triggerFilter) applyFilters();
+    }
 
-  const ws = XLSX.utils.json_to_sheet(exportRows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Filtered Results");
-  XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
-});
+    header.addEventListener("click", () => {
+      const isOpen = container.classList.contains("open");
+      closeAllMultiSelects();
+      if (!isOpen) container.classList.add("open");
+    });
 
-/* ---------------------- Live filter events ---------------------- */
+    menu.addEventListener("change", () => updateLabel(true));
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target)) container.classList.remove("open");
+    });
 
-["input","change"].forEach(evt => {
-  els.keywordSearch.addEventListener(evt, applyFilters);
-  els.firstNameSearch.addEventListener(evt, applyFilters);
-  els.lastNameSearch.addEventListener(evt, applyFilters);
-  els.yearSearch.addEventListener(evt, applyFilters);
-  els.exactNameMatch.addEventListener(evt, applyFilters);
-});
+    function clear() {
+      menu.querySelectorAll("input:checked").forEach(i => (i.checked = false));
+      updateLabel(false);
+    }
 
-/* ---------------------- Start ---------------------- */
-(async function init(){
-  try {
-    await loadWorkbook();
-  } catch (err) {
-    console.error(err);
-    els.resultsCount.textContent =
-      "❌ Database failed to load. Make sure 'Backend database.xlsx' is in the same folder as this page.";
+    updateLabel(false);
+    return { getValues, clear };
   }
-})();
+
+  function closeAllMultiSelects() {
+    document.querySelectorAll(".multi-select.open").forEach(el => el.classList.remove("open"));
+  }
+
+  function populateMultiSelects() {
+    multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d => d.area), "All Areas");
+    multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d => d.position), "All Positions");
+    multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d => d.year), "All Years");
+  }
+
+  // ---------- Table render ----------
+  function renderTable(rows) {
+    currentRows = rows.slice();
+    const frag = document.createDocumentFragment();
+
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+      const url = safeUrl(r.articleLink);
+
+      tr.innerHTML = `
+        <td>${r.lastName || ""}</td>
+        <td>${r.firstName || ""}</td>
+        <td>${r.startDateAtRawls || ""}</td>
+        <td>${r.endDateAtRawls || ""}</td>
+        <td>${r.position || ""}</td>
+        <td>${r.area || ""}</td>
+        <td>${r.pubdate || ""}</td>
+        <td>${r.year || ""}</td>
+        <td>${r.articleTitle || ""}</td>
+        <td>${r.journalName || ""}</td>
+        <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+        <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+        <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+        <td>${r.authorRank || ""}</td>
+        <td>
+          ${
+            url
+              ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>`
+              : `<span class="link-btn disabled">No link</span>`
+          }
+        </td>
+      `;
+      frag.appendChild(tr);
+    });
+
+    elements.resultsBody.innerHTML = "";
+    elements.resultsBody.appendChild(frag);
+    elements.resultsCount.textContent = `Showing ${rows.length} results`;
+  }
+
+  // ---------- Filtering ----------
+  function applyFilters() {
+    const firstQ = elements.firstNameSearch.value;
+    const lastQ  = elements.lastNameSearch.value;
+    const exact  = elements.exactNameMatch.checked;
+
+    const firstTokens = parseNameTokens(firstQ);
+    const lastTokens  = parseNameTokens(lastQ);
+
+    const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
+    const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
+    const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
+
+    const utdY = elements.utdYes.checked, utdN = elements.utdNo.checked;
+    const ftY  = elements.ftYes.checked,  ftN  = elements.ftNo.checked;
+    const r4 = elements.rank4.checked, r5 = elements.rank5.checked, r5s = elements.rank5star.checked;
+
+    const kq = elements.keywordSearch.value.toLowerCase();
+    const tq = elements.titleSearch.value.toLowerCase();
+    const jq = elements.journalSearch.value.toLowerCase();
+
+    const rows = data.filter(d => {
+      const first = d.firstName || "";
+      const last  = d.lastName || "";
+
+      const initialsPair =
+        (firstQ && matchesTwoInitials(firstQ, first, last)) ||
+        (lastQ  && matchesTwoInitials(lastQ, first, last));
+
+      if (!initialsPair) {
+        for (const t of firstTokens) if (!tokenMatchEitherName(t, first, last, exact)) return false;
+        for (const t of lastTokens)  if (!tokenMatchEitherName(t, first, last, exact)) return false;
+      }
+
+      if (kq) {
+        const inTitle = (d.articleTitle || "").toLowerCase().includes(kq);
+        const inJour  = (d.journalName || "").toLowerCase().includes(kq);
+        if (!inTitle && !inJour) return false;
+      }
+
+      if (tq && !String(d.articleTitle || "").toLowerCase().includes(tq)) return false;
+      if (jq && !String(d.journalName || "").toLowerCase().includes(jq)) return false;
+
+      if (areaVals.length && !areaVals.includes(d.area)) return false;
+      if (posVals.length  && !posVals.includes(d.position)) return false;
+      if (yearVals.length && !yearVals.includes(String(d.year))) return false;
+
+      if ((utdY || utdN) && !((utdY && d.utdJournal === "Yes") || (utdN && d.utdJournal === "No"))) return false;
+      if ((ftY  || ftN)  && !((ftY  && d.ftJournal  === "Yes") || (ftN  && d.ftJournal  === "No"))) return false;
+      if ((r4 || r5 || r5s) && !((r4 && d.ranking === "4") || (r5 && d.ranking === "5") || (r5s && d.ranking === "5*"))) return false;
+
+      return true;
+    });
+
+    renderTable(rows);
+  }
+
+  // ---------- Clear filters ----------
+  function clearAllFilters() {
+    elements.firstNameSearch.value = "";
+    elements.lastNameSearch.value = "";
+    elements.exactNameMatch.checked = false;
+
+    elements.keywordSearch.value = "";
+    elements.titleSearch.value = "";
+    elements.journalSearch.value = "";
+
+    if (multiSelectControls.area) multiSelectControls.area.clear();
+    if (multiSelectControls.position) multiSelectControls.position.clear();
+    if (multiSelectControls.year) multiSelectControls.year.clear();
+
+    elements.utdYes.checked = elements.utdNo.checked = false;
+    elements.ftYes.checked = elements.ftNo.checked = false;
+    elements.rank4.checked = elements.rank5.checked = elements.rank5star.checked = false;
+
+    renderTable(data);
+  }
+
+  function getFacultyName(row) {
+    if (row.personName && row.personName.trim()) return row.personName.trim();
+    const parts = [];
+    if (row.lastName) parts.push(row.lastName);
+    if (row.firstName) parts.push(row.firstName);
+    return parts.join(", ");
+  }
+
+  // ---------- Export helpers ----------
+  function exportDataAsXlsx() {
+    if (!currentRows || currentRows.length === 0) { alert("There are no rows to export."); return; }
+    const exportData = currentRows.map(r => ({
+      "Last Name": r.lastName,
+      "First Name": r.firstName,
+      "Faculty (Display)": getFacultyName(r),
+      "Start Date at Rawls": r.startDateAtRawls,
+      "End Date at Rawls": r.endDateAtRawls,
+      "Position": r.position,
+      "Area": r.area,
+      "Pub Date": r.pubdate,
+      "Year": r.year,
+      "Article Title": r.articleTitle,
+      "Journal": r.journalName,
+      "Ranking": r.ranking,
+      "UTD Journal": r.utdJournal,
+      "Financial Times Journal": r.ftJournal,
+      "Author Rank": r.authorRank,
+      "Article Link": r.articleLink,
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Filtered_Results");
+    XLSX.writeFile(wb, "Rawls_Publications_Filtered.xlsx");
+  }
+
+  function exportDataAsCsv() {
+    if (!currentRows || currentRows.length === 0) { alert("There are no rows to export."); return; }
+    const exportData = currentRows.map(r => ({
+      "Last Name": r.lastName,
+      "First Name": r.firstName,
+      "Faculty (Display)": getFacultyName(r),
+      "Start Date at Rawls": r.startDateAtRawls,
+      "End Date at Rawls": r.endDateAtRawls,
+      "Position": r.position,
+      "Area": r.area,
+      "Pub Date": r.pubdate,
+      "Year": r.year,
+      "Article Title": r.articleTitle,
+      "Journal": r.journalName,
+      "Ranking": r.ranking,
+      "UTD Journal": r.utdJournal,
+      "Financial Times Journal": r.ftJournal,
+      "Author Rank": r.authorRank,
+      "Article Link": r.articleLink,
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url; link.download = "Rawls_Publications_Filtered.csv";
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportSummaryOnly() {
+    if (!currentRows || currentRows.length === 0) { alert("There are no rows to summarize."); return; }
+
+    const wb = XLSX.utils.book_new();
+
+    const facultySet = new Set(), yearSet = new Set(), areaSet = new Set();
+    currentRows.forEach(r => {
+      const f = getFacultyName(r);
+      if (f) facultySet.add(f);
+      if (r.year) yearSet.add(r.year);
+      if (r.area) areaSet.add(r.area);
+    });
+
+    const overview = [
+      { Metric: "Total articles (filtered)", Value: currentRows.length },
+      { Metric: "Distinct faculty (filtered)", Value: facultySet.size },
+      { Metric: "Distinct years (filtered)", Value: yearSet.size },
+      { Metric: "Distinct areas (filtered)", Value: areaSet.size },
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(overview), "Summary_Overview");
+
+    const facultySummary = {};
+    currentRows.forEach(r => {
+      const f = getFacultyName(r);
+      if (!f) return;
+      facultySummary[f] = (facultySummary[f] || 0) + 1;
+    });
+    const facultyRows = Object.keys(facultySummary).sort().map(name => ({ "Faculty": name, "Total Articles": facultySummary[name] }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyRows), "By_Faculty");
+
+    const yearSummary = {};
+    currentRows.forEach(r => {
+      const y = r.year || "";
+      if (!y) return;
+      yearSummary[y] = (yearSummary[y] || 0) + 1;
+    });
+    const yearRows = Object.keys(yearSummary).sort().map(y => ({ "Year": y, "Total Articles": yearSummary[y] }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(yearRows), "By_Year");
+
+    XLSX.writeFile(wb, "Rawls_Publications_Summary.xlsx");
+  }
+console.log("Loaded rows:", data.length);
+console.log(data[0]);
+
+  // ---------- Listeners ----------
+  function attachListeners() {
+    const debounce = (fn, ms = 120) => {
+      let t;
+      return () => { clearTimeout(t); t = setTimeout(fn, ms); };
+    };
+    const debouncedApply = debounce(applyFilters, 120);
+
+    [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
+      .forEach(el => el.addEventListener("input", debouncedApply));
+
+    [elements.exactNameMatch, elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo, elements.rank4, elements.rank5, elements.rank5star]
+      .forEach(el => el.addEventListener("input", applyFilters));
+
+    elements.clearFilters.addEventListener("click", clearAllFilters);
+
+    if (elements.advancedToggle && elements.advancedPanel) {
+      elements.advancedToggle.addEventListener("click", () => {
+        const open = elements.advancedPanel.classList.toggle("collapsed") === false;
+        elements.advancedToggle.classList.toggle("open", open);
+        elements.advancedToggle.setAttribute("aria-expanded", String(open));
+      });
+    }
+
+    // Export modal
+    elements.exportExcel.addEventListener("click", () => elements.exportModal.classList.add("active"));
+    elements.exportModalClose.addEventListener("click", () => elements.exportModal.classList.remove("active"));
+    elements.exportModal.addEventListener("click", (e) => { if (e.target === elements.exportModal) elements.exportModal.classList.remove("active"); });
+
+    elements.exportXlsx.addEventListener("click", () => { exportDataAsXlsx(); elements.exportModal.classList.remove("active"); });
+    elements.exportCsv.addEventListener("click",  () => { exportDataAsCsv();  elements.exportModal.classList.remove("active"); });
+    elements.exportSummary.addEventListener("click", () => { exportSummaryOnly(); elements.exportModal.classList.remove("active"); });
+
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") elements.exportModal.classList.remove("active"); });
+  }
+
+  // ---------- Init ----------
+  document.addEventListener("DOMContentLoaded", () => {
+    loadWorkbookFromServer();
+    attachListeners();
+  });
 </script>
 
+<footer class="rawls-footer">
+  <div class="rawls-footer-inner">
+    <span>© 2025 Rawls College Research</span>
+    <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/" target="_blank" class="linkedin-btn" aria-label="Visit Rawls College Research on LinkedIn">
+      <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn logo">
+      Follow us on LinkedIn
+    </a>
+  </div>
+</footer>
 </body>
 </html>
-
-   
