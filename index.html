@@ -528,23 +528,33 @@ function loadWorkbookFromServer() {
         const r = normalizeRow(row);
 
         return {
-          lastName: r["lastname"] || "",
-          firstName: r["firstname"] || "",
-          startDateAtRawls: r["start date at rawls"] || "",
-          endDateAtRawls: r["end date at rawls"] || "",
-          position: r["position"] || "",
-          area: r["area"] || "",
-          pubdate: r["publication date"] || "",
-          year: String(r["year"] || "").trim(),
-          articleTitle: r["Article Title"] || "",
-          journalName: r["journal name"] || "",
-          ranking: String(r["journal ranking"] || "").trim(),
-          utdJournal: String(r["utd journal"] || "").trim(),
-          ftJournal: String(r["financial times journal"] || "").trim(),
-          authorRank: r["author rank"] || "",
-          articleLink: r["article link"] || ""
-        };
-      });
+  lastName: r["lastname"] || "",
+  firstName: r["firstname"] || "",
+
+  startDateAtRawls: r["start date at rawls"] || "",
+  endDateAtRawls: r["end date at rawls"] || "",
+
+  position: r["position"] || "",
+  area: r["area"] || "",
+
+  // ✅ Publication Date (matches your Excel exactly)
+  pubdate: r["publication date"] || "",
+
+  year: String(r["year"] || "").trim(),
+
+  // ✅ Article + Journal (matches exactly)
+  articleTitle: r["article title"] || "",
+  journalName: r["journal name"] || "",
+
+  // ✅ THIS was the main bug
+  ranking: String(r["journal rank"] || "").trim(),
+
+  utdJournal: String(r["utd journal"] || "").trim(),
+  ftJournal: String(r["financial times journal"] || "").trim(),
+
+  authorRank: r["author rank"] || "",
+  articleLink: r["article link"] || ""
+};
 
       console.log("Loaded rows:", data.length);
       console.log("Sample row:", data[0]);
