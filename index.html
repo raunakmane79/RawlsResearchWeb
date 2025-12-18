@@ -403,7 +403,7 @@ function findBestSheet(workbook) {
 
 async function loadWorkbook() {
   // IMPORTANT: must match your file name exactly in the same folder as index.html
-  const fileName = "Backend database.xlsx";
+  const fileName = "Database.xlsx";
 
   const res = await fetch(fileName, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch ${fileName}. Status: ${res.status}`);
