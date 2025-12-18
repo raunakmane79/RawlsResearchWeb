@@ -528,8 +528,9 @@ function loadWorkbookFromServer() {
         const r = normalizeRow(row);
 
         return {
-  lastName: r["lastname"] || "",
-  firstName: r["firstname"] || "",
+  lastName: r["lastname"] || r["last name"] || "",
+firstName: r["firstname"] || r["first name"] || "",
+
 
   startDateAtRawls: r["start date at rawls"] || "",
   endDateAtRawls: r["end date at rawls"] || "",
