@@ -458,12 +458,13 @@
 
   function findSheetWithHeaders(workbook) {
     // Your uploaded sheet uses "OpenAccessURL" for the link column.
-    const targetHeaders = [
-      "lastname","firstname","start date at rawls","end date at rawls","position","area",
-      "pubdate","year","articletitle","journalname",
-      "ranking - updated","utd journal","financial times journal",
-      "author rank","openaccessurl"
-    ];
+const targetHeaders = [
+  "lastname","firstname","start date at rawls","end date at rawls","position","area",
+  "pubdate","year","articletitle","journalname",
+  "ranking - updated","utd journal","financial times journal",
+  "author rank","article link"
+];
+
 
     let bestSheet = workbook.SheetNames[0];
     let bestScore = -1;
@@ -536,7 +537,8 @@
             ftJournal: String(r["financial times journal"] || "").trim(),
             authorRank: r["author rank"] || "",
             // FIX: your sheet uses OpenAccessURL (but keep fallback too)
-            articleLink: r["openaccessurl"] || r["article link"] || "",
+         articleLink: r["article link"] || r["openaccessurl"] || "",
+,
           };
         });
 
