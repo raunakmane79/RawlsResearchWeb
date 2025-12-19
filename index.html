@@ -590,22 +590,58 @@ function ingestWorkbook(workbook){
     const nameFromPerson = splitPersonName(person);
 
     return {
-      lastName: pick(r, ["lastname","last name"]) || nameFromPerson.last,
-      firstName: pick(r, ["firstname","first name"]) || nameFromPerson.first,
-      startDateAtRawls: pick(r, ["start date at rawls"]),
-      endDateAtRawls: pick(r, ["end date at rawls"]),
-      position: pick(r, ["position"]),
-      area: pick(r, ["area"]),
-      pubdate: pick(r, ["publication date","pub date"]),
-      year: r["year"] ? String(r["year"]) : "",
-      articleTitle: pick(r, ["article title"]),
-      journalName: pick(r, ["journal name"]),
-      ranking: pick(r, ["ranking","journal ranking"]),
-      utdJournal: pick(r, ["utd journal"]),
-      ftJournal: pick(r, ["financial times journal"]),
-      articleLink: pick(r, ["article link","openaccessurl"])
-    };
-  });
+  lastName,
+  firstName,
+
+  startDateAtRawls: pick(r, [
+    "start date at rawls","startdate at rawls","start date","startdate"
+  ]),
+
+  endDateAtRawls: pick(r, [
+    "end date at rawls","enddate at rawls","end date","enddate"
+  ]),
+
+  position: pick(r, ["position","title","role"]),
+  area: pick(r, ["area","department","discipline"]),
+
+  // IMPORTANT: your sheet uses pubdate a lot
+  pubdate: String(pick(r, [
+    "pubdate","publication date","pub date","publicationdate","acceptance date"
+  ]) || "").trim(),
+
+  year: String(pick(r, ["year","publication year"]) || "").trim(),
+
+  // IMPORTANT: your sheet uses articletitle/journalname
+  articleTitle: pick(r, [
+    "article title","articletitle","title","article"
+  ]),
+
+  journalName: pick(r, [
+    "journal name","journalname","journal"
+  ]),
+
+  // IMPORTANT: your sheet uses Ranking - Updated / Ranking
+  ranking: String(pick(r, [
+    "ranking - updated","ranking updated","ranking","journal ranking","rawls journal list ranking"
+  ]) || "").trim(),
+
+  utdJournal: String(pick(r, [
+    "utd journal","utd","utd journal?"
+  ]) || "").trim(),
+
+  ftJournal: String(pick(r, [
+    "financial times journal","financial times","ft","ft journal"
+  ]) || "").trim(),
+
+  // Optional: if you want to show this in the table later
+  authorRank: String(pick(r, [
+    "author rank","authorrank"
+  ]) || "").trim(),
+
+  articleLink: String(pick(r, [
+    "article link","articlelink","openaccessurl","open access url","openaccess url"
+  ]) || "").trim(),
+};
 
   console.log("Loaded rows:", data.length, "Sample:", data[0]);
   populateMultiSelects();
