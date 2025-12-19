@@ -294,8 +294,9 @@
     const raw=String(input||"").trim();
     return raw ? raw.split(/[\\s,]+/).filter(Boolean) : [];
   }
-  function isPrefixQuery(q){ return /\\*$/.test(q); }
-  function stripWildcard(q){ return q.replace(/\\*+$/,""); }
+function isPrefixQuery(q){ return /\*$/.test(q); }
+function stripWildcard(q){ return q.replace(/\*+$/,""); }
+
 
   function levenshtein(a,b){
     a=fold(a); b=fold(b);
