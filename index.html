@@ -599,17 +599,33 @@
   }
 
   async function tryLoadViaFetch(){
-    try{
-      const res = await fetch("Database.xlsx", { cache: "no-store" });
-      if(!res.ok) throw new Error("Database.xlsx not found (HTTP " + res.status + ")");
+  const candidates = [
+    "Database.xlsx",
+    "database.xlsx",
+    "DatabaseA.xlsx"
+  ];
+
+  for (const name of candidates) {
+    try {
+      const url = new URL(name, window.location.href).toString();
+      console.log("Trying:", url);
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`${name} -> HTTP ${res.status}`);
+
       const buf = await res.arrayBuffer();
       const workbook = XLSX.read(buf, { type:"array" });
       ingestWorkbook(workbook);
-    }catch(err){
-      console.error(err);
-      showLoadHint("❌ Could not load Database.xlsx automatically. Upload the file below (or run a local server).");
+      console.log("Loaded successfully from:", name);
+      return;
+    } catch (err) {
+      console.warn("Failed:", err.message || err);
     }
   }
+
+  showLoadHint("❌ Could not load the Excel file. Check GitHub Pages folder + exact filename/case.");
+}
+
 
   function attachListeners(){
     const debounce=(fn,ms=120)=>{ let t; return ()=>{ clearTimeout(t); t=setTimeout(fn,ms); }; };
