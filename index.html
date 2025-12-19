@@ -568,18 +568,31 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     elements.resultsCount.textContent = msg || "Database not loaded.";
   }
 function ingestWorkbook(workbook){
-  const pickSheet = findBestSheet(workbook);
-  const sheet = workbook.Sheets[pickSheet.name];
+  // Force Tab 12 (12th worksheet)
+  const tabIndex = 11; // 0-based
+  const sheetName = workbook.SheetNames[tabIndex];
 
-  const rawRows = XLSX.utils.sheet_to_json(sheet, {
-    defval: "",
-    range: pickSheet.headerRow
-  });
-
-  if (!rawRows.length) {
-    showLoadHint("❌ Excel loaded, but 0 rows parsed. Header row may be blank/merged.");
+  if (!sheetName) {
+    showLoadHint(`❌ Tab 12 not found. This workbook only has ${workbook.SheetNames.length} sheets.`);
     return;
   }
+
+  console.log("Forced sheet:", sheetName, "index:", tabIndex + 1);
+
+  const sheet = workbook.Sheets[sheetName];
+
+  // If your headers are not in row 1, adjust this number (0 = first row)
+  const headerRow = 0;
+
+  const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "", range: headerRow });
+
+  if (!rawRows.length) {
+    showLoadHint("❌ Excel loaded, but 0 rows parsed from Tab 12. Header row may be blank/merged.");
+    return;
+  }
+
+  // ...keep the rest of your mapping exactly as you already have it...
+
 
   data = rawRows.map(row => {
     const r = normalizeRowKeys(row);
