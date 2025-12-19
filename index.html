@@ -375,26 +375,33 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
 
   // choose best sheet by matching ANY of these headers (your Database.xlsx uses these)
   function findBestSheet(workbook){
-    const want = [
-      "personname","start date at rawls","end date at rawls","position","area",
-      "acceptance date","publication date","pub date","year","article title",
-      "journal name","ranking","journal ranking","utd journal","financial times journal",
-      "openaccessurl","article link"
-    ];
-    let best = workbook.SheetNames[0];
-    let bestScore = -1;
+  const want = [
+    "personname","start date at rawls","end date at rawls","position","area",
+    "publication date","pub date","year","article title","journal name",
+    "ranking","journal ranking","utd journal","financial times journal",
+    "openaccessurl","article link"
+  ];
 
-    workbook.SheetNames.forEach(name=>{
-      const sheet = workbook.Sheets[name];
-      const rows = XLSX.utils.sheet_to_json(sheet, {header:1, range:0});
-      const headers = (rows[0]||[]).map(canon);
-      const score = want.filter(h=>headers.includes(h)).length;
-      if(score>bestScore){ bestScore=score; best=name; }
-    });
+  let best = { name: workbook.SheetNames[0], score: -1, headerRow: 0 };
 
-    console.log("Using sheet:", best, "score:", bestScore);
-    return best;
-  }
+  workbook.SheetNames.forEach(name=>{
+    const sheet = workbook.Sheets[name];
+    const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
+
+    // scan first 30 rows to find the best header row
+    for (let r = 0; r < Math.min(30, grid.length); r++) {
+      const headers = (grid[r] || []).map(canon);
+      const score = want.filter(h => headers.includes(h)).length;
+
+      if (score > best.score) {
+        best = { name, score, headerRow: r };
+      }
+    }
+  });
+
+  console.log("Using sheet:", best.name, "score:", best.score, "headerRow:", best.headerRow);
+  return best; // return object now
+}
 
   function buildMultiSelect(container, values, placeholderText){
     const unique=[...new Set(values.filter(v=>String(v||"").trim()!==""))].sort();
@@ -561,10 +568,17 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     elements.resultsCount.textContent = msg || "Database not loaded.";
   }
 
-  function ingestWorkbook(workbook){
-    const sheetName = findBestSheet(workbook);
-    const sheet = workbook.Sheets[sheetName];
-    const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+const pickSheet = findBestSheet(workbook);
+const sheet = workbook.Sheets[pickSheet.name];
+
+// start reading at the detected header row
+const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "", range: pickSheet.headerRow });
+
+if (!rawRows.length) {
+  showLoadHint("❌ Excel loaded, but 0 rows parsed. Your header row may be merged/blank. Try saving as a fresh .xlsx or move headers to row 1.");
+  return;
+}
+
 
     data = rawRows.map(row=>{
       const r = normalizeRowKeys(row);
