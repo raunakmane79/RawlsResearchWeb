@@ -541,7 +541,8 @@ firstName: r["firstname"] || r["first name"] || "",
   // ✅ Publication Date (matches your Excel exactly)
   pubdate: r["publication date"] || "",
 
-  year: String(r["year"] || "").trim(),
+  year: r["year"] ? String(r["year"]).trim() : "",
+
 
   // ✅ Article + Journal (matches exactly)
   articleTitle: r["article title"] || "",
