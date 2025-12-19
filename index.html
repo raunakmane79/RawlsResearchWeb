@@ -577,71 +577,70 @@ function ingestWorkbook(workbook){
   });
 
   if (!rawRows.length) {
-    showLoadHint(
-      "❌ Excel loaded, but 0 rows parsed. Your header row may be merged or blank."
-    );
-    return; // ✅ LEGAL here
+    showLoadHint("❌ Excel loaded, but 0 rows parsed. Your header row may be merged or blank.");
+    return;
   }
 
   data = rawRows.map(row => {
     const r = normalizeRowKeys(row);
 
-    const person = pick(r, ["personname","person name"]);
+    // name handling (either personname OR separate first/last)
+    const person = pick(r, ["personname","person name","name"]);
     const nameFromPerson = splitPersonName(person);
 
+    const lastName  = pick(r, ["lastname","last name"])  || nameFromPerson.last;
+    const firstName = pick(r, ["firstname","first name"]) || nameFromPerson.first;
+
     return {
-  lastName,
-  firstName,
+      lastName,
+      firstName,
 
-  startDateAtRawls: pick(r, [
-    "start date at rawls","startdate at rawls","start date","startdate"
-  ]),
+      startDateAtRawls: pick(r, [
+        "start date at rawls","startdate at rawls","start date","startdate"
+      ]),
 
-  endDateAtRawls: pick(r, [
-    "end date at rawls","enddate at rawls","end date","enddate"
-  ]),
+      endDateAtRawls: pick(r, [
+        "end date at rawls","enddate at rawls","end date","enddate"
+      ]),
 
-  position: pick(r, ["position","title","role"]),
-  area: pick(r, ["area","department","discipline"]),
+      position: pick(r, ["position","title","role"]),
+      area: pick(r, ["area","department","discipline"]),
 
-  // IMPORTANT: your sheet uses pubdate a lot
-  pubdate: String(pick(r, [
-    "pubdate","publication date","pub date","publicationdate","acceptance date"
-  ]) || "").trim(),
+      pubdate: String(pick(r, [
+        "pubdate","publication date","pub date","publicationdate","acceptance date"
+      ]) || "").trim(),
 
-  year: String(pick(r, ["year","publication year"]) || "").trim(),
+      year: String(pick(r, ["year","publication year"]) || "").trim(),
 
-  // IMPORTANT: your sheet uses articletitle/journalname
-  articleTitle: pick(r, [
-    "article title","articletitle","title","article"
-  ]),
+      articleTitle: pick(r, [
+        "article title","articletitle","title","article"
+      ]),
 
-  journalName: pick(r, [
-    "journal name","journalname","journal"
-  ]),
+      journalName: pick(r, [
+        "journal name","journalname","journal"
+      ]),
 
-  // IMPORTANT: your sheet uses Ranking - Updated / Ranking
-  ranking: String(pick(r, [
-    "ranking - updated","ranking updated","ranking","journal ranking","rawls journal list ranking"
-  ]) || "").trim(),
+      ranking: String(pick(r, [
+        "ranking - updated","ranking updated","ranking","journal ranking","rawls journal list ranking"
+      ]) || "").trim(),
 
-  utdJournal: String(pick(r, [
-    "utd journal","utd","utd journal?"
-  ]) || "").trim(),
+      utdJournal: String(pick(r, [
+        "utd journal","utd"
+      ]) || "").trim(),
 
-  ftJournal: String(pick(r, [
-    "financial times journal","financial times","ft","ft journal"
-  ]) || "").trim(),
+      ftJournal: String(pick(r, [
+        "financial times journal","financial times","ft"
+      ]) || "").trim(),
 
-  // Optional: if you want to show this in the table later
-  authorRank: String(pick(r, [
-    "author rank","authorrank"
-  ]) || "").trim(),
+      authorRank: String(pick(r, [
+        "author rank","authorrank"
+      ]) || "").trim(),
 
-  articleLink: String(pick(r, [
-    "article link","articlelink","openaccessurl","open access url","openaccess url"
-  ]) || "").trim(),
-};
+      articleLink: String(pick(r, [
+        "article link","articlelink","openaccessurl","open access url","openaccess url"
+      ]) || "").trim(),
+    };
+  });
 
   console.log("Loaded rows:", data.length, "Sample:", data[0]);
   populateMultiSelects();
