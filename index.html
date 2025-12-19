@@ -275,9 +275,15 @@
   function canon(str){
     return String(str||"").toLowerCase().replace(/\\s+/g," ").replace(/[^a-z0-9 ]/g,"").trim();
   }
-  function fold(s){
-    return String(s||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\./g,"").trim().toLowerCase();
-  }
+ function fold(s){
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")  // ← FIXED
+    .replace(/\./g, "")
+    .trim()
+    .toLowerCase();
+}
+
   function safeUrl(u){
     const s=String(u||"").trim();
     if(!s) return "";
