@@ -548,7 +548,13 @@ firstName: r["firstname"] || r["first name"] || "",
   journalName: r["journal name"] || "",
 
   // ✅ THIS was the main bug
-ranking: String(r["journal ranking"] || "").trim(),
+ranking: String(
+  r["journal ranking"] ||
+  r["ranking updated"] ||
+  r["ranking"] ||
+  ""
+).trim(),
+
 
 
   utdJournal: String(r["utd journal"] || "").trim(),
