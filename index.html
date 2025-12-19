@@ -567,57 +567,51 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     elements.loadHint.style.display="block";
     elements.resultsCount.textContent = msg || "Database not loaded.";
   }
+function ingestWorkbook(workbook){
+  const pickSheet = findBestSheet(workbook);
+  const sheet = workbook.Sheets[pickSheet.name];
 
-const pickSheet = findBestSheet(workbook);
-const sheet = workbook.Sheets[pickSheet.name];
+  const rawRows = XLSX.utils.sheet_to_json(sheet, {
+    defval: "",
+    range: pickSheet.headerRow
+  });
 
-// start reading at the detected header row
-const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "", range: pickSheet.headerRow });
-
-if (!rawRows.length) {
-  showLoadHint("❌ Excel loaded, but 0 rows parsed. Your header row may be merged/blank. Try saving as a fresh .xlsx or move headers to row 1.");
-  return;
-}
-
-
-    data = rawRows.map(row=>{
-      const r = normalizeRowKeys(row);
-
-      // support both styles:
-      // A) personname only (your real Database.xlsx)
-      // B) separate lastname/firstname (other versions)
-      const person = pick(r, ["personname","personname1","personname 1","personname.1","person name"]);
-      const nameFromPerson = splitPersonName(person);
-
-      const lastName = pick(r, ["lastname","last name"]) || nameFromPerson.last;
-      const firstName = pick(r, ["firstname","first name"]) || nameFromPerson.first;
-
-      const pubDate = pick(r, ["publication date","pub date","acceptance date","publicationdate","pubdate"]);
-      const link = pick(r, ["article link","openaccessurl","open access url","openaccess url"]);
-
-      return {
-        lastName,
-        firstName,
-        startDateAtRawls: pick(r, ["start date at rawls","startdate at rawls","start date"]),
-        endDateAtRawls: pick(r, ["end date at rawls","enddate at rawls","end date"]),
-        position: pick(r, ["position"]),
-        area: pick(r, ["area"]),
-        pubdate: String(pubDate || "").trim(),
-        year: r["year"] ? String(r["year"]).trim() : "",
-        articleTitle: pick(r, ["article title","articletitle","title"]),
-        journalName: pick(r, ["journal name","journal"]),
-        ranking: String(pick(r, ["journal ranking","ranking","ranking updated"]) || "").trim(),
-        utdJournal: String(pick(r, ["utd journal","utd"]) || "").trim(),
-        ftJournal: String(pick(r, ["financial times journal","financial times","ft"]) || "").trim(),
-        articleLink: String(link || "").trim(),
-      };
-    });
-
-    console.log("Loaded rows:", data.length, "Sample:", data[0]);
-    populateMultiSelects();
-    renderTable(data);
-    elements.loadHint.style.display="none";
+  if (!rawRows.length) {
+    showLoadHint(
+      "❌ Excel loaded, but 0 rows parsed. Your header row may be merged or blank."
+    );
+    return; // ✅ LEGAL here
   }
+
+  data = rawRows.map(row => {
+    const r = normalizeRowKeys(row);
+
+    const person = pick(r, ["personname","person name"]);
+    const nameFromPerson = splitPersonName(person);
+
+    return {
+      lastName: pick(r, ["lastname","last name"]) || nameFromPerson.last,
+      firstName: pick(r, ["firstname","first name"]) || nameFromPerson.first,
+      startDateAtRawls: pick(r, ["start date at rawls"]),
+      endDateAtRawls: pick(r, ["end date at rawls"]),
+      position: pick(r, ["position"]),
+      area: pick(r, ["area"]),
+      pubdate: pick(r, ["publication date","pub date"]),
+      year: r["year"] ? String(r["year"]) : "",
+      articleTitle: pick(r, ["article title"]),
+      journalName: pick(r, ["journal name"]),
+      ranking: pick(r, ["ranking","journal ranking"]),
+      utdJournal: pick(r, ["utd journal"]),
+      ftJournal: pick(r, ["financial times journal"]),
+      articleLink: pick(r, ["article link","openaccessurl"])
+    };
+  });
+
+  console.log("Loaded rows:", data.length, "Sample:", data[0]);
+  populateMultiSelects();
+  renderTable(data);
+  elements.loadHint.style.display = "none";
+}
 
   async function tryLoadViaFetch(){
   const candidates = [
