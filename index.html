@@ -569,7 +569,7 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
   }
 function ingestWorkbook(workbook){
   // Force Tab 12 (12th worksheet)
-  const tabIndex = 11; // 0-based
+  const tabIndex = 10; // 0-based
   const sheetName = workbook.SheetNames[tabIndex];
 
   if (!sheetName) {
