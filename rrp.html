@@ -172,32 +172,51 @@
     });
   }
 
-  async function loadExcelAndRenderCharts() {
-    const response = await fetch(EXCEL_URL);
-    const arrayBuffer = await response.arrayBuffer();
+ async function loadExcelAndRenderCharts() {
+  const response = await fetch(EXCEL_URL);
+  const arrayBuffer = await response.arrayBuffer();
 
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+  const workbook = XLSX.read(arrayBuffer, { type: "array" });
 
-    // 🔢 Use tab "12" (index 11)
-    const sheet = workbook.Sheets[workbook.SheetNames[11]];
-    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-    rawData = json.map(r => ({
-      year: r["year"],
-      rankingUpdated: r["Ranking - Updated"]
-    }));
-
-    const fiveStar = countByYear(rawData, "5*");
-    const five = countByYear(rawData, "5");
-
-    renderBarChart("chart5Star", fiveStar.years, fiveStar.values, "#ba0c2f");
-    renderBarChart("chart5", five.years, five.values, "#6c757d");
+  // ✅ Sheet name is EXACTLY "12"
+  const sheet = workbook.Sheets["12"];
+  if (!sheet) {
+    console.error('Sheet "12" not found');
+    return;
   }
 
-  loadExcelAndRenderCharts().catch(err => {
-    console.error("Error loading Excel or rendering charts:", err);
-  });
-</script>
+  const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
+  // Normalize columns safely
+  const rawData = json.map(r => ({
+    year: String(r["year"] || r["Year"] || "").trim(),
+    rankingUpdated: String(
+      r["Ranking - Updated"] ||
+      r["Journal Ranking"] ||
+      ""
+    ).trim()
+  }));
+
+  console.log("Rows loaded:", rawData.length);
+  console.log("Sample row:", rawData[0]);
+
+  const fiveStar = countByYear(rawData, "5*");
+  const five = countByYear(rawData, "5");
+
+  renderBarChart(
+    "chart5Star",
+    fiveStar.years,
+    fiveStar.values,
+    "#ba0c2f"
+  );
+
+  renderBarChart(
+    "chart5",
+    five.years,
+    five.values,
+    "#6c757d"
+  );
+}
+</script>
 </body>
 </html>
