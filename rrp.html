@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rawls Research Productivity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#ba0c2f" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SheetJS (Excel Reader) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --rawls-red: #ba0c2f;
+      --dark-gray: #2b2b2b;
+      --light-gray: #f4f4f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Roboto", sans-serif;
+      background: var(--light-gray);
+      color: var(--dark-gray);
+    }
+
+    header {
+      background: var(--rawls-red);
+      color: white;
+      padding: 20px 30px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 500;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 30px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 14px;
+      padding: 25px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .chart-card h2 {
+      text-align: center;
+      margin: 0 0 15px;
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    footer span {
+      color: var(--rawls-red);
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Rawls Research Productivity</h1>
+  <p>Automatically updated from the Rawls research database</p>
+</header>
+
+<main>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h2>5★ Publications by Year</h2>
+      <canvas id="chart5Star"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h2>5 Publications by Year</h2>
+      <canvas id="chart5"></canvas>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Data source: <span>Rawls Faculty Publications Database</span><br>
+  Updated automatically on page load
+</footer>
+
+<script>
+  // 🔗 CHANGE THIS TO YOUR ACTUAL EXCEL PATH ON GITHUB
+  const EXCEL_URL = "Database.xlsx"; 
+  // Example:
+  // const EXCEL_URL = "https://raunakmane79.github.io/RawlsResearchWeb/Database.xlsx";
+
+  let rawData = [];
+
+  function countByYear(rows, rankingValue) {
+    const counts = {};
+
+    rows.forEach(r => {
+      if (r.rankingUpdated === rankingValue && r.year) {
+        counts[r.year] = (counts[r.year] || 0) + 1;
+      }
+    });
+
+    const years = Object.keys(counts).sort((a, b) => a - b);
+    const values = years.map(y => counts[y]);
+
+    return { years, values };
+  }
+
+  function renderBarChart(canvasId, years, values, color) {
+    const ctx = document.getElementById(canvasId);
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: years,
+        datasets: [{
+          data: values,
+          backgroundColor: color,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 }
+          }
+        }
+      }
+    });
+  }
+
+  async function loadExcelAndRenderCharts() {
+    const response = await fetch(EXCEL_URL);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+    // 🔢 Use tab "12" (index 11)
+    const sheet = workbook.Sheets[workbook.SheetNames[11]];
+    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+    rawData = json.map(r => ({
+      year: r["year"],
+      rankingUpdated: r["Ranking - Updated"]
+    }));
+
+    const fiveStar = countByYear(rawData, "5*");
+    const five = countByYear(rawData, "5");
+
+    renderBarChart("chart5Star", fiveStar.years, fiveStar.values, "#ba0c2f");
+    renderBarChart("chart5", five.years, five.values, "#6c757d");
+  }
+
+  loadExcelAndRenderCharts().catch(err => {
+    console.error("Error loading Excel or rendering charts:", err);
+  });
+</script>
+
+</body>
+</html>
