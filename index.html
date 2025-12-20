@@ -17,40 +17,6 @@
     body{margin:0;background:radial-gradient(circle at top left,#fff 0,#f3f4f6 45%,#e9ecf2 100%);color:var(--rawls-black)}
     .rawls-header{background:linear-gradient(to right,#000 60%,#111 100%);border-bottom:4px solid var(--rawls-red);color:#fff;padding:10px 28px;position:sticky;top:0;z-index:1000}
     .rawls-header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1320px;margin:0 auto;flex-wrap:wrap}
-    .menu-dropdown {
-  position: relative;
-}
-
-.menu-dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 110%;
-  background: #fff;
-  min-width: 220px;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.18);
-  border: 1px solid #e0e0e0;
-  overflow: hidden;
-  z-index: 2000;
-}
-
-.menu-dropdown-content a {
-  display: block;
-  padding: 10px 14px;
-  font-size: .85rem;
-  color: #111;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.menu-dropdown-content a:hover {
-  background: #f5f5f5;
-  color: var(--rawls-red);
-}
-.menu-dropdown.open .menu-dropdown-content {
-  display: block;
-}
 
     .rawls-header-left{display:flex;align-items:center;gap:16px;min-width:0}
     .rawls-logo{height:46px;width:auto;object-fit:contain;flex-shrink:0}
@@ -123,13 +89,116 @@
     .hint strong{color:#4a0814}
     .file-input{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
     input[type="file"]{font-size:.85rem}
+    /* Drawer button */
+.drawer-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.4);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Overlay */
+.side-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s;
+  z-index: 1500;
+}
+
+.side-drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Drawer */
+.side-drawer {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100%;
+  background: #111;
+  color: #fff;
+  z-index: 1600;
+  transition: .3s ease;
+  box-shadow: 6px 0 20px rgba(0,0,0,.4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Drawer open */
+.side-drawer.open {
+  left: 0;
+}
+
+/* Header */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+.drawer-header button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Links */
+.side-drawer a {
+  padding: 14px 18px;
+  color: #eee;
+  text-decoration: none;
+  font-size: .95rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.side-drawer a:hover {
+  background: var(--rawls-red);
+}
+
   </style>
 </head>
 
 <body>
+  <!-- Side Drawer -->
+<div class="side-drawer-overlay" id="drawerOverlay"></div>
+
+<nav class="side-drawer" id="sideDrawer">
+  <div class="drawer-header">
+    <span>Rawls Research</span>
+    <button id="closeDrawer">✕</button>
+  </div>
+
+  <a href="https://rawlsresearch.ttu.edu/productivity" target="_blank">
+    📊 Rawls Research Productivity
+  </a>
+
+  <a href="https://rawlsresearch.ttu.edu/about" target="_blank">
+    ℹ️ About Us
+  </a>
+
+  <a href="https://www.linkedin.com/school/rawls-college-of-business/" target="_blank">
+    🔗 Follow on LinkedIn
+  </a>
+</nav>
+
 <header class="rawls-header">
   <div class="rawls-header-inner">
     <div class="rawls-header-left">
+      <button class="drawer-btn" id="openDrawer">☰</button>
+
       <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
       <div class="rawls-header-brand">
         <span class="rawls-header-brand-main">Rawls College Research</span>
@@ -141,16 +210,6 @@
       <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
     </div>
   </div>
-    <div class="menu-dropdown" id="menuDropdown">
-  <button class="header-btn" id="menuBtn">
-    ☰ Menu
-  </button>
-  <div class="menu-dropdown-content">
-    <a href="https://rawlsresearch.ttu.edu/productivity" target="_blank">
-      Rawls Productivity Page
-    </a>
-  </div>
-</div>
 </header>
 
 <div class="app">
@@ -765,6 +824,24 @@ document.addEventListener("click", () => {
     attachListeners();
     tryLoadViaFetch();
   });
+  const openDrawer = document.getElementById("openDrawer");
+const closeDrawer = document.getElementById("closeDrawer");
+const sideDrawer = document.getElementById("sideDrawer");
+const overlay = document.getElementById("drawerOverlay");
+
+openDrawer.addEventListener("click", () => {
+  sideDrawer.classList.add("open");
+  overlay.classList.add("open");
+});
+
+closeDrawer.addEventListener("click", closeDrawerFn);
+overlay.addEventListener("click", closeDrawerFn);
+
+function closeDrawerFn() {
+  sideDrawer.classList.remove("open");
+  overlay.classList.remove("open");
+}
+
 </script>
 </body>
 </html>
