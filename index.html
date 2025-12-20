@@ -567,23 +567,29 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     elements.loadHint.style.display="block";
     elements.resultsCount.textContent = msg || "Database not loaded.";
   }
+function excelDateToJS(value) {
+  if (!value) return "";
+  if (typeof value === "number") {
+    const date = new Date((value - 25569) * 86400 * 1000);
+    return date.toLocaleDateString("en-US");
+  }
+  return value; // already text
+}
 
 function ingestWorkbook(workbook) {
 
-  /* 1️⃣ Force sheet named "12" */
   const sheetName = "12";
   const sheet = workbook.Sheets[sheetName];
 
   if (!sheet) {
-    showLoadHint(`❌ Sheet named "12" not found.`);
+    showLoadHint(`❌ Sheet "12" not found.`);
     return;
   }
 
   console.log("Using forced sheet:", sheetName);
 
-  /* 2️⃣ Read ONLY columns A–O */
   const rows = XLSX.utils.sheet_to_json(sheet, {
-    range: "A1:O1048576",
+    range: "A2:O1048576", // ✅ START FROM ROW 2 (skip header row)
     header: [
       "lastname",
       "firstname",
@@ -604,20 +610,17 @@ function ingestWorkbook(workbook) {
     defval: ""
   });
 
-  if (!rows.length) {
-    showLoadHint("❌ Sheet loaded but no rows found.");
-    return;
-  }
-
-  /* 3️⃣ Clean + normalize rows */
   data = rows.map(r => ({
     lastName: r.lastname,
     firstName: r.firstname,
-    startDateAtRawls: r.startDateAtRawls,
-    endDateAtRawls: r.endDateAtRawls,
+
+    // ✅ Convert Excel serial → readable date
+    startDateAtRawls: excelDateToJS(r.startDateAtRawls),
+    endDateAtRawls: excelDateToJS(r.endDateAtRawls),
+
     position: r.position,
     area: r.area,
-    pubdate: r.pubdate,
+    pubdate: excelDateToJS(r.pubdate),
     year: String(r.year),
     articleTitle: r.articleTitle,
     journalName: r.journalName,
@@ -634,6 +637,7 @@ function ingestWorkbook(workbook) {
   renderTable(data);
   elements.loadHint.style.display = "none";
 }
+
 
 
 
