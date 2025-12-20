@@ -791,17 +791,7 @@ function ingestWorkbook(workbook) {
       elements.advancedToggle.classList.toggle("open", open);
       elements.advancedToggle.setAttribute("aria-expanded", String(open));
     });
-const menuBtn = document.getElementById("menuBtn");
-const menuDropdown = document.getElementById("menuDropdown");
 
-menuBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  menuDropdown.classList.toggle("open");
-});
-
-document.addEventListener("click", () => {
-  menuDropdown.classList.remove("open");
-});
 
     // upload fallback (works even on file://)
     elements.dbFile.addEventListener("change", async (e)=>{
