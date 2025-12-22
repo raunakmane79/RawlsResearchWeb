@@ -316,26 +316,48 @@
     function yes(v){ return cleanStr(v).toLowerCase() === "yes"; }
 
     // Map raw Area text -> category key (controls color)
-    function areaCategoryKey(area){
-      const a = cleanStr(area).toLowerCase();
+   function areaCategoryKey(area){
+  const a = cleanStr(area).toLowerCase();
 
-      // If sheet uses short codes sometimes
-      if (a === "mgt" || a.includes("management")) return "MANAGEMENT";
-      if (a === "fin" || a.includes("finance")) return "FINANCE";
-      if (a === "acct" || a.includes("account")) return "ACCOUNTING";
-      if (a.includes("energy") || a.includes("commerce") || a.includes("business economics") || a === "ecbe") return "ECBE";
-      if (a.includes("isqs") || a.includes("information") || a.includes("quantitative")) return "ISQS";
+  // --- Highest priority: combined label should be Supply Chain (Forest Green) ---
+  // Handles: "Marketing & Supply Chain Management", "Marketing and Supply Chain", etc.
+  if (
+    (a.includes("marketing") && a.includes("supply chain")) ||
+    a.includes("marketing & supply chain") ||
+    a.includes("marketing and supply chain")
+  ) {
+    return "SUPPLYCHAIN";
+  }
 
-      // Marketing vs Supply Chain
-      const hasMarketing = a.includes("marketing");
-      const hasSupply = a.includes("supply chain") || a.includes("supply-chain") || a.includes("supplychain") || a.includes("scm");
+  // Management
+  if (a === "mgt" || a.includes("management")) return "MANAGEMENT";
 
-      // If both are present, treat as Supply Chain (as requested for a distinct SCM color)
-      if (hasSupply) return "SUPPLYCHAIN";
-      if (hasMarketing) return "MARKETING";
+  // Finance
+  if (a === "fin" || a.includes("finance")) return "FINANCE";
 
-      return "";
-    }
+  // Accounting
+  if (a === "acct" || a.includes("account")) return "ACCOUNTING";
+
+  // Energy commerce
+  if (a.includes("energy") || a.includes("commerce") || a.includes("business economics") || a === "ecbe") return "ECBE";
+
+  // ISQS
+  if (a.includes("isqs") || a.includes("information") || a.includes("quantitative")) return "ISQS";
+
+  // Supply Chain (includes SCM)
+  if (
+    a.includes("supply chain") ||
+    a.includes("supply-chain") ||
+    a.includes("supplychain") ||
+    a.includes("scm")
+  ) return "SUPPLYCHAIN";
+
+  // Marketing (only marketing without supply chain)
+  if (a.includes("marketing")) return "MARKETING";
+
+  return "";
+}
+
 
     // Wrap long axis labels to stop overlap
     function wrapLabel(label, maxLineLen = 14){
