@@ -2,221 +2,380 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Rawls Research Productivity</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rawls Research Productivity</title>
 
-  <!-- Theme -->
   <meta name="theme-color" content="#ba0c2f" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- SheetJS (Excel Reader) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
   <style>
-    :root {
-      --rawls-red: #ba0c2f;
-      --dark-gray: #2b2b2b;
-      --light-gray: #f4f4f4;
+    :root{
+      --rawls-red:#ba0c2f;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow: 0 8px 20px rgba(0,0,0,0.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
 
-    * {
-      box-sizing: border-box;
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: linear-gradient(90deg, #111827, #1f2937);
+      border-bottom: 3px solid var(--rawls-red);
+      color:#fff;
+    }
+    .topbar-inner{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      flex-direction:column;
+      line-height:1.1;
+    }
+    .brand strong{font-size:16px; letter-spacing:0.2px;}
+    .brand span{font-size:12px; color:#d1d5db;}
+
+    .nav a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+      font-size:14px;
+      padding:8px 10px;
+      border-radius:10px;
+      display:inline-block;
+    }
+    .nav a:hover{background:rgba(255,255,255,0.10);}
+    .nav a.active{background:rgba(186,12,47,0.25); border:1px solid rgba(186,12,47,0.6);}
+
+    /* Layout */
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px 16px 32px;
+    }
+    .hero{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      margin-top:10px;
+      margin-bottom:16px;
+    }
+    .hero h1{
+      margin:0;
+      font-size:26px;
+      letter-spacing:0.2px;
+    }
+    .hero p{
+      margin:6px 0 0;
+      color:var(--muted);
+      max-width:720px;
+      font-size:14px;
+    }
+    .pill{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:13px;
+      color:var(--muted);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      white-space:nowrap;
     }
 
-    body {
-      margin: 0;
-      font-family: "Roboto", sans-serif;
-      background: var(--light-gray);
-      color: var(--dark-gray);
+    /* Cards + charts */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap:16px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+      .hero{ flex-direction:column; align-items:flex-start; }
+      .pill{ width:100%; }
     }
 
-    header {
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px 14px 10px;
+    }
+    .card h2{
+      margin:0 0 8px;
+      font-size:16px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .sub{
+      margin:0 0 10px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .chartBox{
+      height:320px;
+      position:relative;
+    }
+
+    /* Bottom status */
+    .status{
+      margin-top:14px;
+      background:#fff;
+      border:1px dashed var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin: 10px 0 0;
+    }
+    button{
+      appearance:none;
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
       background: var(--rawls-red);
-      color: white;
-      padding: 20px 30px;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size:13px;
     }
-
-    header h1 {
-      margin: 0;
-      font-size: 26px;
-      font-weight: 500;
-    }
-
-    header p {
-      margin: 5px 0 0;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-      gap: 30px;
-    }
-
-    .chart-card {
-      background: white;
-      border-radius: 14px;
-      padding: 25px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
-
-    .chart-card h2 {
-      text-align: center;
-      margin: 0 0 15px;
-      font-weight: 500;
-      font-size: 18px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px;
-      font-size: 13px;
-      color: #666;
-    }
-
-    footer span {
-      color: var(--rawls-red);
-      font-weight: 500;
+    button:hover{filter:brightness(0.95);}
+    .ghost{
+      background:#fff;
+      color:#111827;
+      border:1px solid var(--border);
     }
   </style>
 </head>
 
 <body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <strong>Rawls Faculty Publications</strong>
+        <span>Research Productivity Dashboard</span>
+      </div>
+      <nav class="nav">
+        <!-- Update these links to match your site files -->
+        <a href="index.html">Home</a>
+        <a class="active" href="rrp.html">Rawls Research Productivity</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
 
-<header>
-  <h1>Rawls Research Productivity</h1>
-  <p>Automatically updated from the Rawls research database</p>
-</header>
-
-<main>
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h2>5★ Publications by Year</h2>
-      <canvas id="chart5Star"></canvas>
+  <main class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Rawls Research Productivity</h1>
+        <p>
+          These charts automatically update by reading the backend Excel spreadsheet each time someone opens this page.
+          Data source: <b>Database.xlsx</b>, sheet <b>"12"</b>.
+        </p>
+        <div class="btnrow">
+          <button id="refreshBtn">Refresh Charts</button>
+          <button class="ghost" id="downloadBtn">Download Excel</button>
+        </div>
+      </div>
+      <div class="pill" id="lastUpdated">Loading…</div>
     </div>
 
-    <div class="chart-card">
-      <h2>5 Publications by Year</h2>
-      <canvas id="chart5"></canvas>
-    </div>
-  </div>
-</main>
+    <section class="grid">
+      <div class="card">
+        <h2>5* Publications by Area</h2>
+        <p class="sub">Count of rows where <b>Ranking - Updated</b> = <b>5*</b>, grouped by <b>Area</b>.</p>
+        <div class="chartBox"><canvas id="chart5star"></canvas></div>
+      </div>
 
-<footer>
-  Data source: <span>Rawls Faculty Publications Database</span><br>
-  Updated automatically on page load
-</footer>
+      <div class="card">
+        <h2>5 Publications by Area</h2>
+        <p class="sub">Count of rows where <b>Ranking - Updated</b> = <b>5</b>, grouped by <b>Area</b>.</p>
+        <div class="chartBox"><canvas id="chart5"></canvas></div>
+      </div>
 
-<script>
-  // 🔗 CHANGE THIS TO YOUR ACTUAL EXCEL PATH ON GITHUB
-  const EXCEL_URL = "https://raunakmane79.github.io/RawlsResearchWeb/Database.xlsx"; 
-  // Example:
-  // const EXCEL_URL = "https://raunakmane79.github.io/RawlsResearchWeb/Database.xlsx";
+      <div class="card">
+        <h2>UTD Publications by Area</h2>
+        <p class="sub">Count of rows where <b>UTD Journal</b> = <b>Yes</b>, grouped by <b>Area</b>.</p>
+        <div class="chartBox"><canvas id="chartUTD"></canvas></div>
+      </div>
 
-  let rawData = [];
+      <div class="card">
+        <h2>Financial Times Publications by Area</h2>
+        <p class="sub">Count of rows where <b>Financial Times Journal</b> = <b>Yes</b>, grouped by <b>Area</b>.</p>
+        <div class="chartBox"><canvas id="chartFT"></canvas></div>
+      </div>
+    </section>
 
-  function countByYear(rows, rankingValue) {
-    const counts = {};
+    <div class="status" id="rrpStatus">Loading charts from backend spreadsheet…</div>
+  </main>
 
-    rows.forEach(r => {
-      if (r.rankingUpdated === rankingValue && r.year) {
-        counts[r.year] = (counts[r.year] || 0) + 1;
-      }
-    });
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    const years = Object.keys(counts).sort((a, b) => a - b);
-    const values = years.map(y => counts[y]);
+  <script>
+    // ====== CONFIG (edit if your file is inside a folder) ======
+    const EXCEL_FILE = "Database.xlsx"; // e.g. "data/Database.xlsx"
+    const SHEET_NAME = "12";
 
-    return { years, values };
-  }
+    // Optional: shorten area labels on x-axis (you can edit/remove)
+    const AREA_SHORT = {
+      "ACCT": "ACCT",
+      "ECBE": "ECBE",
+      "MGT": "MGT",
+      "FIN": "FIN",
+      "ISQS": "ISQS",
+      "MKT/SCM": "MKT/SCM",
+      "Marketing/Supply Chain": "MKT/SCM",
+      "Marketing & Supply Chain Management": "MKT/SCM"
+    };
 
-  function renderBarChart(canvasId, years, values, color) {
-    const ctx = document.getElementById(canvasId);
+    let charts = {}; // store Chart.js instances
 
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: years,
-        datasets: [{
-          data: values,
-          backgroundColor: color,
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
+    function cleanStr(v){ return (v ?? "").toString().trim(); }
+    function yes(v){ return cleanStr(v).toLowerCase() === "yes"; }
+
+    function shortArea(area){
+      // If your sheet already uses ACCT/ECBE/etc., this won't change anything.
+      return AREA_SHORT[area] || area;
+    }
+
+    function destroy(key){
+      if (charts[key]) { charts[key].destroy(); delete charts[key]; }
+    }
+
+    function buildBar(canvasId, labels, values, key){
+      const el = document.getElementById(canvasId);
+      if (!el) return;
+
+      destroy(key);
+
+      charts[key] = new Chart(el, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Count",
+            data: values,
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            x: {
+              ticks: { autoSkip: false, maxRotation: 0 }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 }
+            }
           }
         }
+      });
+    }
+
+    async function loadExcelAndRender(){
+      const status = document.getElementById("rrpStatus");
+      const pill = document.getElementById("lastUpdated");
+
+      status.textContent = "Loading charts from backend spreadsheet…";
+
+      try{
+        // Cache-bust so it updates on every page view
+        const url = `${EXCEL_FILE}?v=${Date.now()}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to fetch ${EXCEL_FILE} (HTTP ${res.status})`);
+
+        const buf = await res.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+
+        const sheet = wb.Sheets[SHEET_NAME];
+        if (!sheet) throw new Error(`Sheet "${SHEET_NAME}" not found. Found: ${wb.SheetNames.join(", ")}`);
+
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+        // Aggregate counts by Area
+        const byArea = {}; // area -> counts
+        for (const r of rows){
+          const area = cleanStr(r["Area"]);
+          if (!area) continue;
+
+          if (!byArea[area]) byArea[area] = { fiveStar:0, five:0, utd:0, ft:0 };
+
+          const ranking = cleanStr(r["Ranking - Updated"]);
+          if (ranking === "5*") byArea[area].fiveStar++;
+          if (ranking === "5")  byArea[area].five++;
+
+          if (yes(r["UTD Journal"])) byArea[area].utd++;
+          if (yes(r["Financial Times Journal"])) byArea[area].ft++;
+        }
+
+        // Sort by total volume so charts look consistent
+        const areas = Object.keys(byArea).sort((a,b) => {
+          const ta = byArea[a].fiveStar + byArea[a].five + byArea[a].utd + byArea[a].ft;
+          const tb = byArea[b].fiveStar + byArea[b].five + byArea[b].utd + byArea[b].ft;
+          return tb - ta;
+        });
+
+        const labels = areas.map(shortArea);
+        const data5star = areas.map(a => byArea[a].fiveStar);
+        const data5     = areas.map(a => byArea[a].five);
+        const dataUTD   = areas.map(a => byArea[a].utd);
+        const dataFT    = areas.map(a => byArea[a].ft);
+
+        buildBar("chart5star", labels, data5star, "fiveStar");
+        buildBar("chart5",     labels, data5,     "five");
+        buildBar("chartUTD",   labels, dataUTD,   "utd");
+        buildBar("chartFT",    labels, dataFT,    "ft");
+
+        const now = new Date();
+        pill.textContent = `Updated: ${now.toLocaleString()}`;
+        status.textContent = `✅ Loaded ${rows.length} rows from ${EXCEL_FILE} (Sheet "${SHEET_NAME}")`;
+
+      }catch(err){
+        console.error(err);
+        status.textContent = `❌ Could not load charts: ${err.message}`;
+        document.getElementById("lastUpdated").textContent = "Update failed";
       }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      window.location.href = EXCEL_FILE;
     });
-  }
 
- async function loadExcelAndRenderCharts() {
-  const response = await fetch(EXCEL_URL);
-  const arrayBuffer = await response.arrayBuffer();
-
-  const workbook = XLSX.read(arrayBuffer, { type: "array" });
-
-  // ✅ Sheet name is EXACTLY "12"
-  const sheet = workbook.Sheets["12"];
-  if (!sheet) {
-    console.error('Sheet "12" not found');
-    return;
-  }
-
-  const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-  // Normalize columns safely
-  const rawData = json.map(r => ({
-    year: String(r["year"] || r["Year"] || "").trim(),
-    rankingUpdated: String(
-      r["Ranking - Updated"] ||
-      r["Journal Ranking"] ||
-      ""
-    ).trim()
-  }));
-
-  console.log("Rows loaded:", rawData.length);
-  console.log("Sample row:", rawData[0]);
-
-  const fiveStar = countByYear(rawData, "5*");
-  const five = countByYear(rawData, "5");
-
-  renderBarChart(
-    "chart5Star",
-    fiveStar.years,
-    fiveStar.values,
-    "#ba0c2f"
-  );
-
-  renderBarChart(
-    "chart5",
-    five.years,
-    five.values,
-    "#6c757d"
-  );
-}
-</script>
+    document.addEventListener("DOMContentLoaded", loadExcelAndRender);
+  </script>
 </body>
 </html>
+
