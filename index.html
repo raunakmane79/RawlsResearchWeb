@@ -641,7 +641,10 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
 
       if((utdY||utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
       if((ftY||ftN)   && !((ftY && d.ftJournal==="Yes") || (ftN && d.ftJournal==="No"))) return false;
-      if((r4||r5||r5s) && !((r4 && d.ranking==="4") || (r5 && d.ranking==="5") || (r5s && d.ranking==="5*"))) return false;
+if ((r5 || r5s) && !(
+  (r5 && d.ranking === "5") ||
+  (r5s && d.ranking === "5*")
+)) return false;
 
       return true;
     });
