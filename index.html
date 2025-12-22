@@ -356,7 +356,6 @@
     utdNo: document.getElementById("utdNo"),
     ftYes: document.getElementById("ftYes"),
     ftNo: document.getElementById("ftNo"),
-    rank4: document.getElementById("rank4"),
     rank5: document.getElementById("rank5"),
     rank5star: document.getElementById("rank5star"),
     resultsBody: document.getElementById("resultsBody"),
@@ -615,7 +614,7 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
 
     const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
     const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
-    const r4=elements.rank4.checked, r5=elements.rank5.checked, r5s=elements.rank5star.checked;
+    const r5=elements.rank5.checked, r5s=elements.rank5star.checked;
 
     const kq = elements.keywordSearch.value.toLowerCase();
     const tq = elements.titleSearch.value.toLowerCase();
@@ -662,7 +661,7 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     if(multiSelectControls.year) multiSelectControls.year.clear();
     elements.utdYes.checked=elements.utdNo.checked=false;
     elements.ftYes.checked=elements.ftNo.checked=false;
-    elements.rank4.checked=elements.rank5.checked=elements.rank5star.checked=false;
+    elements.rank5.checked=elements.rank5star.checked=false;
     renderTable(data);
   }
 
@@ -780,7 +779,7 @@ function ingestWorkbook(workbook) {
     [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
       .forEach(el=>el.addEventListener("input", debouncedApply));
 
-    [elements.exactNameMatch, elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo, elements.rank4, elements.rank5, elements.rank5star]
+    [elements.exactNameMatch, elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo, elements.rank5, elements.rank5star]
       .forEach(el=>el.addEventListener("input", applyFilters));
 
     elements.clearFilters.addEventListener("click", clearAllFilters);
