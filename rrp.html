@@ -4,88 +4,111 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rawls Research Productivity</title>
+  <meta name="theme-color" content="#CC0000" />
 
-  <meta name="theme-color" content="#ba0c2f" />
   <style>
     :root{
-      --rawls-red:#ba0c2f;
-      --ink:#0b1220;
+      /* TTU-ish theme */
+      --ttu-scarlet:#CC0000;
+      --ttu-dark:#111827;
+      --ttu-ink:#0b1220;
       --muted:#667085;
-      --border:rgba(16,24,40,0.10);
-      --card:rgba(255,255,255,0.86);
-      --shadow: 0 18px 45px rgba(16,24,40,0.12);
-      --radius:18px;
+      --border: rgba(17, 24, 39, 0.12);
+
+      --card: rgba(255,255,255,0.92);
+      --shadow: 0 18px 44px rgba(17, 24, 39, 0.14);
+      --radius: 18px;
     }
+
     *{box-sizing:border-box;}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color:var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--ttu-ink);
       background:
-        radial-gradient(1100px 520px at 12% -10%, rgba(186,12,47,0.14), transparent 55%),
-        radial-gradient(900px 520px at 90% 0%, rgba(56,189,248,0.12), transparent 55%),
-        linear-gradient(180deg, #f7f7fb, #eef2ff 45%, #f7f7fb);
+        radial-gradient(900px 420px at 14% -10%, rgba(204,0,0,0.16), transparent 60%),
+        radial-gradient(900px 420px at 90% 0%, rgba(17,24,39,0.12), transparent 55%),
+        linear-gradient(180deg, #f7f7fb, #eef2ff 50%, #f7f7fb);
       min-height:100vh;
     }
 
     /* Top bar */
     .topbar{
-      position:sticky; top:0; z-index:20;
-      background: rgba(10,16,28,0.82);
-      border-bottom: 3px solid var(--rawls-red);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(17,24,39,0.88);
+      border-bottom: 3px solid var(--ttu-scarlet);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       color:#fff;
     }
     .topbar-inner{
-      max-width:1140px;
-      margin:0 auto;
-      padding:14px 16px;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 14px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap: 12px;
     }
-    .brand{display:flex; flex-direction:column; line-height:1.1;}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      line-height:1.1;
+    }
+    .mark{
+      width:12px;
+      height:34px;
+      border-radius: 999px;
+      background: var(--ttu-scarlet);
+      box-shadow: 0 8px 18px rgba(204,0,0,0.35);
+    }
     .brand strong{font-size:16px; letter-spacing:0.2px;}
-    .brand span{font-size:12px; color:rgba(255,255,255,0.70);}
+    .brand span{display:block; font-size:12px; color: rgba(255,255,255,0.74); margin-top:2px;}
 
     .nav a{
       color:#fff;
       text-decoration:none;
-      font-weight:800;
-      font-size:14px;
-      padding:8px 10px;
-      border-radius:12px;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid transparent;
       display:inline-block;
-      border:1px solid transparent;
     }
-    .nav a:hover{background:rgba(255,255,255,0.10);}
+    .nav a:hover{background: rgba(255,255,255,0.10);}
     .nav a.active{
-      background: rgba(186,12,47,0.22);
-      border:1px solid rgba(186,12,47,0.55);
+      background: rgba(204,0,0,0.18);
+      border: 1px solid rgba(204,0,0,0.55);
     }
 
     /* Layout */
-    .wrap{max-width:1140px; margin:0 auto; padding:22px 16px 34px;}
+    .wrap{
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 22px 16px 34px;
+    }
+
     .hero{
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
-      gap:14px;
-      margin:10px 0 18px;
+      gap: 14px;
+      margin: 10px 0 18px;
     }
     .hero h1{
       margin:0;
-      font-size:30px;
-      letter-spacing:-0.3px;
+      font-size: 30px;
+      letter-spacing: -0.3px;
     }
     .hero p{
-      margin:6px 0 0;
-      color:var(--muted);
-      max-width:820px;
-      font-size:14px;
-      line-height:1.45;
+      margin: 6px 0 0;
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
     }
 
     .meta{
@@ -93,107 +116,111 @@
       gap:10px;
       align-items:center;
       flex-wrap:wrap;
-      margin-top:12px;
+      margin-top: 12px;
     }
     .pill{
-      background: rgba(255,255,255,0.75);
-      border:1px solid var(--border);
-      border-radius:999px;
-      padding:9px 12px;
-      font-size:13px;
-      color:var(--muted);
-      box-shadow: 0 6px 18px rgba(16,24,40,0.08);
-      white-space:nowrap;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      box-shadow: 0 6px 18px rgba(17,24,39,0.08);
+      white-space: nowrap;
     }
 
     .controls{
-      display:flex; gap:10px; flex-wrap:wrap;
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
-    button, select{
+    button{
       appearance:none;
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:900;
-      font-size:13px;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 900;
+      font-size: 13px;
       cursor:pointer;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,0.86);
-      color:var(--ink);
-      box-shadow: 0 6px 18px rgba(16,24,40,0.08);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.92);
+      color: var(--ttu-ink);
+      box-shadow: 0 6px 18px rgba(17,24,39,0.08);
       transition: transform .06s ease, filter .15s ease;
     }
     button:active{transform: translateY(1px);}
     button.primary{
-      background: linear-gradient(135deg, rgba(186,12,47,0.92), rgba(186,12,47,0.72));
+      background: linear-gradient(135deg, rgba(204,0,0,0.92), rgba(204,0,0,0.72));
       color:#fff;
-      border:1px solid rgba(186,12,47,0.55);
+      border: 1px solid rgba(204,0,0,0.55);
     }
-    button:hover, select:hover{filter:brightness(0.98);}
 
     /* Grid */
     .grid{
       display:grid;
       grid-template-columns: repeat(2, minmax(320px, 1fr));
-      gap:16px;
+      gap: 16px;
     }
-    @media (max-width: 1000px){
-      .grid{ grid-template-columns: 1fr; }
-      .hero{ flex-direction:column; align-items:flex-start; }
+    @media (max-width: 1020px){
+      .grid{grid-template-columns: 1fr;}
+      .hero{flex-direction:column; align-items:flex-start;}
     }
 
     .card{
       background: var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px 14px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      position:relative;
-      overflow:hidden;
+      position: relative;
+      overflow: hidden;
     }
     .card::before{
       content:"";
       position:absolute; inset:0;
-      background: radial-gradient(700px 220px at 20% 0%, rgba(186,12,47,0.08), transparent 60%);
+      background:
+        radial-gradient(760px 240px at 18% 0%, rgba(204,0,0,0.08), transparent 62%);
       pointer-events:none;
     }
     .card > *{position:relative;}
+
     .card h2{
       margin:0 0 6px;
-      font-size:16px;
-      font-weight:950;
+      font-size: 16px;
+      font-weight: 950;
       display:flex;
       align-items:center;
       gap:10px;
       letter-spacing:-0.1px;
     }
     .badge{
-      font-size:12px;
-      font-weight:950;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      color:var(--muted);
-      background: rgba(255,255,255,0.8);
+      font-size: 12px;
+      font-weight: 950;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255,255,255,0.85);
     }
     .sub{
       margin:0 0 10px;
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.35;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.35;
     }
-    .chartBox{height:340px; position:relative;}
+    .chartBox{height: 340px; position:relative;}
 
     .footer-note{
-      margin-top:14px;
-      color:var(--muted);
-      font-size:13px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px dashed rgba(16,24,40,0.14);
-      background: rgba(255,255,255,0.65);
-      box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px dashed rgba(17,24,39,0.16);
+      background: rgba(255,255,255,0.68);
+      box-shadow: 0 6px 18px rgba(17,24,39,0.06);
     }
   </style>
 </head>
@@ -202,8 +229,11 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <strong>Rawls Faculty Publications</strong>
-        <span>Research Productivity</span>
+        <div class="mark"></div>
+        <div>
+          <strong>Rawls Faculty Publications</strong>
+          <span>Research Productivity</span>
+        </div>
       </div>
       <nav class="nav">
         <a href="index.html">Home</a>
@@ -217,24 +247,12 @@
     <div class="hero">
       <div>
         <h1>Rawls Research Productivity</h1>
-        <p>Explore publication counts by Area across key categories.</p>
+        <p>Publication counts by Area across key categories.</p>
 
         <div class="meta">
           <div class="controls">
             <button class="primary" id="refreshBtn">Refresh</button>
-
-            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); font-weight:900;">
-              Show top
-              <select id="topN">
-                <option value="6">6</option>
-                <option value="8">8</option>
-                <option value="10" selected>10</option>
-                <option value="99">All</option>
-              </select>
-              Areas
-            </label>
           </div>
-
           <div class="pill" id="lastUpdated">Updating…</div>
         </div>
       </div>
@@ -266,7 +284,7 @@
       </div>
     </section>
 
-    <div class="footer-note" id="rrpStatus">Charts are updating…</div>
+    <div class="footer-note" id="rrpStatus">Updating…</div>
   </main>
 
   <!-- Chart.js -->
@@ -276,14 +294,24 @@
 
   <script>
     // ====== CONFIG ======
-    const EXCEL_FILE = "Database.xlsx"; // keep your current filename
+    const EXCEL_FILE = "Database.xlsx"; // change if your filename differs
     const SHEET_NAME = "12";
 
-    // Fixed color set (used to assign one color per Area, consistently everywhere)
-    const AREA_COLOR_SET = [
-      "#2563EB", "#7C3AED", "#06B6D4", "#10B981", "#F59E0B", "#EF4444",
-      "#8B5CF6", "#0EA5E9", "#22C55E", "#F97316", "#E11D48", "#14B8A6",
-      "#64748B", "#A855F7", "#84CC16", "#FB7185"
+    // Professional, muted palette (consistent across all charts)
+    // (Not neon, not overly bright; works well on TTU-themed UI)
+    const PROFESSIONAL_AREA_COLORS = [
+      "#1F2937", // slate
+      "#374151", // graphite
+      "#475569", // steel
+      "#0F766E", // deep teal
+      "#155E75", // deep cyan/blue
+      "#1D4ED8", // mature blue
+      "#4F46E5", // indigo
+      "#6D28D9", // deep purple
+      "#9A3412", // warm brown
+      "#B45309", // amber-brown
+      "#7F1D1D", // maroon
+      "#9F1239"  // wine
     ];
 
     const charts = {};
@@ -291,9 +319,8 @@
     function cleanStr(v){ return (v ?? "").toString().trim(); }
     function yes(v){ return cleanStr(v).toLowerCase() === "yes"; }
 
-    // Deterministic string hash -> index
     function hashString(str){
-      let h = 2166136261; // FNV-ish
+      let h = 2166136261;
       for (let i = 0; i < str.length; i++){
         h ^= str.charCodeAt(i);
         h = Math.imul(h, 16777619);
@@ -309,7 +336,6 @@
       return `rgba(${r}, ${g}, ${b}, ${a})`;
     }
 
-    // Wrap long labels to stop overlap (Chart.js supports array = multi-line)
     function wrapLabel(label, maxLineLen = 14){
       const s = cleanStr(label);
       if (s.length <= maxLineLen) return s;
@@ -329,7 +355,6 @@
       }
       if (line) lines.push(line);
 
-      // fallback hard split if needed
       if (lines.length === 1 && lines[0].length > maxLineLen){
         const hard = [];
         let t = lines[0];
@@ -344,16 +369,17 @@
       return lines;
     }
 
-    // Build a stable Area->Color map for the current view
+    // Stable Area -> Color mapping (same Area always same color)
     function buildAreaColorMap(areaLabels){
       const map = {};
       for (const area of areaLabels){
-        const idx = hashString(area) % AREA_COLOR_SET.length;
-        const base = AREA_COLOR_SET[idx];
+        const idx = hashString(area) % PROFESSIONAL_AREA_COLORS.length;
+        const base = PROFESSIONAL_AREA_COLORS[idx];
+
         map[area] = {
           border: base,
-          fill: hexToRgba(base, 0.50),
-          fillHover: hexToRgba(base, 0.70)
+          fill: hexToRgba(base, 0.48),
+          fillHover: hexToRgba(base, 0.66)
         };
       }
       return map;
@@ -386,23 +412,22 @@
             borderWidth: 2,
             borderRadius: 12,
             barThickness: 44,
-            maxBarThickness: 54
+            maxBarThickness: 56
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           animation: { duration: 650, easing: "easeOutQuart" },
-          layout: { padding: { left: 6, right: 6, top: 8, bottom: 0 } },
+          layout: { padding: { left: 8, right: 8, top: 10, bottom: 0 } },
           plugins: {
             legend: { display: false },
             tooltip: {
               enabled: true,
-              displayColors: true,
               callbacks: {
                 title: (items) => {
                   const idx = items[0].dataIndex;
-                  return labels[idx]; // full Area name, not wrapped
+                  return labels[idx]; // full label (not wrapped)
                 }
               }
             }
@@ -435,25 +460,22 @@
     async function loadExcelAndRender(){
       const status = document.getElementById("rrpStatus");
       const pill = document.getElementById("lastUpdated");
-      const topN = parseInt(document.getElementById("topN").value, 10);
 
-      status.textContent = "Updating charts…";
+      status.textContent = "Updating…";
 
       try{
-        // cache-bust so it refreshes on each load
         const url = `${EXCEL_FILE}?v=${Date.now()}`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Unable to load charts right now.");
+        if (!res.ok) throw new Error("Unavailable");
 
         const buf = await res.arrayBuffer();
         const wb = XLSX.read(buf, { type: "array" });
 
         const sheet = wb.Sheets[SHEET_NAME];
-        if (!sheet) throw new Error("Unable to load charts right now.");
+        if (!sheet) throw new Error("Unavailable");
 
         const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-        // Aggregate counts by Area
         const byArea = {};
         for (const r of rows){
           const area = cleanStr(r["Area"]);
@@ -469,40 +491,32 @@
           if (yes(r["Financial Times Journal"])) byArea[area].ft++;
         }
 
-        // Sort by total (keeps order consistent across charts)
-        const allAreas = Object.keys(byArea).sort((a,b) => {
+        // One consistent Area ordering across all charts
+        const areas = Object.keys(byArea).sort((a,b) => {
           const ta = byArea[a].fiveStar + byArea[a].five + byArea[a].utd + byArea[a].ft;
           const tb = byArea[b].fiveStar + byArea[b].five + byArea[b].utd + byArea[b].ft;
           return tb - ta;
         });
 
-        const areas = (topN >= 99) ? allAreas : allAreas.slice(0, topN);
-
         const areaColorMap = buildAreaColorMap(areas);
 
-        const data5star = areas.map(a => byArea[a].fiveStar);
-        const data5     = areas.map(a => byArea[a].five);
-        const dataUTD   = areas.map(a => byArea[a].utd);
-        const dataFT    = areas.map(a => byArea[a].ft);
-
-        buildBar("chart5star", areas, data5star, "fiveStar", areaColorMap);
-        buildBar("chart5",     areas, data5,     "five",     areaColorMap);
-        buildBar("chartUTD",   areas, dataUTD,   "utd",      areaColorMap);
-        buildBar("chartFT",    areas, dataFT,    "ft",       areaColorMap);
+        buildBar("chart5star", areas, areas.map(a => byArea[a].fiveStar), "fiveStar", areaColorMap);
+        buildBar("chart5",     areas, areas.map(a => byArea[a].five),     "five",     areaColorMap);
+        buildBar("chartUTD",   areas, areas.map(a => byArea[a].utd),      "utd",      areaColorMap);
+        buildBar("chartFT",    areas, areas.map(a => byArea[a].ft),       "ft",       areaColorMap);
 
         const now = new Date();
         pill.textContent = `Last updated: ${now.toLocaleString()}`;
-        status.textContent = `Showing ${areas.length} Area(s).`;
+        status.textContent = "—";
 
-      }catch(err){
-        console.error(err);
+      }catch(e){
+        console.error(e);
         status.textContent = "Charts are temporarily unavailable. Please try again.";
         pill.textContent = "—";
       }
     }
 
     document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
-    document.getElementById("topN").addEventListener("change", loadExcelAndRender);
     document.addEventListener("DOMContentLoaded", loadExcelAndRender);
   </script>
 </body>
