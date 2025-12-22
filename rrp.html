@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#000000" />
 
   <style>
-       .rawls-logo{height:46px;width:auto;object-fit:contain;flex-shrink:0}
+       rawls-logo{height:46px;width:auto;object-fit:contain;flex-shrink:0}
     :root{
       --rawls-red:#CC0000;
       --black:#000000;
@@ -296,8 +296,6 @@
     const EXCEL_FILE = "Database.xlsx";      // <-- your real filename in repo
     const SHEET_NAME = "12";
 
-    // Logo file (place in same folder as rrp.html)
-    const LOGO_SRC = "rawls-research-logo.png"; // <-- change to your logo filename if needed
 
     // Your requested solid colors (no transparency)
     const AREA_SOLID_COLORS = {
@@ -510,10 +508,6 @@
       }
     }
 
-    // Logo (hide if missing)
-    const logoEl = document.getElementById("logo");
-    logoEl.src = LOGO_SRC;
-    logoEl.onerror = () => { logoEl.style.display = "none"; };
 
     // Buttons
     document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
