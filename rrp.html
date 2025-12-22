@@ -9,31 +9,36 @@
   <style>
     :root{
       --rawls-red:#ba0c2f;
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
+      --ink:#111827;
       --muted:#6b7280;
+      --bg1:#f7f7fb;
+      --bg2:#ffffff;
       --border:#e5e7eb;
-      --shadow: 0 8px 20px rgba(0,0,0,0.08);
-      --radius:16px;
+      --shadow: 0 10px 26px rgba(17,24,39,0.10);
+      --radius:18px;
     }
     *{box-sizing:border-box;}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
+      color:var(--ink);
+      background:
+        radial-gradient(900px 400px at 15% 0%, rgba(186,12,47,0.10), transparent 60%),
+        radial-gradient(800px 380px at 85% 10%, rgba(59,130,246,0.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1), #eef2ff 55%, #f7f7fb);
+      min-height:100vh;
     }
 
     /* Top bar */
     .topbar{
       position:sticky; top:0; z-index:10;
-      background: linear-gradient(90deg, #111827, #1f2937);
+      background: rgba(17,24,39,0.85);
+      backdrop-filter: blur(10px);
       border-bottom: 3px solid var(--rawls-red);
       color:#fff;
     }
     .topbar-inner{
-      max-width:1100px;
+      max-width:1120px;
       margin:0 auto;
       display:flex;
       align-items:center;
@@ -41,132 +46,113 @@
       padding:14px 16px;
       gap:12px;
     }
-    .brand{
-      display:flex;
-      flex-direction:column;
-      line-height:1.1;
-    }
+    .brand{display:flex; flex-direction:column; line-height:1.1;}
     .brand strong{font-size:16px; letter-spacing:0.2px;}
     .brand span{font-size:12px; color:#d1d5db;}
 
     .nav a{
-      color:#fff;
-      text-decoration:none;
-      font-weight:600;
-      font-size:14px;
-      padding:8px 10px;
-      border-radius:10px;
-      display:inline-block;
+      color:#fff; text-decoration:none; font-weight:700; font-size:14px;
+      padding:8px 10px; border-radius:12px; display:inline-block;
     }
     .nav a:hover{background:rgba(255,255,255,0.10);}
     .nav a.active{background:rgba(186,12,47,0.25); border:1px solid rgba(186,12,47,0.6);}
 
     /* Layout */
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:18px 16px 32px;
-    }
+    .wrap{max-width:1120px; margin:0 auto; padding:20px 16px 34px;}
     .hero{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:14px;
-      margin-top:10px;
-      margin-bottom:16px;
+      display:flex; align-items:flex-end; justify-content:space-between; gap:14px;
+      margin:10px 0 18px;
     }
-    .hero h1{
-      margin:0;
-      font-size:26px;
-      letter-spacing:0.2px;
-    }
-    .hero p{
-      margin:6px 0 0;
-      color:var(--muted);
-      max-width:720px;
-      font-size:14px;
-    }
+    .hero h1{margin:0; font-size:28px; letter-spacing:0.2px;}
+    .hero p{margin:6px 0 0; color:var(--muted); max-width:760px; font-size:14px; line-height:1.4;}
+
     .pill{
-      background:#fff;
-      border:1px solid var(--border);
+      background: rgba(255,255,255,0.75);
+      border:1px solid rgba(229,231,235,0.9);
       border-radius:999px;
-      padding:8px 12px;
+      padding:9px 12px;
       font-size:13px;
       color:var(--muted);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       white-space:nowrap;
     }
 
-    /* Cards + charts */
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    button, select{
+      appearance:none;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--ink);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    }
+    button.primary{
+      background: var(--rawls-red);
+      color:#fff;
+      border:1px solid rgba(186,12,47,0.6);
+    }
+    button:hover{filter:brightness(0.98);}
+
+    /* Grid */
     .grid{
       display:grid;
-      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, minmax(300px, 1fr));
       gap:16px;
     }
-    @media (max-width: 920px){
+    @media (max-width: 980px){
       .grid{ grid-template-columns: 1fr; }
       .hero{ flex-direction:column; align-items:flex-start; }
       .pill{ width:100%; }
     }
 
     .card{
-      background:var(--card);
-      border:1px solid var(--border);
+      background: rgba(255,255,255,0.82);
+      border:1px solid rgba(229,231,235,0.9);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:14px 14px 10px;
+      padding:14px 14px 12px;
+      backdrop-filter: blur(6px);
     }
     .card h2{
-      margin:0 0 8px;
+      margin:0 0 6px;
       font-size:16px;
-      font-weight:800;
+      font-weight:900;
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:10px;
+    }
+    .badge{
+      font-size:12px;
+      font-weight:900;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(229,231,235,0.9);
+      color:var(--muted);
+      background: rgba(255,255,255,0.7);
     }
     .sub{
       margin:0 0 10px;
       font-size:13px;
       color:var(--muted);
+      line-height:1.35;
     }
-    .chartBox{
-      height:320px;
-      position:relative;
-    }
+    .chartBox{height:340px; position:relative;}
 
-    /* Bottom status */
     .status{
       margin-top:14px;
-      background:#fff;
-      border:1px dashed var(--border);
+      background: rgba(255,255,255,0.75);
+      border:1px dashed rgba(229,231,235,0.95);
       border-radius:14px;
       padding:10px 12px;
       color:var(--muted);
       font-size:13px;
-    }
-
-    .btnrow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin: 10px 0 0;
-    }
-    button{
-      appearance:none;
-      border:none;
-      border-radius:12px;
-      padding:10px 12px;
-      background: var(--rawls-red);
-      color:#fff;
-      font-weight:700;
-      cursor:pointer;
-      font-size:13px;
-    }
-    button:hover{filter:brightness(0.95);}
-    .ghost{
-      background:#fff;
-      color:#111827;
-      border:1px solid var(--border);
     }
   </style>
 </head>
@@ -179,7 +165,6 @@
         <span>Research Productivity Dashboard</span>
       </div>
       <nav class="nav">
-        <!-- Update these links to match your site files -->
         <a href="index.html">Home</a>
         <a class="active" href="rrp.html">Rawls Research Productivity</a>
         <a href="about.html">About</a>
@@ -192,40 +177,51 @@
       <div>
         <h1>Rawls Research Productivity</h1>
         <p>
-          These charts automatically update by reading the backend Excel spreadsheet each time someone opens this page.
-          Data source: <b>Database.xlsx</b>, sheet <b>"12"</b>.
+          By Rawls Research
         </p>
-        <div class="btnrow">
-          <button id="refreshBtn">Refresh Charts</button>
-          <button class="ghost" id="downloadBtn">Download Excel</button>
+
+        <div class="controls">
+          <button class="primary" id="refreshBtn">Refresh Charts</button>
+          <button id="downloadBtn">Download Excel</button>
+
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); font-weight:800;">
+            Show top
+            <select id="topN">
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10" selected>10</option>
+              <option value="99">All</option>
+            </select>
+            areas
+          </label>
         </div>
       </div>
+
       <div class="pill" id="lastUpdated">Loading…</div>
     </div>
 
     <section class="grid">
       <div class="card">
-        <h2>5* Publications by Area</h2>
-        <p class="sub">Count of rows where <b>Ranking - Updated</b> = <b>5*</b>, grouped by <b>Area</b>.</p>
+        <h2><span class="badge">5*</span> 5* Publications by Area</h2>
+        <p class="sub">Number of 5* grouped by Area </p>
         <div class="chartBox"><canvas id="chart5star"></canvas></div>
       </div>
 
       <div class="card">
-        <h2>5 Publications by Area</h2>
-        <p class="sub">Count of rows where <b>Ranking - Updated</b> = <b>5</b>, grouped by <b>Area</b>.</p>
+        <h2><span class="badge">5</span> 5 Publications by Area</h2>
+     <p class="sub">Number of 5 grouped by Area </p>
         <div class="chartBox"><canvas id="chart5"></canvas></div>
       </div>
 
       <div class="card">
-        <h2>UTD Publications by Area</h2>
-        <p class="sub">Count of rows where <b>UTD Journal</b> = <b>Yes</b>, grouped by <b>Area</b>.</p>
+        <h2><span class="badge">UTD</span> UTD Publications by Area</h2>
+   <p class="sub">Number of UTD grouped by Area </p>
         <div class="chartBox"><canvas id="chartUTD"></canvas></div>
       </div>
 
       <div class="card">
-        <h2>Financial Times Publications by Area</h2>
-        <p class="sub">Count of rows where <b>Financial Times Journal</b> = <b>Yes</b>, grouped by <b>Area</b>.</p>
-        <div class="chartBox"><canvas id="chartFT"></canvas></div>
+        <h2><span class="badge">FT</span> Financial Times Publications by Area</h2>
+  <p class="sub">Number of Financial Times Journal grouped by Area </p>        <div class="chartBox"><canvas id="chartFT"></canvas></div>
       </div>
     </section>
 
@@ -238,30 +234,56 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
-    // ====== CONFIG (edit if your file is inside a folder) ======
-    const EXCEL_FILE = "Database.xlsx"; // e.g. "data/Database.xlsx"
+    // ====== CONFIG ======
+    const EXCEL_FILE = "Database8.xlsx"; // change if in folder: "data/Database8.xlsx"
     const SHEET_NAME = "12";
 
-    // Optional: shorten area labels on x-axis (you can edit/remove)
-    const AREA_SHORT = {
-      "ACCT": "ACCT",
-      "ECBE": "ECBE",
-      "MGT": "MGT",
-      "FIN": "FIN",
-      "ISQS": "ISQS",
-      "MKT/SCM": "MKT/SCM",
-      "Marketing/Supply Chain": "MKT/SCM",
-      "Marketing & Supply Chain Management": "MKT/SCM"
+    // Nice palette (Rawls red + cool accents)
+    const PALETTES = {
+      fiveStar: { fill: "rgba(186, 12, 47, 0.65)", border: "rgba(186, 12, 47, 1)" },
+      five:     { fill: "rgba(245, 158, 11, 0.55)", border: "rgba(245, 158, 11, 1)" },
+      utd:      { fill: "rgba(59, 130, 246, 0.55)", border: "rgba(59, 130, 246, 1)" },
+      ft:       { fill: "rgba(16, 185, 129, 0.55)", border: "rgba(16, 185, 129, 1)" }
     };
 
-    let charts = {}; // store Chart.js instances
+    let charts = {};
 
     function cleanStr(v){ return (v ?? "").toString().trim(); }
     function yes(v){ return cleanStr(v).toLowerCase() === "yes"; }
 
-    function shortArea(area){
-      // If your sheet already uses ACCT/ECBE/etc., this won't change anything.
-      return AREA_SHORT[area] || area;
+    // Wrap long labels into multiple lines to stop overlap
+    function wrapLabel(label, maxLineLen = 14){
+      const s = cleanStr(label);
+      if (s.length <= maxLineLen) return s;
+
+      const words = s.split(/\s+/);
+      const lines = [];
+      let line = "";
+
+      for (const w of words){
+        const test = line ? (line + " " + w) : w;
+        if (test.length > maxLineLen){
+          if (line) lines.push(line);
+          line = w;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+
+      // If still too long (like one huge word), hard-split it
+      if (lines.length === 1 && lines[0].length > maxLineLen){
+        const hard = [];
+        let t = lines[0];
+        while (t.length > maxLineLen){
+          hard.push(t.slice(0, maxLineLen));
+          t = t.slice(maxLineLen);
+        }
+        if (t) hard.push(t);
+        return hard;
+      }
+
+      return lines;
     }
 
     function destroy(key){
@@ -274,30 +296,54 @@
 
       destroy(key);
 
+      const pal = PALETTES[key];
+
       charts[key] = new Chart(el, {
         type: "bar",
         data: {
-          labels,
+          labels: labels.map(l => wrapLabel(l, 14)),
           datasets: [{
             label: "Count",
             data: values,
-            borderWidth: 1
+            backgroundColor: pal.fill,
+            borderColor: pal.border,
+            borderWidth: 2,
+            borderRadius: 10,
+            barThickness: 46,
+            maxBarThickness: 54
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: { padding: { left: 6, right: 6, top: 8, bottom: 0 } },
           plugins: {
             legend: { display: false },
-            tooltip: { enabled: true }
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                title: (items) => {
+                  // Show full label in tooltip (not wrapped array)
+                  const idx = items[0].dataIndex;
+                  return labels[idx];
+                }
+              }
+            }
           },
           scales: {
             x: {
-              ticks: { autoSkip: false, maxRotation: 0 }
+              grid: { display: false },
+              ticks: {
+                autoSkip: false,
+                maxRotation: 0,  // keep neat, wrapping handles length
+                minRotation: 0,
+                font: { size: 11, weight: "700" }
+              }
             },
             y: {
               beginAtZero: true,
-              ticks: { precision: 0 }
+              ticks: { precision: 0 },
+              grid: { color: "rgba(17,24,39,0.08)" }
             }
           }
         }
@@ -307,11 +353,12 @@
     async function loadExcelAndRender(){
       const status = document.getElementById("rrpStatus");
       const pill = document.getElementById("lastUpdated");
+      const topN = parseInt(document.getElementById("topN").value, 10);
 
       status.textContent = "Loading charts from backend spreadsheet…";
 
       try{
-        // Cache-bust so it updates on every page view
+        // Cache-bust (updates on every page view)
         const url = `${EXCEL_FILE}?v=${Date.now()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Failed to fetch ${EXCEL_FILE} (HTTP ${res.status})`);
@@ -340,14 +387,16 @@
           if (yes(r["Financial Times Journal"])) byArea[area].ft++;
         }
 
-        // Sort by total volume so charts look consistent
-        const areas = Object.keys(byArea).sort((a,b) => {
+        // Sort by total volume for consistent ordering
+        const allAreas = Object.keys(byArea).sort((a,b) => {
           const ta = byArea[a].fiveStar + byArea[a].five + byArea[a].utd + byArea[a].ft;
           const tb = byArea[b].fiveStar + byArea[b].five + byArea[b].utd + byArea[b].ft;
           return tb - ta;
         });
 
-        const labels = areas.map(shortArea);
+        const areas = (topN >= 99) ? allAreas : allAreas.slice(0, topN);
+
+        const labels = areas;
         const data5star = areas.map(a => byArea[a].fiveStar);
         const data5     = areas.map(a => byArea[a].five);
         const dataUTD   = areas.map(a => byArea[a].utd);
@@ -360,22 +409,20 @@
 
         const now = new Date();
         pill.textContent = `Updated: ${now.toLocaleString()}`;
-        status.textContent = `✅ Loaded ${rows.length} rows from ${EXCEL_FILE} (Sheet "${SHEET_NAME}")`;
+        status.textContent = `✅ Loaded ${rows.length} rows from ${EXCEL_FILE} (Sheet "${SHEET_NAME}") • Showing ${areas.length} area(s)`;
 
       }catch(err){
         console.error(err);
         status.textContent = `❌ Could not load charts: ${err.message}`;
-        document.getElementById("lastUpdated").textContent = "Update failed";
+        pill.textContent = "Update failed";
       }
     }
 
     document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      window.location.href = EXCEL_FILE;
-    });
+    document.getElementById("downloadBtn").addEventListener("click", () => window.location.href = EXCEL_FILE);
+    document.getElementById("topN").addEventListener("change", loadExcelAndRender);
 
     document.addEventListener("DOMContentLoaded", loadExcelAndRender);
   </script>
 </body>
 </html>
-
