@@ -509,11 +509,16 @@
     }
 
 
-    // Buttons
-    document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
-    document.getElementById("refreshTop").addEventListener("click", loadExcelAndRender);
+   // Buttons
+document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
 
-    document.addEventListener("DOMContentLoaded", loadExcelAndRender);
+const refreshTopBtn = document.getElementById("refreshTop");
+if (refreshTopBtn) {
+  refreshTopBtn.addEventListener("click", loadExcelAndRender);
+}
+
+document.addEventListener("DOMContentLoaded", loadExcelAndRender);
+
   </script>
 </body>
 </html>
