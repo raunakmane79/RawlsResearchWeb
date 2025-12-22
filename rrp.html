@@ -8,19 +8,18 @@
 
   <style>
     :root{
-      /* Rawls / TTU look */
-      --rawls-red: #CC0000;   /* TTU scarlet */
-      --black: #000000;
-      --ink: #101828;
-      --muted: #667085;
+      --rawls-red:#CC0000;
+      --black:#000000;
+      --ink:#101828;
+      --muted:#667085;
 
-      --bg: #F2F4F7;
-      --card: #FFFFFF;
-      --border: rgba(16,24,40,0.12);
-      --shadow: 0 14px 38px rgba(16,24,40,0.10);
-      --radius: 16px;
+      --bg:#F2F4F7;
+      --card:#FFFFFF;
+      --border:rgba(16,24,40,0.12);
+      --shadow:0 14px 38px rgba(16,24,40,0.10);
+      --radius:16px;
 
-      --maxw: 1160px;
+      --maxw:1160px;
     }
 
     *{ box-sizing:border-box; }
@@ -51,26 +50,6 @@
       gap: 14px;
     }
 
-    .leftHeader{
-      display:flex;
-      align-items:center;
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .menuBtn{
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      flex: 0 0 auto;
-    }
-    .menuBtn:hover{ background: rgba(255,255,255,0.12); }
-
     .logoWrap{
       display:flex;
       align-items:center;
@@ -82,7 +61,6 @@
       width: 52px;
       height: 36px;
       object-fit: contain;
-      background: transparent;
       flex: 0 0 auto;
     }
 
@@ -134,59 +112,6 @@
       border-color: rgba(204,0,0,0.75);
     }
     .pillBtn.primary:hover{ filter: brightness(0.95); }
-
-    /* ===== Side drawer (optional) ===== */
-    .drawerBackdrop{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.48);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .18s ease;
-      z-index: 60;
-    }
-    .drawer{
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 320px;
-      background: #0b0b0b;
-      border-right: 2px solid rgba(204,0,0,0.75);
-      transform: translateX(-102%);
-      transition: transform .18s ease;
-      z-index: 70;
-      padding: 16px;
-      color: #fff;
-    }
-    .drawer.open{ transform: translateX(0); }
-    .drawerBackdrop.open{
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .drawer h3{
-      margin: 8px 0 12px;
-      font-size: 14px;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.75);
-    }
-    .drawer a{
-      display:block;
-      padding: 12px 12px;
-      border-radius: 12px;
-      color: #fff;
-      text-decoration: none;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.06);
-      margin-bottom: 10px;
-    }
-    .drawer a:hover{ background: rgba(255,255,255,0.10); }
-    .drawer a.active{
-      border-color: rgba(204,0,0,0.75);
-      background: rgba(204,0,0,0.18);
-    }
 
     /* ===== Page layout ===== */
     .wrap{
@@ -247,7 +172,7 @@
     }
     @media (max-width: 1000px){
       .grid{ grid-template-columns: 1fr; }
-      .headerActions{ display:none; } /* matches “cleaner” mobile like the real site */
+      .headerActions{ display:none; }
     }
 
     .card{
@@ -259,16 +184,8 @@
       overflow: hidden;
     }
 
-    .cardHeader{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
     .cardTitle{
-      margin:0;
+      margin:0 0 6px;
       font-size: 16px;
       font-weight: 950;
       letter-spacing: -0.1px;
@@ -312,32 +229,14 @@
 </head>
 
 <body>
-  <!-- Drawer -->
-  <div id="drawerBackdrop" class="drawerBackdrop"></div>
-  <aside id="drawer" class="drawer" aria-hidden="true">
-    <h3>Navigation</h3>
-    <a href="index.html">Home</a>
-    <a class="active" href="rrp.html">Rawls Research Productivity</a>
-    <a href="about.html">About</a>
-  </aside>
-
   <!-- Header -->
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="leftHeader">
-        <button class="menuBtn" id="menuBtn" aria-label="Open menu" title="Menu">
-          <!-- Hamburger icon -->
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-          </svg>
-        </button>
-
-        <div class="logoWrap">
-          <img id="logo" class="logo" alt="Rawls College Research" />
-          <div class="brandText">
-            <div class="brandTitle">Rawls College Research</div>
-            <div class="brandSub">Rawls College of Business · Texas Tech University</div>
-          </div>
+      <div class="logoWrap">
+        <img id="logo" class="logo" alt="Rawls College Research" />
+        <div class="brandText">
+          <div class="brandTitle">Rawls College Research</div>
+          <div class="brandSub">Rawls College of Business · Texas Tech University</div>
         </div>
       </div>
 
@@ -359,33 +258,25 @@
 
     <section class="grid">
       <div class="card">
-        <div class="cardHeader">
-          <h2 class="cardTitle"><span class="tag">5*</span> 5* Publications by Area</h2>
-        </div>
+        <h2 class="cardTitle"><span class="tag">5*</span> 5* Publications by Area</h2>
         <p class="cardSub">Count by Area</p>
         <div class="chartBox"><canvas id="chart5star"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="cardHeader">
-          <h2 class="cardTitle"><span class="tag">5</span> 5 Publications by Area</h2>
-        </div>
+        <h2 class="cardTitle"><span class="tag">5</span> 5 Publications by Area</h2>
         <p class="cardSub">Count by Area</p>
         <div class="chartBox"><canvas id="chart5"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="cardHeader">
-          <h2 class="cardTitle"><span class="tag">UTD</span> UTD Publications by Area</h2>
-        </div>
+        <h2 class="cardTitle"><span class="tag">UTD</span> UTD Publications by Area</h2>
         <p class="cardSub">Count by Area</p>
         <div class="chartBox"><canvas id="chartUTD"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="cardHeader">
-          <h2 class="cardTitle"><span class="tag">FT</span> Financial Times Publications by Area</h2>
-        </div>
+        <h2 class="cardTitle"><span class="tag">FT</span> Financial Times Publications by Area</h2>
         <p class="cardSub">Count by Area</p>
         <div class="chartBox"><canvas id="chartFT"></canvas></div>
       </div>
@@ -401,54 +292,52 @@
 
   <script>
     // ====== CONFIG ======
-    const EXCEL_FILE = "Database.xlsx";      // <-- keep your real filename here
+    const EXCEL_FILE = "Database.xlsx";      // <-- your real filename in repo
     const SHEET_NAME = "12";
 
     // Logo file (place in same folder as rrp.html)
-    const LOGO_SRC = "rawls-research-logo.png"; // <-- change if your logo filename differs
+    const LOGO_SRC = "rawls-research-logo.png"; // <-- change to your logo filename if needed
 
-    // Solid, professional colors per Area (consistent across all charts)
-    // Canonical keys: ACCT, ECBE, MGT, FIN, ISQS, MKT/SCM
+    // Your requested solid colors (no transparency)
     const AREA_SOLID_COLORS = {
-      "ACCT":    "#1F2937", // slate
-      "ECBE":    "#7A1E28", // deep maroon
-      "MGT":     "#2F3B4A", // steel
-      "FIN":     "#B45309", // bronze/amber (professional)
-      "ISQS":    "#1D4ED8", // mature blue
-      "MKT/SCM": "#CC0000"  // TTU scarlet
+      "MANAGEMENT": "#4169E1",   // Royal Blue
+      "MARKETING":  "#CC0000",   // Red
+      "SUPPLYCHAIN":"#228B22",   // Forest Green
+      "ISQS":       "#00A3E0",   // Cyber Blue
+      "FINANCE":    "#003366",   // Deep Navy Blue
+      "ECBE":       "#FFBF00",   // Amber
+      "ACCOUNTING": "#800020"    // Burgundy
     };
 
-    // Fallback color if an unexpected Area appears
     const FALLBACK_COLOR = "#475467";
-
     const charts = {};
 
     function cleanStr(v){ return (v ?? "").toString().trim(); }
     function yes(v){ return cleanStr(v).toLowerCase() === "yes"; }
 
-    // Map long Area names to canonical bucket keys (keeps color standardized)
-    function canonicalAreaKey(area){
+    // Map raw Area text -> category key (controls color)
+    function areaCategoryKey(area){
       const a = cleanStr(area).toLowerCase();
 
-      // If sheet already stores short keys (ACCT etc.)
-      if (["acct","ecbe","mgt","fin","isqs","mkt/scm","mkt","scm"].includes(a)) {
-        if (a === "mkt" || a === "scm") return "MKT/SCM";
-        if (a === "mkt/scm") return "MKT/SCM";
-        return a.toUpperCase();
-      }
+      // If sheet uses short codes sometimes
+      if (a === "mgt" || a.includes("management")) return "MANAGEMENT";
+      if (a === "fin" || a.includes("finance")) return "FINANCE";
+      if (a === "acct" || a.includes("account")) return "ACCOUNTING";
+      if (a.includes("energy") || a.includes("commerce") || a.includes("business economics") || a === "ecbe") return "ECBE";
+      if (a.includes("isqs") || a.includes("information") || a.includes("quantitative")) return "ISQS";
 
-      if (a.includes("account")) return "ACCT";
-      if (a.includes("energy") || a.includes("commerce") || a.includes("business economics")) return "ECBE";
-      if (a.includes("management")) return "MGT";
-      if (a === "finance" || a.includes(" finance")) return "FIN";
-      if (a.includes("information") || a.includes("quantitative") || a.includes("isqs")) return "ISQS";
-      if (a.includes("marketing") || a.includes("supply chain")) return "MKT/SCM";
+      // Marketing vs Supply Chain
+      const hasMarketing = a.includes("marketing");
+      const hasSupply = a.includes("supply chain") || a.includes("supply-chain") || a.includes("supplychain") || a.includes("scm");
 
-      // otherwise return original (it will get fallback color)
-      return cleanStr(area);
+      // If both are present, treat as Supply Chain (as requested for a distinct SCM color)
+      if (hasSupply) return "SUPPLYCHAIN";
+      if (hasMarketing) return "MARKETING";
+
+      return "";
     }
 
-    // Wrap long axis labels so they don't overlap
+    // Wrap long axis labels to stop overlap
     function wrapLabel(label, maxLineLen = 14){
       const s = cleanStr(label);
       if (s.length <= maxLineLen) return s;
@@ -467,7 +356,6 @@
         }
       }
       if (line) lines.push(line);
-
       return lines;
     }
 
@@ -488,10 +376,9 @@
         data: {
           labels: labels.map(l => wrapLabel(l, 14)),
           datasets: [{
-            label: "Count",
             data: values,
-            backgroundColor: bg,       // SOLID colors (no transparency)
-            borderWidth: 0,            // Rawls site look = clean fill
+            backgroundColor: bg,   // SOLID fill
+            borderWidth: 0,
             borderRadius: 10,
             barThickness: 44,
             maxBarThickness: 54
@@ -543,7 +430,7 @@
       status.textContent = "Loading…";
 
       try{
-        const url = `${EXCEL_FILE}?v=${Date.now()}`; // cache bust
+        const url = `${EXCEL_FILE}?v=${Date.now()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Unavailable");
 
@@ -554,7 +441,7 @@
 
         const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-        // Aggregate by displayed Area label (we will display the long name, but color via canonical key)
+        // Aggregate by displayed Area label
         const byArea = {};
         for (const r of rows){
           const areaLabel = cleanStr(r["Area"]);
@@ -577,11 +464,11 @@
           return tb - ta;
         });
 
-        // Map each displayed area label -> solid color using canonical key
+        // Map each displayed area label -> your requested solid color
         const labelToColor = {};
         for (const label of areas){
-          const key = canonicalAreaKey(label);
-          labelToColor[label] = AREA_SOLID_COLORS[key] || FALLBACK_COLOR;
+          const k = areaCategoryKey(label);
+          labelToColor[label] = AREA_SOLID_COLORS[k] || FALLBACK_COLOR;
         }
 
         buildBar("chart5star", areas, areas.map(a => byArea[a].fiveStar), "fiveStar", labelToColor);
@@ -600,27 +487,7 @@
       }
     }
 
-    // Drawer
-    const drawer = document.getElementById("drawer");
-    const backdrop = document.getElementById("drawerBackdrop");
-    const menuBtn = document.getElementById("menuBtn");
-
-    function openDrawer(){
-      drawer.classList.add("open");
-      backdrop.classList.add("open");
-      drawer.setAttribute("aria-hidden", "false");
-    }
-    function closeDrawer(){
-      drawer.classList.remove("open");
-      backdrop.classList.remove("open");
-      drawer.setAttribute("aria-hidden", "true");
-    }
-
-    menuBtn.addEventListener("click", openDrawer);
-    backdrop.addEventListener("click", closeDrawer);
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
-
-    // Logo setup (hide if missing)
+    // Logo (hide if missing)
     const logoEl = document.getElementById("logo");
     logoEl.src = LOGO_SRC;
     logoEl.onerror = () => { logoEl.style.display = "none"; };
