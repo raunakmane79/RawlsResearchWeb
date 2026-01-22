@@ -714,7 +714,7 @@ function ingestWorkbook(workbook) {
       "utdJournal",
       "ftJournal",
       "authorRank",
-       "Number of Authors",
+      "numAuthors",
       "articleLink"
     ],
     defval: ""
@@ -738,6 +738,7 @@ function ingestWorkbook(workbook) {
     utdJournal: String(r.utdJournal),
     ftJournal: String(r.ftJournal),
     authorRank: String(r.authorRank),
+     numAuthors: String(r.numAuthors),  
     articleLink: String(r.articleLink)
   }));
 
