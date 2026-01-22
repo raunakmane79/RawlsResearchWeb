@@ -334,6 +334,7 @@
           <th>UTD</th>
           <th>Financial Times</th>
           <th>Author Rank</th>
+          <th>Number of Authors</th>
           <th>Article Link</th>
         </tr>
       </thead>
@@ -592,6 +593,7 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
         <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
         <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
 <td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
+<td>${r.NumberofAuthors ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
         <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
       `;
       frag.appendChild(tr);
@@ -712,6 +714,7 @@ function ingestWorkbook(workbook) {
       "utdJournal",
       "ftJournal",
       "authorRank",
+       "Number of Authors",
       "articleLink"
     ],
     defval: ""
