@@ -698,7 +698,7 @@ function ingestWorkbook(workbook) {
   console.log("Using forced sheet:", sheetName);
 
   const rows = XLSX.utils.sheet_to_json(sheet, {
-    range: "A2:O1048576", // ✅ START FROM ROW 2 (skip header row)
+   range: "A2:P1048576", // ✅ START FROM ROW 2 (skip header row)
     header: [
       "lastname",
       "firstname",
