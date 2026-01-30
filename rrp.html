@@ -154,18 +154,6 @@
     }
     .refreshBtn:hover{ filter: brightness(0.95); }
     
-<div class="dateFilter">
-  <label class="dateLabel">From
-    <input type="date" id="dateFrom" class="dateInput">
-  </label>
-
-  <label class="dateLabel">To
-    <input type="date" id="dateTo" class="dateInput">
-  </label>
-
-  <button class="dateBtn" id="applyDate">Apply</button>
-  <button class="dateBtn ghost" id="clearDate">Clear</button>
-</div>
 
     .stamp{
       border-radius: 999px;
@@ -315,10 +303,25 @@
     <h1 class="pageTitle">Rawls Research Productivity</h1>
     <p class="pageSubtitle">Publication counts by Area across key categories.</p>
 
-    <div class="toolbar">
-      <button class="refreshBtn" id="refreshBtn">Refresh</button>
-      <div class="stamp" id="lastUpdated">Last updated: —</div>
-    </div>
+   <div class="toolbar">
+  <button class="refreshBtn" id="refreshBtn">Refresh</button>
+  <div class="stamp" id="lastUpdated">Last updated: —</div>
+
+  <!-- ✅ Date filter belongs in the HTML body -->
+  <div class="dateFilter">
+    <label class="dateLabel">From
+      <input type="date" id="dateFrom" class="dateInput">
+    </label>
+
+    <label class="dateLabel">To
+      <input type="date" id="dateTo" class="dateInput">
+    </label>
+
+    <button class="dateBtn" id="applyDate" type="button">Apply</button>
+    <button class="dateBtn ghost" id="clearDate" type="button">Clear</button>
+  </div>
+</div>
+
 
     <section class="grid">
       <div class="card">
