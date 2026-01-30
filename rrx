@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rawls Research Productivity</title>
+  <meta name="theme-color" content="#000000" />
+
+  <style>
+       .rawls-logo{height:46px;width:auto;object-fit:contain;flex-shrink:0}
+    :root{
+      --rawls-red:#CC0000;
+      --black:#000000;
+      --ink:#101828;
+      --muted:#667085;
+
+      --bg:#F2F4F7;
+      --card:#FFFFFF;
+      --border:rgba(16,24,40,0.12);
+      --shadow:0 14px 38px rgba(16,24,40,0.10);
+      --radius:16px;
+
+      --maxw:1160px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    /* ===== Header (Rawls-style) ===== */
+    .topbar{
+      background: var(--black);
+      color:#fff;
+      position: sticky;
+      top:0;
+      z-index:50;
+      border-bottom: 3px solid var(--rawls-red);
+    }
+
+    .topbar-inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+    }
+
+    .logoWrap{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo{
+      width: 52px;
+      height: 36px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .brandText{
+      min-width: 0;
+      line-height: 1.1;
+    }
+    .brandTitle{
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      font-size: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brandSub{
+      margin-top: 4px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.72);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    .headerActions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .pillBtn{
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color:#fff;
+      cursor:pointer;
+      white-space: nowrap;
+    }
+    .pillBtn:hover{ background: rgba(255,255,255,0.10); }
+
+    .pillBtn.primary{
+      background: var(--rawls-red);
+      border-color: rgba(204,0,0,0.75);
+    }
+    .pillBtn.primary:hover{ filter: brightness(0.95); }
+
+    /* ===== Page layout ===== */
+    .wrap{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 22px 16px 36px;
+    }
+
+    .pageTitle{
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -0.4px;
+      font-weight: 950;
+    }
+    .pageSubtitle{
+      margin: 6px 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .toolbar{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 10px 0 18px;
+    }
+
+    .refreshBtn{
+      border: none;
+      border-radius: 12px;
+      background: var(--rawls-red);
+      color:#fff;
+      font-weight: 900;
+      padding: 10px 14px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(204,0,0,0.22);
+    }
+    .refreshBtn:hover{ filter: brightness(0.95); }
+
+    .stamp{
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(16,24,40,0.70);
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 22px rgba(16,24,40,0.08);
+      white-space: nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 1000px){
+      .grid{ grid-template-columns: 1fr; }
+      .headerActions{ display:none; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 16px 14px;
+      overflow: hidden;
+    }
+
+    .cardTitle{
+      margin:0 0 6px;
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing: -0.1px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .tag{
+      font-size: 12px;
+      font-weight: 950;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(16,24,40,0.14);
+      background: #fff;
+      color: rgba(16,24,40,0.72);
+    }
+
+    .cardSub{
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .chartBox{
+      height: 340px;
+      position: relative;
+    }
+
+    .status{
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px dashed rgba(16,24,40,0.18);
+      color: rgba(16,24,40,0.65);
+      font-size: 13px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logoWrap">
+         <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
+        <div class="brandText">
+          <div class="brandTitle">Rawls College Research</div>
+          <div class="brandSub">Rawls College of Business · Texas Tech University</div>
+        </div>
+      </div>
+
+      <div class="headerActions">
+       
+        <button class="pillBtn" onclick="location.href='index.html'">Homepage</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1 class="pageTitle">Rawls Research Productivity</h1>
+    <p class="pageSubtitle">Publication counts by Area across key categories.</p>
+
+    <div class="toolbar">
+      <button class="refreshBtn" id="refreshBtn">Refresh</button>
+      <div class="stamp" id="lastUpdated">Last updated: —</div>
+    </div>
+
+    <section class="grid">
+      <div class="card">
+        <h2 class="cardTitle"><span class="tag">5*</span> 5* Publications by Area</h2>
+        <p class="cardSub">Count by Area</p>
+        <div class="chartBox"><canvas id="chart5star"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2 class="cardTitle"><span class="tag">5</span> 5 Publications by Area</h2>
+        <p class="cardSub">Count by Area</p>
+        <div class="chartBox"><canvas id="chart5"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2 class="cardTitle"><span class="tag">UTD</span> UTD Publications by Area</h2>
+        <p class="cardSub">Count by Area</p>
+        <div class="chartBox"><canvas id="chartUTD"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2 class="cardTitle"><span class="tag">FT</span> Financial Times Publications by Area</h2>
+        <p class="cardSub">Count by Area</p>
+        <div class="chartBox"><canvas id="chartFT"></canvas></div>
+      </div>
+    </section>
+
+    <div class="status" id="rrpStatus">Loading…</div>
+  </main>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    // ====== CONFIG ======
+    const EXCEL_FILE = "Database.xlsx";      // <-- your real filename in repo
+    const SHEET_NAME = "12";
+
+
+    // Your requested solid colors (no transparency)
+    const AREA_SOLID_COLORS = {
+      "MANAGEMENT": "#4169E1",   // Royal Blue
+      "MARKETING":  "#CC0000",   // Red
+      "SUPPLYCHAIN":"#228B22",   // Forest Green
+      "ISQS":       "#00A3E0",   // Cyber Blue
+      "FINANCE":    "#003366",   // Deep Navy Blue
+      "ECBE":       "#FFBF00",   // Amber
+      "ACCOUNTING": "#800020"    // Burgundy
+    };
+
+    const FALLBACK_COLOR = "#475467";
+    const charts = {};
+
+    function cleanStr(v){ return (v ?? "").toString().trim(); }
+    function yes(v){ return cleanStr(v).toLowerCase() === "yes"; }
+
+    // Map raw Area text -> category key (controls color)
+   function areaCategoryKey(area){
+  const a = cleanStr(area).toLowerCase();
+
+  // --- Highest priority: combined label should be Supply Chain (Forest Green) ---
+  // Handles: "Marketing & Supply Chain Management", "Marketing and Supply Chain", etc.
+  if (
+    (a.includes("marketing") && a.includes("supply chain")) ||
+    a.includes("marketing & supply chain") ||
+    a.includes("marketing and supply chain")
+  ) {
+    return "SUPPLYCHAIN";
+  }
+
+  // Management
+  if (a === "mgt" || a.includes("management")) return "MANAGEMENT";
+
+  // Finance
+  if (a === "fin" || a.includes("finance")) return "FINANCE";
+
+  // Accounting
+  if (a === "acct" || a.includes("account")) return "ACCOUNTING";
+
+  // Energy commerce
+  if (a.includes("energy") || a.includes("commerce") || a.includes("business economics") || a === "ecbe") return "ECBE";
+
+  // ISQS
+  if (a.includes("isqs") || a.includes("information") || a.includes("quantitative")) return "ISQS";
+
+  // Supply Chain (includes SCM)
+  if (
+    a.includes("supply chain") ||
+    a.includes("supply-chain") ||
+    a.includes("supplychain") ||
+    a.includes("scm")
+  ) return "SUPPLYCHAIN";
+
+  // Marketing (only marketing without supply chain)
+  if (a.includes("marketing")) return "MARKETING";
+
+  return "";
+}
+
+
+    // Wrap long axis labels to stop overlap
+    function wrapLabel(label, maxLineLen = 14){
+      const s = cleanStr(label);
+      if (s.length <= maxLineLen) return s;
+
+      const words = s.split(/\s+/);
+      const lines = [];
+      let line = "";
+
+      for (const w of words){
+        const test = line ? (line + " " + w) : w;
+        if (test.length > maxLineLen){
+          if (line) lines.push(line);
+          line = w;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function destroy(key){
+      if (charts[key]) { charts[key].destroy(); delete charts[key]; }
+    }
+
+    function buildBar(canvasId, labels, values, key, labelToColor){
+      const el = document.getElementById(canvasId);
+      if (!el) return;
+
+      destroy(key);
+
+      const bg = labels.map(l => labelToColor[l] || FALLBACK_COLOR);
+
+      charts[key] = new Chart(el, {
+        type: "bar",
+        data: {
+          labels: labels.map(l => wrapLabel(l, 14)),
+          datasets: [{
+            data: values,
+            backgroundColor: bg,   // SOLID fill
+            borderWidth: 0,
+            borderRadius: 10,
+            barThickness: 44,
+            maxBarThickness: 54
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 650, easing: "easeOutQuart" },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                title: (items) => labels[items[0].dataIndex]
+              }
+            }
+          },
+          layout: { padding: { left: 8, right: 8, top: 8, bottom: 0 } },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0,
+                font: { size: 11, weight: "800" },
+                color: "rgba(16,24,40,0.70)"
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0,
+                font: { weight: "800" },
+                color: "rgba(16,24,40,0.60)"
+              },
+              grid: { color: "rgba(16,24,40,0.08)" }
+            }
+          }
+        }
+      });
+    }
+
+    async function loadExcelAndRender(){
+      const status = document.getElementById("rrpStatus");
+      const pill = document.getElementById("lastUpdated");
+
+      status.textContent = "Loading…";
+
+      try{
+        const url = `${EXCEL_FILE}?v=${Date.now()}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Unavailable");
+
+        const buf = await res.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+        const sheet = wb.Sheets[SHEET_NAME];
+        if (!sheet) throw new Error("Unavailable");
+
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+        // Aggregate by displayed Area label
+        const byArea = {};
+        for (const r of rows){
+          const areaLabel = cleanStr(r["Area"]);
+          if (!areaLabel) continue;
+
+          if (!byArea[areaLabel]) byArea[areaLabel] = { fiveStar:0, five:0, utd:0, ft:0 };
+
+          const ranking = cleanStr(r["Ranking - Updated"]);
+          if (ranking === "5*") byArea[areaLabel].fiveStar++;
+          if (ranking === "5")  byArea[areaLabel].five++;
+
+          if (yes(r["UTD Journal"])) byArea[areaLabel].utd++;
+          if (yes(r["Financial Times Journal"])) byArea[areaLabel].ft++;
+        }
+
+        // Stable ordering (total volume)
+        const areas = Object.keys(byArea).sort((a,b) => {
+          const ta = byArea[a].fiveStar + byArea[a].five + byArea[a].utd + byArea[a].ft;
+          const tb = byArea[b].fiveStar + byArea[b].five + byArea[b].utd + byArea[b].ft;
+          return tb - ta;
+        });
+
+        // Map each displayed area label -> your requested solid color
+        const labelToColor = {};
+        for (const label of areas){
+          const k = areaCategoryKey(label);
+          labelToColor[label] = AREA_SOLID_COLORS[k] || FALLBACK_COLOR;
+        }
+
+        buildBar("chart5star", areas, areas.map(a => byArea[a].fiveStar), "fiveStar", labelToColor);
+        buildBar("chart5",     areas, areas.map(a => byArea[a].five),     "five",     labelToColor);
+        buildBar("chartUTD",   areas, areas.map(a => byArea[a].utd),      "utd",      labelToColor);
+        buildBar("chartFT",    areas, areas.map(a => byArea[a].ft),       "ft",       labelToColor);
+
+        const now = new Date();
+        pill.textContent = `Last updated: ${now.toLocaleString()}`;
+        status.textContent = "—";
+
+      }catch(e){
+        console.error(e);
+        status.textContent = "Charts are temporarily unavailable. Please try again.";
+        pill.textContent = "Last updated: —";
+      }
+    }
+
+
+   // Buttons
+document.getElementById("refreshBtn").addEventListener("click", loadExcelAndRender);
+
+const refreshTopBtn = document.getElementById("refreshTop");
+if (refreshTopBtn) {
+  refreshTopBtn.addEventListener("click", loadExcelAndRender);
+}
+
+document.addEventListener("DOMContentLoaded", loadExcelAndRender);
+
+  </script>
+</body>
+</html>
+
