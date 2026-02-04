@@ -313,6 +313,13 @@
           <label><input type="checkbox" id="ftNo"> No</label>
         </div>
       </div>
+      <div class="filter-group">
+  <label>Author Rank</label>
+  <div class="checkbox-group">
+    <label><input type="checkbox" id="author1"> 1st Author</label>
+    <label><input type="checkbox" id="author2"> 2nd Author</label>
+  </div>
+</div>
     </div>
   </div>
 
@@ -360,6 +367,8 @@
     ftNo: document.getElementById("ftNo"),
     rank5: document.getElementById("rank5"),
     rank5star: document.getElementById("rank5star"),
+    author1: document.getElementById("author1"),
+    author2: document.getElementById("author2"),
     resultsBody: document.getElementById("resultsBody"),
     resultsCount: document.getElementById("resultsCount"),
     clearFilters: document.getElementById("clearFilters"),
@@ -653,7 +662,12 @@ if ((r5 || r5s) && !(
   (r5 && d.ranking === "5") ||
   (r5s && d.ranking === "5*")
 )) return false;
-
+const a1 = elements.author1.checked;
+const a2 = elements.author2.checked;
+if ((a1 || a2) && !(
+  (a1 && String(d.authorRank) === "1") ||
+  (a2 && String(d.authorRank) === "2")
+)) return false;
       return true;
     });
 
@@ -673,6 +687,9 @@ if ((r5 || r5s) && !(
     elements.utdYes.checked=elements.utdNo.checked=false;
     elements.ftYes.checked=elements.ftNo.checked=false;
     elements.rank5.checked=elements.rank5star.checked=false;
+    elements.author1.checked = false;
+    elements.author2.checked = false;
+
     renderTable(data);
   }
 
@@ -792,8 +809,13 @@ function ingestWorkbook(workbook) {
     [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
       .forEach(el=>el.addEventListener("input", debouncedApply));
 
-    [elements.exactNameMatch, elements.utdYes, elements.utdNo, elements.ftYes, elements.ftNo, elements.rank5, elements.rank5star]
-      .forEach(el=>el.addEventListener("input", applyFilters));
+    [elements.exactNameMatch,
+ elements.utdYes, elements.utdNo,
+ elements.ftYes, elements.ftNo,
+ elements.rank5, elements.rank5star,
+ elements.author1, elements.author2
+].forEach(el => el.addEventListener("input", applyFilters));
+
 
     elements.clearFilters.addEventListener("click", clearAllFilters);
 
