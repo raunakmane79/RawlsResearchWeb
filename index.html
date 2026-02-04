@@ -508,7 +508,11 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
 }
 
   function buildMultiSelect(container, values, placeholderText){
-    const unique=[...new Set(values.filter(v=>String(v||"").trim()!==""))].sort();
+    const unique = [...new Set(
+  values
+    .map(v => String(v || "").trim())
+    .filter(v => v !== "")
+)].sort();
     container.innerHTML = `
       <div class="multi-select-header">
         <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
