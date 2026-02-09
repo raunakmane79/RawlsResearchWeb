@@ -361,7 +361,64 @@
 <script>
   let data = [];
   let currentRows = [];
+// -------- Sorting --------
+let sortState = { key: "acceptanceDate", dir: "desc" }; // default: newest first
 
+function parseDateAny(v){
+  const s = String(v || "").trim();
+  if(!s) return NaN;
+
+  // Handles MM/DD/YYYY from toLocaleDateString("en-US")
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m){
+    const mm = Number(m[1]), dd = Number(m[2]), yy = Number(m[3]);
+    return new Date(yy, mm - 1, dd).getTime();
+  }
+
+  const t = Date.parse(s);
+  return Number.isFinite(t) ? t : NaN;
+}
+
+function compareValues(a, b, key){
+  if(key === "acceptanceDate"){
+    const ta = parseDateAny(a.acceptanceDate);
+    const tb = parseDateAny(b.acceptanceDate);
+
+    // blanks always at bottom
+    const aBad = !Number.isFinite(ta);
+    const bBad = !Number.isFinite(tb);
+    if(aBad && bBad) return 0;
+    if(aBad) return 1;
+    if(bBad) return -1;
+
+    return ta - tb;
+  }
+
+  // firstName / lastName string sort
+  const av = fold(a[key] || "");
+  const bv = fold(b[key] || "");
+  return av.localeCompare(bv);
+}
+
+function sortRows(rows){
+  const { key, dir } = sortState;
+  const mult = dir === "asc" ? 1 : -1;
+  return rows.slice().sort((a,b)=> mult * compareValues(a,b,key));
+}
+
+function updateSortIndicators(){
+  document.querySelectorAll("th.sortable").forEach(th=>{
+    const span = th.querySelector(".sort-indicator");
+    if(!span) return;
+
+    const key = th.getAttribute("data-sort");
+    if(key === sortState.key){
+      span.textContent = sortState.dir === "asc" ? "▲" : "▼";
+    } else {
+      span.textContent = "";
+    }
+  });
+}
   const elements = {
     lastNameSearch: document.getElementById("lastNameSearch"),
     firstNameSearch: document.getElementById("firstNameSearch"),
@@ -592,38 +649,43 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d=>d.year), "All Years");
   }
 
-  function renderTable(rows){
-    currentRows = rows.slice();
-    const frag=document.createDocumentFragment();
+function renderTable(rows){
+  const sorted = sortRows(rows);
+  currentRows = sorted.slice();
+  updateSortIndicators();
 
-    rows.forEach(r=>{
-      const tr=document.createElement("tr");
-      const url=safeUrl(r.articleLink);
-      tr.innerHTML=`
-        <td>${r.lastName||""}</td>
-        <td>${r.firstName||""}</td>
-        <td>${r.startDateAtRawls||""}</td>
-        <td>${r.endDateAtRawls||""}</td>
-        <td>${r.position||""}</td>
-        <td>${r.area||""}</td>
-        <td>${r.pubdate||""}</td>
-        <td>${r.year||""}</td>
-        <td>${r.articleTitle||""}</td>
-        <td>${r.journalName||""}</td>
-        <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
-        <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-        <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-<td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
-<td>${r.numAuthors ? `<span class="badge badge-blue">${r.numAuthors}</span>` : ""}</td>
-        <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
-      `;
-      frag.appendChild(tr);
-    });
+  const frag = document.createDocumentFragment();
 
-    elements.resultsBody.innerHTML="";
-    elements.resultsBody.appendChild(frag);
-    elements.resultsCount.textContent = `Showing ${rows.length} results`;
-  }
+  sorted.forEach(r=>{
+    const tr=document.createElement("tr");
+    const url=safeUrl(r.articleLink);
+
+    tr.innerHTML=`
+      <td>${r.lastName||""}</td>
+      <td>${r.firstName||""}</td>
+      <td>${r.startDateAtRawls||""}</td>
+      <td>${r.endDateAtRawls||""}</td>
+      <td>${r.position||""}</td>
+      <td>${r.area||""}</td>
+      <td>${r.acceptanceDate||""}</td>
+      <td>${r.year||""}</td>
+      <td>${r.articleTitle||""}</td>
+      <td>${r.journalName||""}</td>
+      <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+      <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+      <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+      <td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
+      <td>${r.numAuthors ? `<span class="badge badge-blue">${r.numAuthors}</span>` : ""}</td>
+      <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
+    `;
+    frag.appendChild(tr);
+  });
+
+  elements.resultsBody.innerHTML="";
+  elements.resultsBody.appendChild(frag);
+  elements.resultsCount.textContent = `Showing ${sorted.length} results`;
+}
+
 
   function applyFilters(){
     const firstQ = elements.firstNameSearch.value;
@@ -831,6 +893,24 @@ function ingestWorkbook(workbook) {
       const open = elements.advancedPanel.classList.toggle("collapsed") === false;
       elements.advancedToggle.classList.toggle("open", open);
       elements.advancedToggle.setAttribute("aria-expanded", String(open));
+      // column header sorting
+document.querySelectorAll("th.sortable").forEach(th=>{
+  th.addEventListener("click", ()=>{
+    const key = th.getAttribute("data-sort");
+    if(!key) return;
+
+    if(sortState.key === key){
+      sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
+    } else {
+      sortState.key = key;
+      sortState.dir = (key === "acceptanceDate") ? "desc" : "asc";
+    }
+
+    // re-render current table (keeps current filters)
+    renderTable(currentRows);
+  });
+});
+
     });
 
 
