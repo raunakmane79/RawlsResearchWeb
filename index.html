@@ -758,10 +758,10 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
     elements.resultsCount.textContent = `Showing ${rows.length} results`;
   }
 
-  function applyFilters(){
+ function applyFilters(){
   let firstQ = elements.firstNameSearch.value.trim();
   let lastQ  = elements.lastNameSearch.value.trim();
-  const exact  = elements.exactNameMatch.checked;
+  const exact = elements.exactNameMatch.checked;
 
   // If user typed "E Walden" in FIRST box, split it
   if(firstQ && !lastQ){
@@ -774,60 +774,57 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
 
   const firstTokens = parseNameTokens(firstQ);
   const lastTokens  = parseNameTokens(lastQ);
-    const exact  = elements.exactNameMatch.checked;
 
-    const firstTokens=parseNameTokens(firstQ);
-    const lastTokens=parseNameTokens(lastQ);
+  const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
+  const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
+  const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
 
-    const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
-    const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
-    const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
+  const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
+  const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
+  const r5=elements.rank5.checked, r5s=elements.rank5star.checked;
 
-    const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
-    const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
-    const r5=elements.rank5.checked, r5s=elements.rank5star.checked;
+  const kq = elements.keywordSearch.value.toLowerCase();
+  const tq = elements.titleSearch.value.toLowerCase();
+  const jq = elements.journalSearch.value.toLowerCase();
 
-    const kq = elements.keywordSearch.value.toLowerCase();
-    const tq = elements.titleSearch.value.toLowerCase();
-    const jq = elements.journalSearch.value.toLowerCase();
+  const rows = data.filter(d=>{
+    const first = d.firstName || "";
+    const last  = d.lastName  || "";
 
-    const rows = data.filter(d=>{
-      const first=d.firstName||"";
-      const last=d.lastName||"";
+    for(const t of firstTokens){
+      if(!tokenMatchOneField(t, first, exact) && !tokenMatchOneField(t, last, exact)) return false;
+    }
+    for(const t of lastTokens){
+      if(!tokenMatchOneField(t, last, exact) && !tokenMatchOneField(t, first, exact)) return false;
+    }
 
-      for(const t of firstTokens) if(!tokenMatchOneField(t, first, exact) && !tokenMatchOneField(t, last, exact)) return false;
-      for(const t of lastTokens)  if(!tokenMatchOneField(t, last, exact)  && !tokenMatchOneField(t, first, exact)) return false;
+    if(kq){
+      const inTitle = (d.articleTitle||"").toLowerCase().includes(kq);
+      const inJour  = (d.journalName||"").toLowerCase().includes(kq);
+      if(!inTitle && !inJour) return false;
+    }
+    if(tq && !String(d.articleTitle||"").toLowerCase().includes(tq)) return false;
+    if(jq && !String(d.journalName||"").toLowerCase().includes(jq)) return false;
 
-      if(kq){
-        const inTitle=(d.articleTitle||"").toLowerCase().includes(kq);
-        const inJour=(d.journalName||"").toLowerCase().includes(kq);
-        if(!inTitle && !inJour) return false;
-      }
-      if(tq && !String(d.articleTitle||"").toLowerCase().includes(tq)) return false;
-      if(jq && !String(d.journalName||"").toLowerCase().includes(jq)) return false;
+    if(areaVals.length && !areaVals.includes(d.area)) return false;
+    if(posVals.length  && !posVals.includes(d.position)) return false;
+    if(yearVals.length && !yearVals.includes(String(d.year))) return false;
 
-      if(areaVals.length && !areaVals.includes(d.area)) return false;
-      if(posVals.length  && !posVals.includes(d.position)) return false;
-      if(yearVals.length && !yearVals.includes(String(d.year))) return false;
+    if((utdY||utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
+    if((ftY||ftN)   && !((ftY && d.ftJournal==="Yes")  || (ftN && d.ftJournal==="No"))) return false;
 
-      if((utdY||utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
-      if((ftY||ftN)   && !((ftY && d.ftJournal==="Yes") || (ftN && d.ftJournal==="No"))) return false;
-if ((r5 || r5s) && !(
-  (r5 && d.ranking === "5") ||
-  (r5s && d.ranking === "5*")
-)) return false;
-const a1 = elements.author1.checked;
-const a2 = elements.author2.checked;
-if ((a1 || a2) && !(
-  (a1 && String(d.authorRank) === "1") ||
-  (a2 && String(d.authorRank) === "2")
-)) return false;
-      return true;
-    });
+    if((r5 || r5s) && !((r5 && d.ranking==="5") || (r5s && d.ranking==="5*"))) return false;
 
-    renderTable(sortRows(rows));
+    const a1 = elements.author1.checked;
+    const a2 = elements.author2.checked;
+    if((a1 || a2) && !((a1 && String(d.authorRank)==="1") || (a2 && String(d.authorRank)==="2"))) return false;
 
-  }
+    return true;
+  });
+
+  renderTable(sortRows(rows));
+}
+
 
   function clearAllFilters(){
     elements.firstNameSearch.value="";
