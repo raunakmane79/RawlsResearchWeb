@@ -540,34 +540,63 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
     }
     return dp[m][n];
   }
-  function fuzzyOK(q,s){
-    const L=Math.max(q.length,s.length);
-    const tol=L<=4?1:2;
-    return levenshtein(q,s)<=tol;
-  }
+  function fuzzyOK(q, c){
+  q = fold(q);
+  c = fold(c);
+
+  // Don’t fuzzy-match tiny queries
+  if(q.length < 4) return false;
+
+  // Require same starting letter (prevents Walden -> Allen)
+  if(q[0] !== c[0]) return false;
+
+  // Avoid big length differences
+  if(Math.abs(q.length - c.length) > 1) return false;
+
+  // Allow at most 1 edit
+  return levenshtein(q, c) <= 1;
+}
+
   function matchesInitial(queryToken, name){
     const q=fold(queryToken), n=fold(name);
     if(!q||!n) return false;
     return q.length===1 && n[0]===q;
   }
-  function tokenMatchOneField(queryToken, candidate, exactMode){
-    const qRaw=String(queryToken||"").trim();
-    const cRaw=String(candidate||"");
-    const q=fold(qRaw), c=fold(cRaw);
+function tokenMatchOneField(queryToken, candidate, exactMode){
+  const qRaw = String(queryToken||"").trim();
+  const cRaw = String(candidate||"");
+  const q = fold(qRaw);
+  const c = fold(cRaw);
 
-    if(!q) return true;
-    if(!c) return false;
+  if(!q) return true;
+  if(!c) return false;
 
-    if(exactMode){
-      if(q===c) return true;
-      if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
-      return false;
-    }
-    if(isPrefixQuery(qRaw)) return c.startsWith(fold(stripWildcard(qRaw)));
-    if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
-    if(c.includes(q)) return true;
-    return fuzzyOK(q,c);
+  // Split candidate into word-like tokens (handles "Walden-Smith", "Tingting", "Walden, Eric", etc.)
+  const words = c.split(/[^a-z0-9]+/).filter(Boolean);
+
+  // Initial support: "E" should match "Eric" (but not random fuzzy)
+  if(matchesInitial(qRaw, cRaw)){
+    return words.some(w => w.startsWith(q));
   }
+
+  // Prefix wildcard: "ting*" explicitly means prefix
+  if(isPrefixQuery(qRaw)){
+    const qp = fold(stripWildcard(qRaw));
+    return words.some(w => w.startsWith(qp));
+  }
+
+  if(exactMode){
+    // IMPORTANT: make "exact" mean "prefix of the cell/word", not full equality
+    // so "ting" matches "tingting" but "walden" won’t match "waldron"
+    return words.some(w => w.startsWith(q));
+  }
+
+  // Non-exact: still “starts with” a word, not substring anywhere
+  if(words.some(w => w.startsWith(q))) return true;
+
+  // Optional: tiny bit of typo tolerance (strict)
+  return words.some(w => fuzzyOK(q, w));
+}
 
   // Our real Excel has personname like "LAST, FIRST M"
   function splitPersonName(personname){
@@ -732,6 +761,18 @@ function stripWildcard(q){ return q.replace(/\*+$/,""); }
   }
 
   function applyFilters(){
+    let firstQ = elements.firstNameSearch.value.trim();
+let lastQ  = elements.lastNameSearch.value.trim();
+
+if(firstQ && !lastQ){
+  const parts = firstQ.split(/\s+/).filter(Boolean);
+  if(parts.length >= 2){
+    // assume "First Last" OR "Initial Last"
+    firstQ = parts[0];
+    lastQ  = parts.slice(1).join(" ");
+  }
+}
+
     const firstQ = elements.firstNameSearch.value;
     const lastQ  = elements.lastNameSearch.value;
     const exact  = elements.exactNameMatch.checked;
