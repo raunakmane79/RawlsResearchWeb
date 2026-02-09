@@ -585,21 +585,16 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
   if(!q) return true;
   if(!c) return false;
 
-  // Compare against whole word tokens only
   const words = c.split(/[^a-z0-9]+/).filter(Boolean);
 
-  // Exact mode: "ting" should still match "tingting" (prefix)
   if(exactMode){
-    return words.some(w => w === q || w.startsWith(q));
+    if(words.some(w => w === q || w.startsWith(q))) return true;
+    return words.some(w => fuzzyOK(q, w)); // ✅ allow minor typo
   }
 
-  // Non-exact: prefer prefix match (clean + intuitive)
   if(words.some(w => w.startsWith(q))) return true;
-
-  // Then allow small typos within guardrails
   return words.some(w => fuzzyOK(q, w));
 }
-
 
   // Our real Excel has personname like "LAST, FIRST M"
   function splitPersonName(personname){
@@ -764,20 +759,21 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
   }
 
   function applyFilters(){
-    let firstQ = elements.firstNameSearch.value.trim();
-let lastQ  = elements.lastNameSearch.value.trim();
+  let firstQ = elements.firstNameSearch.value.trim();
+  let lastQ  = elements.lastNameSearch.value.trim();
+  const exact  = elements.exactNameMatch.checked;
 
-if(firstQ && !lastQ){
-  const parts = firstQ.split(/\s+/).filter(Boolean);
-  if(parts.length >= 2){
-    // assume "First Last" OR "Initial Last"
-    firstQ = parts[0];
-    lastQ  = parts.slice(1).join(" ");
+  // If user typed "E Walden" in FIRST box, split it
+  if(firstQ && !lastQ){
+    const parts = firstQ.split(/\s+/).filter(Boolean);
+    if(parts.length >= 2){
+      firstQ = parts[0];
+      lastQ  = parts.slice(1).join(" ");
+    }
   }
-}
 
-    const firstQ = elements.firstNameSearch.value;
-    const lastQ  = elements.lastNameSearch.value;
+  const firstTokens = parseNameTokens(firstQ);
+  const lastTokens  = parseNameTokens(lastQ);
     const exact  = elements.exactNameMatch.checked;
 
     const firstTokens=parseNameTokens(firstQ);
