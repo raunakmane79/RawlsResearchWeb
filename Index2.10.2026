@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rawls Faculty Publications Database</title>
+
+  <!-- XLSX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    :root{
+      --rawls-red:#ba0c2f; --rawls-red-dark:#8c001a; --rawls-black:#1f1f1f;
+      --rawls-bg:#f3f4f6; --rawls-card-bg:#ffffff; --rawls-border:#e0e0e0;
+    }
+    *{box-sizing:border-box;font-family:"Roboto",system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
+    body{margin:0;background:radial-gradient(circle at top left,#fff 0,#f3f4f6 45%,#e9ecf2 100%);color:var(--rawls-black)}
+    .rawls-header{background:linear-gradient(to right,#000 60%,#111 100%);border-bottom:4px solid var(--rawls-red);color:#fff;padding:10px 28px;position:sticky;top:0;z-index:1000}
+    .rawls-header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1320px;margin:0 auto;flex-wrap:wrap}
+
+    .rawls-header-left{display:flex;align-items:center;gap:16px;min-width:0}
+    .rawls-logo{height:46px;width:auto;object-fit:contain;flex-shrink:0}
+    .rawls-header-brand{display:flex;flex-direction:column;line-height:1.25}
+    .rawls-header-brand-main{font-weight:700;font-size:1.2rem;letter-spacing:.02em}
+    .rawls-header-brand-sub{font-size:.85rem;color:#ccc;letter-spacing:.05em;text-transform:uppercase}
+    .rawls-header-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .header-btn{border-radius:999px;padding:6px 14px;font-size:.8rem;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.35);color:#fff;background:transparent;transition:.15s;white-space:nowrap}
+    .header-btn.primary{background:var(--rawls-red);border-color:var(--rawls-red)}
+    .header-btn:hover{transform:translateY(-1px);border-color:#fff;background:rgba(255,255,255,.08)}
+    .header-btn.primary:hover{background:var(--rawls-red-dark);border-color:var(--rawls-red-dark)}
+    .app{background:var(--rawls-card-bg);padding:24px 24px 20px;margin:24px auto;border-radius:12px;max-width:1320px;box-shadow:0 12px 30px rgba(0,0,0,.12);border-top:5px solid var(--rawls-red)}
+    .app-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
+    h1{margin:0;font-weight:800;font-size:1.8rem;letter-spacing:.03em;color:var(--rawls-red)}
+    .app-subtitle{font-size:.9rem;color:#555}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0;flex-wrap:wrap}
+    .toolbar-left{font-size:.85rem;color:#555}
+    .toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn{border-radius:999px;border:1px solid var(--rawls-border);padding:5px 12px;font-size:.8rem;background:#f8f8f8;color:#111;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+    .btn:hover{background:#fff;border-color:var(--rawls-red);color:var(--rawls-red);transform:translateY(-.5px)}
+    .btn:active,.btn.active{background:var(--rawls-red);border-color:var(--rawls-red-dark);color:#fff;box-shadow:0 0 0 2px rgba(186,12,47,.25);transform:scale(.98)}
+    .filters{margin-top:12px;padding:14px 14px 10px;border-radius:10px;border:1px solid var(--rawls-border);background:linear-gradient(to bottom,#fafafa,#fff);display:flex;flex-direction:column;gap:10px;position:relative;z-index:100}
+    .filters-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .filters-title{font-size:.9rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555}
+    .advanced-toggle{border-radius:999px;border:1px solid var(--rawls-border);padding:4px 10px;font-size:.8rem;background:#f8f8f8;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:#444;transition:.15s}
+    .advanced-toggle:hover{background:#fff;border-color:var(--rawls-red);transform:translateY(-.5px)}
+    .advanced-toggle.open{background:var(--rawls-red);border-color:var(--rawls-red-dark);color:#fff;box-shadow:0 0 0 2px rgba(186,12,47,.25)}
+    .advanced-toggle-icon{font-size:.8rem;transition:transform .2s ease}
+    .advanced-toggle.open .advanced-toggle-icon{transform:rotate(180deg)}
+    .filters-primary,.filters-advanced{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 16px}
+    .filters-advanced{margin-top:.75rem;padding:1rem 1.5rem 1.25rem;border-radius:14px;background:linear-gradient(180deg,#fff 0%,#fafafa 100%);border:1px solid rgba(186,12,47,.25);box-shadow:0 4px 14px rgba(0,0,0,.08);border-top:1px dashed var(--rawls-border)}
+    .filters-advanced.collapsed{display:none}
+    .filter-group{display:flex;flex-direction:column;gap:4px}
+    label{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:#555}
+    input[type="text"]{padding:6px 8px;border-radius:6px;border:1px solid var(--rawls-border);font-size:.85rem;background:#fafafa;transition:.15s}
+    input[type="text"]:focus{outline:none;border-color:var(--rawls-red);box-shadow:0 0 0 2px rgba(186,12,47,.18);background:#fff}
+    .checkbox-group{display:flex;gap:10px;flex-wrap:wrap;font-size:.85rem;color:#444}
+    .name-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
+    .name-options{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:.8rem;color:#555}
+    .name-option{display:inline-flex;align-items:center;gap:6px}
+    .filter-hint{font-size:.7rem;color:#777}
+    .multi-select{position:relative;font-size:.85rem}
+    .multi-select-header{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;border:1px solid var(--rawls-border);background:#fafafa;cursor:pointer;min-height:32px;transition:.15s}
+    .multi-select.open .multi-select-header{border-color:var(--rawls-red);box-shadow:0 0 0 2px rgba(186,12,47,.18);background:#fff}
+    .multi-select-label{color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .multi-select-placeholder{color:#999}
+    .multi-select-arrow{font-size:.7rem;margin-left:8px}
+    .multi-select-menu{position:absolute;left:0;right:0;margin-top:4px;background:#fff;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.15);border:1px solid #ddd;max-height:220px;overflow-y:auto;padding:6px 0;z-index:200;display:none}
+    .multi-select.open .multi-select-menu{display:block}
+    .multi-select-option{display:flex;align-items:center;gap:6px;padding:4px 10px;cursor:pointer;font-size:.85rem}
+    .multi-select-option:hover{background:#f5f5f5}
+    .multi-select-option input{margin:0}
+    .table-container{border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.05);overflow:hidden;border:1px solid #e0e0e0;background:#fff;max-height:500px;overflow:auto;margin-top:8px;position:relative;z-index:1}
+    table{width:100%;border-collapse:collapse;border:1px solid #e3e3e3;border-radius:8px;overflow:hidden}
+    th,td{padding:10px 12px;border:1px solid #eaeaea;text-align:left;vertical-align:top}
+    th{background:#f8f8f8;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#444;position:sticky;top:0;z-index:10}
+    tr:nth-child(even){background:#fcfcfc}
+    tr:hover{background:#fafafa}
+    #resultsCount{font-weight:600;color:#444}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.75rem;font-weight:700;margin-right:4px;white-space:nowrap}
+    .badge-blue{background:#f8f8f8;color:#333;border:1px solid #ddd;padding:2px 6px}
+    .badge-green{background:#e8f5e9;color:#2e7d32;border:1px solid rgba(46,125,50,.3)}
+    .badge-no{background:#f3f4f6;color:#777;border:1px solid #ddd}
+    .link-btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--rawls-border);background:#fff;color:var(--rawls-red);font-weight:800;font-size:.78rem;text-decoration:none;transition:.15s;white-space:nowrap}
+    .link-btn:hover{background:var(--rawls-red);border-color:var(--rawls-red);color:#fff;transform:translateY(-1px)}
+    .link-btn.disabled{opacity:.5;pointer-events:none}
+    /* Sortable column arrows (in header cells) */
+th.sortable{
+  cursor:pointer;
+  user-select:none;
+  white-space:nowrap;
+}
+.sort-arrow{
+  margin-left:6px;
+  border:1px solid var(--rawls-border);
+  background:#fff;
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:.85rem;
+  line-height:1;
+  cursor:pointer;
+}
+th.sortable:hover .sort-arrow{
+  border-color:var(--rawls-red);
+  color:var(--rawls-red);
+}
+
+
+    /* Upload hint */
+    .hint{padding:10px 12px;border:1px dashed rgba(186,12,47,.35);border-radius:10px;background:rgba(186,12,47,.04);color:#5b0a19;font-size:.85rem}
+    .hint strong{color:#4a0814}
+    .file-input{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+    input[type="file"]{font-size:.85rem}
+    /* Drawer button */
+.drawer-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.4);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Overlay */
+.side-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s;
+  z-index: 1500;
+}
+
+.side-drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Drawer */
+.side-drawer {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100%;
+  background: #111;
+  color: #fff;
+  z-index: 1600;
+  transition: .3s ease;
+  box-shadow: 6px 0 20px rgba(0,0,0,.4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Drawer open */
+.side-drawer.open {
+  left: 0;
+}
+
+/* Header */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+.drawer-header button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Links */
+.side-drawer a {
+  padding: 14px 18px;
+  color: #eee;
+  text-decoration: none;
+  font-size: .95rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.side-drawer a:hover {
+  background: var(--rawls-red);
+}
+/* Sort UI in header */
+.th-flex{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.sort-wrap{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.sort-select{
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--rawls-border);
+  background:#fff;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#444;
+  cursor:pointer;
+}
+.sort-dir{
+  border-radius:999px;
+  border:1px solid var(--rawls-border);
+  background:#fff;
+  padding:4px 10px;
+  font-size:.8rem;
+  cursor:pointer;
+  line-height:1;
+}
+.sort-dir:hover{ border-color:var(--rawls-red); color:var(--rawls-red); }
+
+  </style>
+</head>
+
+<body>
+  <!-- Side Drawer -->
+<div class="side-drawer-overlay" id="drawerOverlay"></div>
+
+<nav class="side-drawer" id="sideDrawer">
+  <div class="drawer-header">
+    <span>Rawls Research</span>
+    <button id="closeDrawer">✕</button>
+  </div>
+
+  <a href="rrp.html" target="_blank">
+    Rawls Research Productivity
+  </a>
+
+  <a href="https://www.depts.ttu.edu/rawlsbusiness/research/" target="_blank">
+    About Rawls Research
+  </a>
+
+  <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/" target="_blank">
+    Follow on LinkedIn
+  </a>
+</nav>
+
+<header class="rawls-header">
+  <div class="rawls-header-inner">
+    <div class="rawls-header-left">
+      <button class="drawer-btn" id="openDrawer">☰</button>
+
+      <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
+      <div class="rawls-header-brand">
+        <span class="rawls-header-brand-main">Rawls College Research</span>
+        <span class="rawls-header-brand-sub">Rawls College of Business · Texas Tech University</span>
+      </div>
+    </div>
+    <div class="rawls-header-actions">
+      <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+      <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+  <div class="app-header">
+    <h1>Rawls Faculty Publications Database</h1>
+    <div class="app-subtitle">Research Built on Rawls.</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left"><span id="resultsCount">Loading publications…</span></div>
+    <div class="toolbar-right">
+      <button class="btn" id="clearFilters"><span>&#10006;</span> Clear filters</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filters-header">
+      <div class="filters-title">Search publications</div>
+      <button class="advanced-toggle" id="advancedToggle">
+        <span class="advanced-toggle-icon">▾</span> Advanced filters
+      </button>
+    </div>
+
+    <div class="hint" id="loadHint" style="display:none;">
+      <strong>Database not loaded.</strong> If you are opening this file directly (file://), the browser blocks loading <code>Database.xlsx</code>.
+      <div class="file-input">
+        <span>Fix: choose your Excel file here:</span>
+        <input type="file" id="dbFile" accept=".xlsx,.xls" />
+        <button class="btn" id="tryFetchBtn" type="button">Try loading Database.xlsx again</button>
+      </div>
+    </div>
+
+    <!-- Keyword -->
+    <div class="filter-group">
+      <label>Keyword (Title / Journal)</label>
+      <input type="text" id="keywordSearch" placeholder="Search in title or journal">
+    </div>
+
+    <div class="filters-primary">
+      <div class="filter-group author-group">
+        <label>Author Name</label>
+        <div class="name-inputs">
+          <input type="text" id="firstNameSearch" placeholder="First name">
+          <input type="text" id="lastNameSearch"  placeholder="Last name">
+        </div>
+        <div class="name-options">
+          <label class="name-option">
+            <input type="checkbox" id="exactNameMatch"> Match entire cell contents
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Year of Publication</label>
+        <div class="multi-select" id="yearMulti"></div>
+        <span class="filter-hint">Filter by publication year.</span>
+      </div>
+    </div>
+
+    <div class="filters-advanced collapsed" id="advancedPanel">
+      <div class="filter-group">
+        <label>Article Title</label>
+        <input type="text" id="titleSearch" placeholder="Search by title">
+      </div>
+
+      <div class="filter-group">
+        <label>Journal Name</label>
+        <input type="text" id="journalSearch" placeholder="Search by journal">
+      </div>
+
+      <div class="filter-group">
+        <label>Area</label>
+        <div class="multi-select" id="areaMulti"></div>
+      </div>
+
+      <div class="filter-group">
+        <label>Position</label>
+        <div class="multi-select" id="positionMulti"></div>
+      </div>
+
+      <div class="filter-group">
+        <label>Rawls Journal List Rankings</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="rank5"> 5</label>
+          <label><input type="checkbox" id="rank5star"> 5*</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>UTD Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="utdYes"> Yes</label>
+          <label><input type="checkbox" id="utdNo"> No</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Financial Times Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="ftYes"> Yes</label>
+          <label><input type="checkbox" id="ftNo"> No</label>
+        </div>
+      </div>
+      <div class="filter-group">
+  <label>Author Rank</label>
+  <div class="checkbox-group">
+    <label><input type="checkbox" id="author1"> 1st Author</label>
+    <label><input type="checkbox" id="author2"> 2nd Author</label>
+  </div>
+</div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+         <th class="sortable" data-sort="lastName">
+  Last Name <button class="sort-arrow" type="button" aria-label="Sort by last name">↕</button>
+</th>
+         <th class="sortable" data-sort="firstName">
+  First Name <button class="sort-arrow" type="button" aria-label="Sort by first name">↕</button>
+</th>
+          <th>Start Date at Rawls</th>
+          <th>End Date at Rawls</th>
+          <th>Position</th>
+          <th>Area</th>
+          <th class="sortable" data-sort="pubdate">
+  Acceptance Date <button class="sort-arrow" type="button" aria-label="Sort by acceptance date">↕</button>
+</th>
+          <th>Year</th>
+          <th>Article Title</th>
+          <th>Journal</th>
+          <th>Rawls Journal List Ranking</th>
+          <th>UTD</th>
+          <th>Financial Times</th>
+          <th>Author Rank</th>
+          <th>Number of Authors</th>
+          <th>Article Link</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let data = [];
+  let currentRows = [];
+
+  const elements = {
+    lastNameSearch: document.getElementById("lastNameSearch"),
+    firstNameSearch: document.getElementById("firstNameSearch"),
+    exactNameMatch: document.getElementById("exactNameMatch"),
+    keywordSearch: document.getElementById("keywordSearch"),
+    titleSearch: document.getElementById("titleSearch"),
+    journalSearch: document.getElementById("journalSearch"),
+    utdYes: document.getElementById("utdYes"),
+    utdNo: document.getElementById("utdNo"),
+    ftYes: document.getElementById("ftYes"),
+    ftNo: document.getElementById("ftNo"),
+    rank5: document.getElementById("rank5"),
+    rank5star: document.getElementById("rank5star"),
+    author1: document.getElementById("author1"),
+    author2: document.getElementById("author2"),
+    resultsBody: document.getElementById("resultsBody"),
+    resultsCount: document.getElementById("resultsCount"),
+    clearFilters: document.getElementById("clearFilters"),
+    areaMulti: document.getElementById("areaMulti"),
+    positionMulti: document.getElementById("positionMulti"),
+    yearMulti: document.getElementById("yearMulti"),
+    advancedToggle: document.getElementById("advancedToggle"),
+    advancedPanel: document.getElementById("advancedPanel"),
+    loadHint: document.getElementById("loadHint"),
+    dbFile: document.getElementById("dbFile"),
+    tryFetchBtn: document.getElementById("tryFetchBtn"),
+
+  };
+
+  const multiSelectControls = {};
+
+  // ---------- helpers ----------
+  function toTime(v){
+  const d = parseDateLoose(v);
+  return d ? d.getTime() : -Infinity;
+}
+
+let sortState = { key: "pubdate", dir: "desc" }; // default: Acceptance Date (recent first)
+
+
+function parseDateLoose(v){
+  const s = String(v || "").trim();
+  if(!s) return null;
+
+  // If already a Date-ish string like "MM/DD/YYYY"
+  const d = new Date(s);
+  if(!isNaN(d.getTime())) return d;
+
+  return null;
+}
+
+function compareValues(a, b, key){
+  if(key === "pubdate"){
+    const da = parseDateLoose(a.pubdate);
+    const db = parseDateLoose(b.pubdate);
+    const ta = da ? da.getTime() : -Infinity;
+    const tb = db ? db.getTime() : -Infinity;
+    return ta - tb;
+  }
+
+  // default string compare (firstName/lastName)
+  const sa = fold(a[key] || "");
+  const sb = fold(b[key] || "");
+  return sa.localeCompare(sb);
+}
+
+function sortRows(rows){
+  const { key, dir } = sortState;
+  if(!key) return rows;
+
+  const factor = dir === "asc" ? 1 : -1;
+
+  return rows.slice().sort((a,b)=>{
+    const c = compareValues(a,b,key);
+    if(c !== 0) return c * factor;
+
+    // tie-breakers to keep it stable-ish
+    const t1 = fold(a.lastName||"").localeCompare(fold(b.lastName||""));
+    if(t1 !== 0) return t1;
+    return fold(a.firstName||"").localeCompare(fold(b.firstName||""));
+  });
+}
+
+  
+  function canon(str){
+    return String(str||"").toLowerCase().replace(/\\s+/g," ").replace(/[^a-z0-9 ]/g,"").trim();
+  }
+ function fold(s){
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")  // ← FIXED
+    .replace(/\./g, "")
+    .trim()
+    .toLowerCase();
+}
+
+  function safeUrl(u){
+    const s=String(u||"").trim();
+    if(!s) return "";
+   if (/^https?:\/\//i.test(s)) return s;
+    return "";
+  }
+  function parseNameTokens(input){
+    const raw=String(input||"").trim();
+    return raw ? raw.split(/[\\s,]+/).filter(Boolean) : [];
+  }
+function isPrefixQuery(q){ return /\*$/.test(q); }
+function stripWildcard(q){ return q.replace(/\*+$/,""); }
+
+
+  function levenshtein(a,b){
+    a=fold(a); b=fold(b);
+    const m=a.length,n=b.length;
+    if(!m) return n; if(!n) return m;
+    const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));
+    for(let i=0;i<=m;i++) dp[i][0]=i;
+    for(let j=0;j<=n;j++) dp[0][j]=j;
+    for(let i=1;i<=m;i++){
+      for(let j=1;j<=n;j++){
+        const cost=a[i-1]===b[j-1]?0:1;
+        dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+cost);
+      }
+    }
+    return dp[m][n];
+  }
+  function fuzzyOK(q,s){
+    const L=Math.max(q.length,s.length);
+    const tol=L<=4?1:2;
+    return levenshtein(q,s)<=tol;
+  }
+  function matchesInitial(queryToken, name){
+    const q=fold(queryToken), n=fold(name);
+    if(!q||!n) return false;
+    return q.length===1 && n[0]===q;
+  }
+  function tokenMatchOneField(queryToken, candidate, exactMode){
+    const qRaw=String(queryToken||"").trim();
+    const cRaw=String(candidate||"");
+    const q=fold(qRaw), c=fold(cRaw);
+
+    if(!q) return true;
+    if(!c) return false;
+
+    if(exactMode){
+      if(q===c) return true;
+      if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
+      return false;
+    }
+    if(isPrefixQuery(qRaw)) return c.startsWith(fold(stripWildcard(qRaw)));
+    if(matchesInitial(qRaw,cRaw)) return c.startsWith(q);
+    if(c.includes(q)) return true;
+    return fuzzyOK(q,c);
+  }
+
+  // Our real Excel has personname like "LAST, FIRST M"
+  function splitPersonName(personname){
+    const s=String(personname||"").trim();
+    if(!s) return {first:"", last:""};
+    // expected "LAST, FIRST ..."
+    const parts=s.split(",");
+    if(parts.length>=2){
+      const last=parts[0].trim();
+      const first=parts.slice(1).join(",").trim().split(/\\s+/)[0] || "";
+      return {first, last};
+    }
+    // fallback: "First Last"
+    const tokens=s.split(/\\s+/).filter(Boolean);
+    if(tokens.length===1) return {first:"", last:tokens[0]};
+    return {first:tokens[0], last:tokens[tokens.length-1]};
+  }
+
+  function normalizeRowKeys(row){
+    const out={};
+    Object.keys(row||{}).forEach(k=>{ out[canon(k)]=row[k]; });
+    return out;
+  }
+
+  function pick(r, keys){
+    for(const k of keys){
+      const v=r[k];
+      if(v!==undefined && v!==null && String(v).trim()!=="") return v;
+    }
+    return "";
+  }
+
+  // choose best sheet by matching ANY of these headers (your Database.xlsx uses these)
+  function findBestSheet(workbook){
+  const want = [
+    "personname","start date at rawls","end date at rawls","position","area",
+    "publication date","pub date","year","article title","journal name",
+    "ranking","journal ranking","utd journal","financial times journal",
+    "openaccessurl","article link"
+  ];
+
+  let best = { name: workbook.SheetNames[0], score: -1, headerRow: 0 };
+
+  workbook.SheetNames.forEach(name=>{
+    const sheet = workbook.Sheets[name];
+    const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
+
+    // scan first 30 rows to find the best header row
+    for (let r = 0; r < Math.min(30, grid.length); r++) {
+      const headers = (grid[r] || []).map(canon);
+      const score = want.filter(h => headers.includes(h)).length;
+
+      if (score > best.score) {
+        best = { name, score, headerRow: r };
+      }
+    }
+  });
+
+  console.log("Using sheet:", best.name, "score:", best.score, "headerRow:", best.headerRow);
+  return best; // return object now
+}
+
+  function buildMultiSelect(container, values, placeholderText){
+    const unique = [...new Set(
+  values
+    .map(v => String(v || "").trim())
+    .filter(v => v !== "")
+)].sort();
+    container.innerHTML = `
+      <div class="multi-select-header">
+        <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
+        <span class="multi-select-arrow">▾</span>
+      </div>
+      <div class="multi-select-menu"></div>
+    `;
+    const header=container.querySelector(".multi-select-header");
+    const label=container.querySelector(".multi-select-label");
+    const menu=container.querySelector(".multi-select-menu");
+
+    unique.forEach(v=>{
+      const item=document.createElement("label");
+      item.className="multi-select-option";
+      const cb=document.createElement("input");
+      cb.type="checkbox"; cb.value=String(v);
+      const sp=document.createElement("span");
+      sp.textContent=String(v);
+      item.appendChild(cb); item.appendChild(sp);
+      menu.appendChild(item);
+    });
+
+    function getValues(){
+      return Array.from(menu.querySelectorAll("input:checked")).map(i=>i.value);
+    }
+    function updateLabel(trigger){
+      const selected=getValues();
+      if(!selected.length){
+        label.textContent=placeholderText;
+        label.classList.add("multi-select-placeholder");
+      }else if(selected.length<=2){
+        label.textContent=selected.join(", ");
+        label.classList.remove("multi-select-placeholder");
+      }else{
+        label.textContent=`${selected.length} selected`;
+        label.classList.remove("multi-select-placeholder");
+      }
+      if(trigger) applyFilters();
+    }
+
+    header.addEventListener("click", ()=>{
+      const isOpen=container.classList.contains("open");
+      document.querySelectorAll(".multi-select.open").forEach(el=>el.classList.remove("open"));
+      if(!isOpen) container.classList.add("open");
+    });
+    menu.addEventListener("change", ()=>updateLabel(true));
+    document.addEventListener("click",(e)=>{ if(!container.contains(e.target)) container.classList.remove("open"); });
+
+    function clear(){
+      menu.querySelectorAll("input:checked").forEach(i=>i.checked=false);
+      updateLabel(false);
+    }
+    updateLabel(false);
+    return {getValues, clear};
+  }
+
+  function populateMultiSelects(){
+    multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d=>d.area), "All Areas");
+    multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d=>d.position), "All Positions");
+    multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d=>d.year), "All Years");
+  }
+
+  function renderTable(rows){
+    currentRows = rows.slice();
+    const frag=document.createDocumentFragment();
+
+    rows.forEach(r=>{
+      const tr=document.createElement("tr");
+      const url=safeUrl(r.articleLink);
+      tr.innerHTML=`
+        <td>${r.lastName||""}</td>
+        <td>${r.firstName||""}</td>
+        <td>${r.startDateAtRawls||""}</td>
+        <td>${r.endDateAtRawls||""}</td>
+        <td>${r.position||""}</td>
+        <td>${r.area||""}</td>
+        <td>${r.pubdate||""}</td>
+        <td>${r.year||""}</td>
+        <td>${r.articleTitle||""}</td>
+        <td>${r.journalName||""}</td>
+        <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+        <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+        <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+<td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
+<td>${r.numAuthors ? `<span class="badge badge-blue">${r.numAuthors}</span>` : ""}</td>
+        <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
+      `;
+      frag.appendChild(tr);
+    });
+
+    elements.resultsBody.innerHTML="";
+    elements.resultsBody.appendChild(frag);
+    elements.resultsCount.textContent = `Showing ${rows.length} results`;
+  }
+
+  function applyFilters(){
+    const firstQ = elements.firstNameSearch.value;
+    const lastQ  = elements.lastNameSearch.value;
+    const exact  = elements.exactNameMatch.checked;
+
+    const firstTokens=parseNameTokens(firstQ);
+    const lastTokens=parseNameTokens(lastQ);
+
+    const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
+    const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
+    const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
+
+    const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
+    const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
+    const r5=elements.rank5.checked, r5s=elements.rank5star.checked;
+
+    const kq = elements.keywordSearch.value.toLowerCase();
+    const tq = elements.titleSearch.value.toLowerCase();
+    const jq = elements.journalSearch.value.toLowerCase();
+
+    const rows = data.filter(d=>{
+      const first=d.firstName||"";
+      const last=d.lastName||"";
+
+      for(const t of firstTokens) if(!tokenMatchOneField(t, first, exact) && !tokenMatchOneField(t, last, exact)) return false;
+      for(const t of lastTokens)  if(!tokenMatchOneField(t, last, exact)  && !tokenMatchOneField(t, first, exact)) return false;
+
+      if(kq){
+        const inTitle=(d.articleTitle||"").toLowerCase().includes(kq);
+        const inJour=(d.journalName||"").toLowerCase().includes(kq);
+        if(!inTitle && !inJour) return false;
+      }
+      if(tq && !String(d.articleTitle||"").toLowerCase().includes(tq)) return false;
+      if(jq && !String(d.journalName||"").toLowerCase().includes(jq)) return false;
+
+      if(areaVals.length && !areaVals.includes(d.area)) return false;
+      if(posVals.length  && !posVals.includes(d.position)) return false;
+      if(yearVals.length && !yearVals.includes(String(d.year))) return false;
+
+      if((utdY||utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
+      if((ftY||ftN)   && !((ftY && d.ftJournal==="Yes") || (ftN && d.ftJournal==="No"))) return false;
+if ((r5 || r5s) && !(
+  (r5 && d.ranking === "5") ||
+  (r5s && d.ranking === "5*")
+)) return false;
+const a1 = elements.author1.checked;
+const a2 = elements.author2.checked;
+if ((a1 || a2) && !(
+  (a1 && String(d.authorRank) === "1") ||
+  (a2 && String(d.authorRank) === "2")
+)) return false;
+      return true;
+    });
+
+    renderTable(sortRows(rows));
+
+  }
+
+  function clearAllFilters(){
+    elements.firstNameSearch.value="";
+    elements.lastNameSearch.value="";
+    elements.exactNameMatch.checked=false;
+    elements.keywordSearch.value="";
+    elements.titleSearch.value="";
+    elements.journalSearch.value="";
+    if(multiSelectControls.area) multiSelectControls.area.clear();
+    if(multiSelectControls.position) multiSelectControls.position.clear();
+    if(multiSelectControls.year) multiSelectControls.year.clear();
+    elements.utdYes.checked=elements.utdNo.checked=false;
+    elements.ftYes.checked=elements.ftNo.checked=false;
+    elements.rank5.checked=elements.rank5star.checked=false;
+    elements.author1.checked = false;
+    elements.author2.checked = false;
+
+    renderTable(sortRows(data));
+
+  }
+
+  function showLoadHint(msg){
+    elements.loadHint.style.display="block";
+    elements.resultsCount.textContent = msg || "Database not loaded.";
+  }
+function excelDateToJS(value) {
+  if (!value) return "";
+  if (typeof value === "number") {
+    const date = new Date((value - 25569) * 86400 * 1000);
+    return date.toLocaleDateString("en-US");
+  }
+  return value; // already text
+}
+
+function ingestWorkbook(workbook) {
+
+  const sheetName = "13";
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet) {
+    showLoadHint(`❌ Sheet "13" not found.`);
+    return;
+  }
+
+  console.log("Using forced sheet:", sheetName);
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+   range: "A2:P1048576", // ✅ START FROM ROW 2 (skip header row)
+    header: [
+      "lastname",
+      "firstname",
+      "startDateAtRawls",
+      "endDateAtRawls",
+      "position",
+      "area",
+      "pubdate",
+      "year",
+      "articleTitle",
+      "journalName",
+      "ranking",
+      "utdJournal",
+      "ftJournal",
+      "authorRank",
+      "numAuthors",
+      "articleLink"
+    ],
+    defval: ""
+  });
+
+  data = rows.map(r => ({
+    lastName: r.lastname,
+    firstName: r.firstname,
+
+    // ✅ Convert Excel serial → readable date
+    startDateAtRawls: excelDateToJS(r.startDateAtRawls),
+    endDateAtRawls: excelDateToJS(r.endDateAtRawls),
+
+    position: r.position,
+    area: r.area,
+    pubdate: excelDateToJS(r.pubdate),
+    pubdateTime: toTime(excelDateToJS(r.pubdate)),
+    year: String(r.year),
+    articleTitle: r.articleTitle,
+    journalName: r.journalName,
+    ranking: String(r.ranking),
+    utdJournal: String(r.utdJournal),
+    ftJournal: String(r.ftJournal),
+    authorRank: String(r.authorRank),
+     numAuthors: String(r.numAuthors),  
+    articleLink: String(r.articleLink)
+  }));
+
+  console.log("Loaded rows:", data.length, data[0]);
+
+  populateMultiSelects();
+  renderTable(sortRows(data));
+  elements.loadHint.style.display = "none";
+}
+
+
+
+
+  async function tryLoadViaFetch(){
+  const candidates = [
+    "Database.xlsx",
+    "database.xlsx",
+    "DatabaseA.xlsx"
+  ];
+
+  for (const name of candidates) {
+    try {
+      const url = new URL(name, window.location.href).toString();
+      console.log("Trying:", url);
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`${name} -> HTTP ${res.status}`);
+
+      const buf = await res.arrayBuffer();
+      const workbook = XLSX.read(buf, { type:"array" });
+      ingestWorkbook(workbook);
+      console.log("Loaded successfully from:", name);
+      return;
+    } catch (err) {
+      console.warn("Failed:", err.message || err);
+    }
+  }
+
+  showLoadHint("❌ Could not load the Excel file. Check GitHub Pages folder + exact filename/case.");
+}
+
+
+  function attachListeners(){
+    const debounce=(fn,ms=120)=>{ let t; return ()=>{ clearTimeout(t); t=setTimeout(fn,ms); }; };
+    const debouncedApply = debounce(applyFilters, 120);
+
+    [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
+      .forEach(el=>el.addEventListener("input", debouncedApply));
+
+    [elements.exactNameMatch,
+ elements.utdYes, elements.utdNo,
+ elements.ftYes, elements.ftNo,
+ elements.rank5, elements.rank5star,
+ elements.author1, elements.author2
+].forEach(el => el.addEventListener("input", applyFilters));
+
+
+    elements.clearFilters.addEventListener("click", clearAllFilters);
+
+    elements.advancedToggle.addEventListener("click", ()=>{
+      const open = elements.advancedPanel.classList.toggle("collapsed") === false;
+      elements.advancedToggle.classList.toggle("open", open);
+      elements.advancedToggle.setAttribute("aria-expanded", String(open));
+    });
+
+
+    // upload fallback (works even on file://)
+    elements.dbFile.addEventListener("change", async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        const buf = await file.arrayBuffer();
+        const workbook = XLSX.read(buf, { type:"array" });
+        ingestWorkbook(workbook);
+      }catch(err){
+        console.error(err);
+        showLoadHint("❌ Could not read that Excel file. Make sure it's .xlsx and not protected.");
+      }
+      });
+// Click-to-sort on header arrows (Last, First, Acceptance Date)
+document.querySelectorAll("th.sortable").forEach(th=>{
+  th.addEventListener("click", (e)=>{
+    // allow clicks on the th OR the arrow button
+    const key = th.getAttribute("data-sort");
+    if(!key) return;
+
+    // toggle direction if clicking same column again
+    if(sortState.key === key){
+      sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
+    }else{
+      sortState.key = key;
+     sortState.dir = (key === "pubdate") ? "desc" : "asc";
+    }
+
+    // update arrow symbols
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn=>btn.textContent="↕");
+    const arrow = th.querySelector(".sort-arrow");
+    arrow.textContent = (sortState.dir === "asc") ? "↑" : "↓";
+
+    applyFilters();
+  });
+});
+
+    elements.tryFetchBtn.addEventListener("click", ()=>tryLoadViaFetch());
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+  attachListeners();
+
+  // default UI indicator: Acceptance Date ↓
+  const th = document.querySelector('th.sortable[data-sort="pubdate"]');
+  if (th) {
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn => btn.textContent = "↕");
+    const arrow = th.querySelector(".sort-arrow");
+    if (arrow) arrow.textContent = "↓";
+  }
+
+  tryLoadViaFetch();
+});
+
+  const openDrawer = document.getElementById("openDrawer");
+const closeDrawer = document.getElementById("closeDrawer");
+const sideDrawer = document.getElementById("sideDrawer");
+const overlay = document.getElementById("drawerOverlay");
+
+openDrawer.addEventListener("click", () => {
+  sideDrawer.classList.add("open");
+  overlay.classList.add("open");
+});
+
+closeDrawer.addEventListener("click", closeDrawerFn);
+overlay.addEventListener("click", closeDrawerFn);
+
+function closeDrawerFn() {
+  sideDrawer.classList.remove("open");
+  overlay.classList.remove("open");
+}
+
+</script>
+</body>
+</html>
+</html>
