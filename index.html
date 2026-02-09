@@ -167,6 +167,40 @@
 .side-drawer a:hover {
   background: var(--rawls-red);
 }
+/* Sort UI in header */
+.th-flex{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.sort-wrap{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.sort-select{
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--rawls-border);
+  background:#fff;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#444;
+  cursor:pointer;
+}
+.sort-dir{
+  border-radius:999px;
+  border:1px solid var(--rawls-border);
+  background:#fff;
+  padding:4px 10px;
+  font-size:.8rem;
+  cursor:pointer;
+  line-height:1;
+}
+.sort-dir:hover{ border-color:var(--rawls-red); color:var(--rawls-red); }
 
   </style>
 </head>
@@ -335,7 +369,21 @@
           <th>Area</th>
           <th>Publication Date</th>
           <th>Year</th>
-          <th>Article Title</th>
+          <th>
+  <div class="th-flex">
+    <span>Article Title</span>
+    <!-- Sort controls (in header row, next to title) -->
+    <span class="sort-wrap">
+      <select class="sort-select" id="sortBy">
+        <option value="">Sort…</option>
+        <option value="firstName">First Name</option>
+        <option value="lastName">Last Name</option>
+        <option value="pubdate">Acceptance Date</option>
+      </select>
+      <button class="sort-dir" id="sortDir" type="button" aria-label="Toggle sort direction" title="Toggle sort direction">↑</button>
+    </span>
+  </div>
+</th>
           <th>Journal</th>
           <th>Rawls Journal List Ranking</th>
           <th>UTD</th>
@@ -380,11 +428,60 @@
     loadHint: document.getElementById("loadHint"),
     dbFile: document.getElementById("dbFile"),
     tryFetchBtn: document.getElementById("tryFetchBtn"),
+    sortBy: document.getElementById("sortBy"),
+    sortDir: document.getElementById("sortDir"),
+
   };
 
   const multiSelectControls = {};
 
   // ---------- helpers ----------
+  let sortState = { key: "", dir: "asc" }; // dir: asc | desc
+
+function parseDateLoose(v){
+  const s = String(v || "").trim();
+  if(!s) return null;
+
+  // If already a Date-ish string like "MM/DD/YYYY"
+  const d = new Date(s);
+  if(!isNaN(d.getTime())) return d;
+
+  return null;
+}
+
+function compareValues(a, b, key){
+  if(key === "pubdate"){
+    const da = parseDateLoose(a.pubdate);
+    const db = parseDateLoose(b.pubdate);
+    const ta = da ? da.getTime() : -Infinity;
+    const tb = db ? db.getTime() : -Infinity;
+    return ta - tb;
+  }
+
+  // default string compare (firstName/lastName)
+  const sa = fold(a[key] || "");
+  const sb = fold(b[key] || "");
+  return sa.localeCompare(sb);
+}
+
+function sortRows(rows){
+  const { key, dir } = sortState;
+  if(!key) return rows;
+
+  const factor = dir === "asc" ? 1 : -1;
+
+  return rows.slice().sort((a,b)=>{
+    const c = compareValues(a,b,key);
+    if(c !== 0) return c * factor;
+
+    // tie-breakers to keep it stable-ish
+    const t1 = fold(a.lastName||"").localeCompare(fold(b.lastName||""));
+    if(t1 !== 0) return t1;
+    return fold(a.firstName||"").localeCompare(fold(b.firstName||""));
+  });
+}
+
+  
   function canon(str){
     return String(str||"").toLowerCase().replace(/\\s+/g," ").replace(/[^a-z0-9 ]/g,"").trim();
   }
@@ -671,7 +768,8 @@ if ((a1 || a2) && !(
       return true;
     });
 
-    renderTable(rows);
+    renderTable(sortRows(rows));
+
   }
 
   function clearAllFilters(){
@@ -838,7 +936,20 @@ function ingestWorkbook(workbook) {
         console.error(err);
         showLoadHint("❌ Could not read that Excel file. Make sure it's .xlsx and not protected.");
       }
-    });
+      });
+    // Sort controls
+elements.sortBy.addEventListener("change", ()=>{
+  sortState.key = elements.sortBy.value;
+  // re-render current filtered view
+  applyFilters();
+});
+
+elements.sortDir.addEventListener("click", ()=>{
+  sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
+  elements.sortDir.textContent = (sortState.dir === "asc") ? "↑" : "↓";
+  applyFilters();
+});
+
 
     elements.tryFetchBtn.addEventListener("click", ()=>tryLoadViaFetch());
   }
