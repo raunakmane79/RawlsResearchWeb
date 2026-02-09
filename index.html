@@ -447,7 +447,8 @@ th.sortable:hover .sort-arrow{
   const multiSelectControls = {};
 
   // ---------- helpers ----------
-  let sortState = { key: "", dir: "asc" }; // dir: asc | desc
+let sortState = { key: "pubdate", dir: "desc" }; // default: Acceptance Date (recent first)
+
 
 function parseDateLoose(v){
   const s = String(v || "").trim();
@@ -977,6 +978,16 @@ document.querySelectorAll("th.sortable").forEach(th=>{
 
   document.addEventListener("DOMContentLoaded", ()=>{
     attachListeners();
+      // default UI indicator: Acceptance Date ↓
+  const th = document.querySelector('th.sortable[data-sort="pubdate"]');
+  if(th){
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn=>btn.textContent="↕");
+    const arrow = th.querySelector(".sort-arrow");
+    if(arrow) arrow.textContent = "↓";
+  }
+
+  tryLoadViaFetch();
+});
     tryLoadViaFetch();
   });
   const openDrawer = document.getElementById("openDrawer");
