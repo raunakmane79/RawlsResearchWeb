@@ -447,6 +447,11 @@ th.sortable:hover .sort-arrow{
   const multiSelectControls = {};
 
   // ---------- helpers ----------
+  function toTime(v){
+  const d = parseDateLoose(v);
+  return d ? d.getTime() : -Infinity;
+}
+
 let sortState = { key: "pubdate", dir: "desc" }; // default: Acceptance Date (recent first)
 
 
@@ -863,6 +868,7 @@ function ingestWorkbook(workbook) {
     position: r.position,
     area: r.area,
     pubdate: excelDateToJS(r.pubdate),
+    pubdateTime: toTime(excelDateToJS(r.pubdate)),
     year: String(r.year),
     articleTitle: r.articleTitle,
     journalName: r.journalName,
@@ -877,7 +883,7 @@ function ingestWorkbook(workbook) {
   console.log("Loaded rows:", data.length, data[0]);
 
   populateMultiSelects();
-  renderTable(data);
+  renderTable(sortRows(data));
   elements.loadHint.style.display = "none";
 }
 
