@@ -83,6 +83,27 @@
     .link-btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--rawls-border);background:#fff;color:var(--rawls-red);font-weight:800;font-size:.78rem;text-decoration:none;transition:.15s;white-space:nowrap}
     .link-btn:hover{background:var(--rawls-red);border-color:var(--rawls-red);color:#fff;transform:translateY(-1px)}
     .link-btn.disabled{opacity:.5;pointer-events:none}
+    /* Sortable column arrows (in header cells) */
+th.sortable{
+  cursor:pointer;
+  user-select:none;
+  white-space:nowrap;
+}
+.sort-arrow{
+  margin-left:6px;
+  border:1px solid var(--rawls-border);
+  background:#fff;
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:.85rem;
+  line-height:1;
+  cursor:pointer;
+}
+th.sortable:hover .sort-arrow{
+  border-color:var(--rawls-red);
+  color:var(--rawls-red);
+}
+
 
     /* Upload hint */
     .hint{padding:10px 12px;border:1px dashed rgba(186,12,47,.35);border-radius:10px;background:rgba(186,12,47,.04);color:#5b0a19;font-size:.85rem}
@@ -361,29 +382,21 @@
     <table>
       <thead>
         <tr>
-          <th>Last Name</th>
-          <th>First Name</th>
+         <th class="sortable" data-sort="lastName">
+  Last Name <button class="sort-arrow" type="button" aria-label="Sort by last name">↕</button>
+</th>
+         <th class="sortable" data-sort="firstName">
+  First Name <button class="sort-arrow" type="button" aria-label="Sort by first name">↕</button>
+</th>
           <th>Start Date at Rawls</th>
           <th>End Date at Rawls</th>
           <th>Position</th>
           <th>Area</th>
-          <th>Publication Date</th>
-          <th>Year</th>
-          <th>
-  <div class="th-flex">
-    <span>Article Title</span>
-    <!-- Sort controls (in header row, next to title) -->
-    <span class="sort-wrap">
-      <select class="sort-select" id="sortBy">
-        <option value="">Sort…</option>
-        <option value="firstName">First Name</option>
-        <option value="lastName">Last Name</option>
-        <option value="pubdate">Acceptance Date</option>
-      </select>
-      <button class="sort-dir" id="sortDir" type="button" aria-label="Toggle sort direction" title="Toggle sort direction">↑</button>
-    </span>
-  </div>
+          <th class="sortable" data-sort="pubdate">
+  Acceptance Date <button class="sort-arrow" type="button" aria-label="Sort by acceptance date">↕</button>
 </th>
+          <th>Year</th>
+          <th>Article Title</th>
           <th>Journal</th>
           <th>Rawls Journal List Ranking</th>
           <th>UTD</th>
@@ -428,8 +441,6 @@
     loadHint: document.getElementById("loadHint"),
     dbFile: document.getElementById("dbFile"),
     tryFetchBtn: document.getElementById("tryFetchBtn"),
-    sortBy: document.getElementById("sortBy"),
-    sortDir: document.getElementById("sortDir"),
 
   };
 
@@ -937,19 +948,29 @@ function ingestWorkbook(workbook) {
         showLoadHint("❌ Could not read that Excel file. Make sure it's .xlsx and not protected.");
       }
       });
-    // Sort controls
-elements.sortBy.addEventListener("change", ()=>{
-  sortState.key = elements.sortBy.value;
-  // re-render current filtered view
-  applyFilters();
-});
+// Click-to-sort on header arrows (Last, First, Acceptance Date)
+document.querySelectorAll("th.sortable").forEach(th=>{
+  th.addEventListener("click", (e)=>{
+    // allow clicks on the th OR the arrow button
+    const key = th.getAttribute("data-sort");
+    if(!key) return;
 
-elements.sortDir.addEventListener("click", ()=>{
-  sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
-  elements.sortDir.textContent = (sortState.dir === "asc") ? "↑" : "↓";
-  applyFilters();
-});
+    // toggle direction if clicking same column again
+    if(sortState.key === key){
+      sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
+    }else{
+      sortState.key = key;
+      sortState.dir = "asc";
+    }
 
+    // update arrow symbols
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn=>btn.textContent="↕");
+    const arrow = th.querySelector(".sort-arrow");
+    arrow.textContent = (sortState.dir === "asc") ? "↑" : "↓";
+
+    applyFilters();
+  });
+});
 
     elements.tryFetchBtn.addEventListener("click", ()=>tryLoadViaFetch());
   }
