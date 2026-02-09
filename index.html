@@ -83,6 +83,10 @@
     .link-btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--rawls-border);background:#fff;color:var(--rawls-red);font-weight:800;font-size:.78rem;text-decoration:none;transition:.15s;white-space:nowrap}
     .link-btn:hover{background:var(--rawls-red);border-color:var(--rawls-red);color:#fff;transform:translateY(-1px)}
     .link-btn.disabled{opacity:.5;pointer-events:none}
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { background: #f1f1f1; }
+    .sort-indicator { margin-left: 6px; font-size: .8em; opacity: .75; }
+
 
     /* Upload hint */
     .hint{padding:10px 12px;border:1px dashed rgba(186,12,47,.35);border-radius:10px;background:rgba(186,12,47,.04);color:#5b0a19;font-size:.85rem}
@@ -325,26 +329,30 @@
 
   <div class="table-container">
     <table>
-      <thead>
-        <tr>
-          <th>Last Name</th>
-          <th>First Name</th>
-          <th>Start Date at Rawls</th>
-          <th>End Date at Rawls</th>
-          <th>Position</th>
-          <th>Area</th>
-          <th>Publication Date</th>
-          <th>Year</th>
-          <th>Article Title</th>
-          <th>Journal</th>
-          <th>Rawls Journal List Ranking</th>
-          <th>UTD</th>
-          <th>Financial Times</th>
-          <th>Author Rank</th>
-          <th>Number of Authors</th>
-          <th>Article Link</th>
-        </tr>
-      </thead>
+<thead>
+  <tr>
+    <th class="sortable" data-sort="lastName">Last Name <span class="sort-indicator"></span></th>
+    <th class="sortable" data-sort="firstName">First Name <span class="sort-indicator"></span></th>
+    <th>Start Date at Rawls</th>
+    <th>End Date at Rawls</th>
+    <th>Position</th>
+    <th>Area</th>
+
+    <!-- CHANGE THIS -->
+    <th class="sortable" data-sort="acceptanceDate">Acceptance Date <span class="sort-indicator"></span></th>
+
+    <th>Year</th>
+    <th>Article Title</th>
+    <th>Journal</th>
+    <th>Rawls Journal List Ranking</th>
+    <th>UTD</th>
+    <th>Financial Times</th>
+    <th>Author Rank</th>
+    <th>Number of Authors</th>
+    <th>Article Link</th>
+  </tr>
+</thead>
+
       <tbody id="resultsBody"></tbody>
     </table>
   </div>
