@@ -800,7 +800,8 @@ if ((a1 || a2) && !(
     elements.author1.checked = false;
     elements.author2.checked = false;
 
-    renderTable(data);
+    renderTable(sortRows(data));
+
   }
 
   function showLoadHint(msg){
@@ -961,7 +962,7 @@ document.querySelectorAll("th.sortable").forEach(th=>{
       sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
     }else{
       sortState.key = key;
-      sortState.dir = "asc";
+     sortState.dir = (key === "pubdate") ? "desc" : "asc";
     }
 
     // update arrow symbols
@@ -976,20 +977,20 @@ document.querySelectorAll("th.sortable").forEach(th=>{
     elements.tryFetchBtn.addEventListener("click", ()=>tryLoadViaFetch());
   }
 
-  document.addEventListener("DOMContentLoaded", ()=>{
-    attachListeners();
-      // default UI indicator: Acceptance Date ↓
+  document.addEventListener("DOMContentLoaded", () => {
+  attachListeners();
+
+  // default UI indicator: Acceptance Date ↓
   const th = document.querySelector('th.sortable[data-sort="pubdate"]');
-  if(th){
-    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn=>btn.textContent="↕");
+  if (th) {
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn => btn.textContent = "↕");
     const arrow = th.querySelector(".sort-arrow");
-    if(arrow) arrow.textContent = "↓";
+    if (arrow) arrow.textContent = "↓";
   }
 
   tryLoadViaFetch();
 });
-    tryLoadViaFetch();
-  });
+
   const openDrawer = document.getElementById("openDrawer");
 const closeDrawer = document.getElementById("closeDrawer");
 const sideDrawer = document.getElementById("sideDrawer");
