@@ -28,6 +28,32 @@
     .header-btn.primary{background:var(--rawls-red);border-color:var(--rawls-red)}
     .header-btn:hover{transform:translateY(-1px);border-color:#fff;background:rgba(255,255,255,.08)}
     .header-btn.primary:hover{background:var(--rawls-red-dark);border-color:var(--rawls-red-dark)}
+    /* Buttons when they’re used inside the white app card (not the black header) */
+.app-header-actions .header-btn{
+  color: #111;
+  background: #fff;
+  border: 1px solid var(--rawls-border);
+}
+
+.app-header-actions .header-btn:hover{
+  background: #fff;
+  border-color: var(--rawls-red);
+  color: var(--rawls-red);
+}
+
+/* Primary stays Rawls red */
+.app-header-actions .header-btn.primary{
+  color:#fff;
+  background: var(--rawls-red);
+  border-color: var(--rawls-red);
+}
+
+.app-header-actions .header-btn.primary:hover{
+  background: var(--rawls-red-dark);
+  border-color: var(--rawls-red-dark);
+  color:#fff;
+}
+
     .app{background:var(--rawls-card-bg);padding:24px 24px 20px;margin:24px auto;border-radius:12px;max-width:1320px;box-shadow:0 12px 30px rgba(0,0,0,.12);border-top:5px solid var(--rawls-red)}
     .app-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
     .app-header{
