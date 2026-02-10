@@ -125,6 +125,19 @@
     .link-btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--rawls-border);background:#fff;color:var(--rawls-red);font-weight:800;font-size:.78rem;text-decoration:none;transition:.15s;white-space:nowrap}
     .link-btn:hover{background:var(--rawls-red);border-color:var(--rawls-red);color:#fff;transform:translateY(-1px)}
     .link-btn.disabled{opacity:.5;pointer-events:none}
+    .header-btn.icon{
+  padding: 6px 10px;
+  width: 36px;
+  height: 30px;
+}
+
+.icon-svg{
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  display: block;
+}
+
     /* Sortable column arrows (in header cells) */
 th.sortable{
   cursor:pointer;
@@ -152,149 +165,7 @@ th.sortable:hover .sort-arrow{
     .hint strong{color:#4a0814}
     .file-input{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
     input[type="file"]{font-size:.85rem}
-    /* Drawer button */
-.drawer-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.4);
-  color: #fff;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
 
-/* Overlay */
-.side-drawer-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: .25s;
-  z-index: 1500;
-}
-
-.side-drawer-overlay.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Drawer */
-.side-drawer {
-  position: fixed;
-  top: 0;
-  left: -280px;
-  width: 280px;
-  height: 100%;
-  background: #111;
-  color: #fff;
-  z-index: 1600;
-  transition: .3s ease;
-  box-shadow: 6px 0 20px rgba(0,0,0,.4);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Drawer open */
-.side-drawer.open {
-  left: 0;
-}
-
-/* Header */
-.drawer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px;
-  font-weight: 700;
-  border-bottom: 1px solid rgba(255,255,255,.15);
-}
-
-.drawer-header button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-/* Links */
-.side-drawer a {
-  padding: 14px 18px;
-  color: #eee;
-  text-decoration: none;
-  font-size: .95rem;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-}
-
-.side-drawer a:hover {
-  background: var(--rawls-red);
-}
-/* Sort UI in header */
-.th-flex{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-.sort-wrap{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-}
-.sort-select{
-  padding:4px 8px;
-  border-radius:999px;
-  border:1px solid var(--rawls-border);
-  background:#fff;
-  font-size:.72rem;
-  font-weight:700;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  color:#444;
-  cursor:pointer;
-}
-.sort-dir{
-  border-radius:999px;
-  border:1px solid var(--rawls-border);
-  background:#fff;
-  padding:4px 10px;
-  font-size:.8rem;
-  cursor:pointer;
-  line-height:1;
-}
-.sort-dir:hover{ border-color:var(--rawls-red); color:var(--rawls-red); }
-
-  </style>
-</head>
-
-<body>
-  <!-- Side Drawer -->
-<div class="side-drawer-overlay" id="drawerOverlay"></div>
-
-<nav class="side-drawer" id="sideDrawer">
-  <div class="drawer-header">
-    <span>Rawls Research</span>
-    <button id="closeDrawer">✕</button>
-  </div>
-
-  <a href="rrp.html" target="_blank">
-    Rawls Research Productivity
-  </a>
-
-  <a href="https://www.depts.ttu.edu/rawlsbusiness/research/" target="_blank">
-    About Rawls Research
-  </a>
-
-  <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/" target="_blank">
-    Follow on LinkedIn
-  </a>
-</nav>
-
-<header class="rawls-header">
-  <div class="rawls-header-inner">
-    <div class="rawls-header-left">
-      <button class="drawer-btn" id="openDrawer">☰</button>
 
       <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
       <div class="rawls-header-brand">
@@ -302,11 +173,26 @@ th.sortable:hover .sort-arrow{
         <span class="rawls-header-brand-sub">Rawls College of Business · Texas Tech University</span>
       </div>
     </div>
-    <div class="rawls-header-actions">
-      <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
-      <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
-    </div>
-  </div>
+  <div class="rawls-header-actions">
+  <a href="rrp.html" target="_blank" class="header-btn">Productivity</a>
+
+  <a href="https://www.depts.ttu.edu/rawlsbusiness/research/" target="_blank" class="header-btn">About</a>
+
+  <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
+     target="_blank"
+     class="header-btn icon"
+     aria-label="Rawls Research on LinkedIn"
+     title="LinkedIn">
+    <!-- LinkedIn logo (SVG) -->
+    <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1s2.49 1.12 2.49 2.5ZM0.5 23.5h3.98V7.98H0.5V23.5ZM8.5 7.98h3.82v2.12h.05c.53-1 1.82-2.06 3.75-2.06 4.01 0 4.75 2.64 4.75 6.07v9.39h-3.98v-8.32c0-1.98-.04-4.52-2.75-4.52-2.75 0-3.17 2.15-3.17 4.38v8.46H8.5V7.98Z"/>
+    </svg>
+  </a>
+
+  <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+  <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
+</div>
+
 </header>
 
 <div class="app-header">
@@ -1080,23 +966,7 @@ document.querySelectorAll("th.sortable").forEach(th=>{
   tryLoadViaFetch();
 });
 
-  const openDrawer = document.getElementById("openDrawer");
-const closeDrawer = document.getElementById("closeDrawer");
-const sideDrawer = document.getElementById("sideDrawer");
-const overlay = document.getElementById("drawerOverlay");
 
-openDrawer.addEventListener("click", () => {
-  sideDrawer.classList.add("open");
-  overlay.classList.add("open");
-});
-
-closeDrawer.addEventListener("click", closeDrawerFn);
-overlay.addEventListener("click", closeDrawerFn);
-
-function closeDrawerFn() {
-  sideDrawer.classList.remove("open");
-  overlay.classList.remove("open");
-}
 
 </script>
 </body>
