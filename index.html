@@ -30,6 +30,22 @@
     .header-btn.primary:hover{background:var(--rawls-red-dark);border-color:var(--rawls-red-dark)}
     .app{background:var(--rawls-card-bg);padding:24px 24px 20px;margin:24px auto;border-radius:12px;max-width:1320px;box-shadow:0 12px 30px rgba(0,0,0,.12);border-top:5px solid var(--rawls-red)}
     .app-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
+    .app-header{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.app-header-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
     h1{margin:0;font-weight:800;font-size:1.8rem;letter-spacing:.03em;color:var(--rawls-red)}
     .app-subtitle{font-size:.9rem;color:#555}
     .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0;flex-wrap:wrap}
@@ -267,11 +283,15 @@ th.sortable:hover .sort-arrow{
   </div>
 </header>
 
-<div class="app">
-  <div class="app-header">
-    <h1>Rawls Faculty Publications Database</h1>
-    <div class="app-subtitle">Research Built on Rawls.</div>
+<div class="app-header">
+  <h1>Rawls Faculty Publications Database</h1>
+
+  <div class="app-header-actions">
+    <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+    <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
   </div>
+</div>
+
 
   <div class="toolbar">
     <div class="toolbar-left"><span id="resultsCount">Loading publications…</span></div>
