@@ -66,6 +66,27 @@ body{
 .rawls-header-brand-main{font-weight:800;font-size:1.05rem;letter-spacing:.02em}
 .rawls-header-brand-sub{font-size:.78rem;color:#cfcfd4;letter-spacing:.08em;text-transform:uppercase}
 
+    /* --- Make only action buttons less bold --- */
+
+/* Header buttons (New Submission / Request Modification) */
+.app-header-actions .header-btn{
+  font-weight:600 !important;
+}
+
+/* Toolbar buttons (Export / Clear filters) */
+.toolbar .btn{
+  font-weight:600 !important;
+}
+
+/* Export dropdown items */
+.export-item{
+  font-weight:600 !important;
+}
+.app-header-actions .header-btn,
+.toolbar .btn{
+  letter-spacing:.02em;
+}
+
 .rawls-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .header-btn{
   border-radius:999px;
