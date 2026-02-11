@@ -714,6 +714,14 @@ a:focus-visible, button:focus-visible, input:focus-visible{
           <label><input type="checkbox" id="author2"> 2nd Author</label>
         </div>
       </div>
+      <div class="filter-group">
+  <label>Currently at Rawls</label>
+  <div class="checkbox-group">
+    <label><input type="checkbox" id="currentYes"> Yes</label>
+    <label><input type="checkbox" id="currentNo"> No</label>
+  </div>
+</div>
+
     </div>
   </div>
 
@@ -961,6 +969,9 @@ function toggleExportMenu(){
     loadHint: document.getElementById("loadHint"),
     dbFile: document.getElementById("dbFile"),
     tryFetchBtn: document.getElementById("tryFetchBtn"),
+    currentYes: document.getElementById("currentYes"),
+currentNo: document.getElementById("currentNo"),
+
 
   };
 
@@ -1302,6 +1313,7 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
   const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
   const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
   const r5=elements.rank5.checked, r5s=elements.rank5star.checked;
+const curY = elements.currentYes.checked, curN = elements.currentNo.checked;
 
   const kq = elements.keywordSearch.value.toLowerCase();
   const tq = elements.titleSearch.value.toLowerCase();
@@ -1317,6 +1329,16 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
     for(const t of lastTokens){
       if(!tokenMatchOneField(t, last, exact) && !tokenMatchOneField(t, first, exact)) return false;
     }
+// Currently at Rawls filter: Yes => End Date is N/A, No => End Date is NOT N/A
+const endVal = fold(d.endDateAtRawls || "");
+const isNAEnd =
+  !endVal ||
+  endVal === "n/a" ||
+  endVal === "na" ||
+  endVal === "n.a" ||
+  endVal === "n.a.";
+
+if ((curY || curN) && !((curY && isNAEnd) || (curN && !isNAEnd))) return false;
 
     if(kq){
       const inTitle = (d.articleTitle||"").toLowerCase().includes(kq);
@@ -1361,6 +1383,8 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
     elements.rank5.checked=elements.rank5star.checked=false;
     elements.author1.checked = false;
     elements.author2.checked = false;
+    elements.currentYes.checked = elements.currentNo.checked = false;
+
 
     renderTable(sortRows(data));
 
@@ -1483,12 +1507,14 @@ function ingestWorkbook(workbook) {
     [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
       .forEach(el=>el.addEventListener("input", debouncedApply));
 
-    [elements.exactNameMatch,
+[elements.exactNameMatch,
  elements.utdYes, elements.utdNo,
  elements.ftYes, elements.ftNo,
  elements.rank5, elements.rank5star,
- elements.author1, elements.author2
+ elements.author1, elements.author2,
+ elements.currentYes, elements.currentNo
 ].forEach(el => el.addEventListener("input", applyFilters));
+
 
 
     elements.clearFilters.addEventListener("click", clearAllFilters);
