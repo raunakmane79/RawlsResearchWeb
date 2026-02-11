@@ -1542,7 +1542,8 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
 
     elements.resultsBody.innerHTML="";
     elements.resultsBody.appendChild(frag);
-    elements.resultsCount.textContent = `elements.resultsCount.textContent = `Showing ${rows.length} result${rows.length===1?"":"s"}`;
+    elements.resultsCount.textContent = `Showing ${rows.length} result${rows.length === 1 ? "" : "s"}`;
+
  ${rows.length} results`;
   }
 
