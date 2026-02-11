@@ -158,7 +158,8 @@ h1{
 }
 
 /*  */
-.{
+/* Toolbar (results + export/clear on the right) */
+.toolbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -166,9 +167,26 @@ h1{
   padding:12px 20px;
   flex-wrap:wrap;
 }
-.-left{font-size:.92rem;color:var(--muted)}
-#resultsCount{font-weight:750;color:#30323a}
-.-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.toolbar-left{
+  font-size:.92rem;
+  color:var(--muted);
+}
+
+#resultsCount{
+  font-weight:750;
+  color:#30323a;
+}
+
+.toolbar-right{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-left:auto;          /* ✅ pushes to the far right */
+  justify-content:flex-end;  /* ✅ keeps items right-aligned */
+}
+
 
 .btn{
   border-radius:999px;
