@@ -159,40 +159,44 @@ h1{
 
 /*  */
 /* Toolbar (results + export/clear on the right) */
+/* Toolbar (results count + actions) */
 .toolbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
   padding:12px 20px;
-  flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
 }
 
 .toolbar-left{
   font-size:.92rem;
   color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
 }
 
 #resultsCount{
-  font-weight:750;
-  color:#30323a;
+  font-weight:800;
+  color:#2c2f38;
 }
 
 .toolbar-right{
   display:flex;
-  gap:10px;
   align-items:center;
+  gap:10px;
   flex-wrap:wrap;
-  margin-left:auto;          /* ✅ pushes to the far right */
-  justify-content:flex-end;  /* ✅ keeps items right-aligned */
 }
 
-
+/* Buttons (toolbar) */
 .btn{
   border-radius:999px;
   border:1px solid var(--border2);
-  padding:7px 12px;
-  font-size:.85rem;
+  padding:8px 12px;
+  font-size:.86rem;
   background:#fff;
   color:#111;
   cursor:pointer;
@@ -201,18 +205,6 @@ h1{
   gap:8px;
   transition:.15s;
 }
-    /* Export button (clean, not loud) */
-.export-btn{
-  border-color: rgba(186,12,47,.35);
-  background: rgba(186,12,47,.06);
-  color: var(--rawls-red);
-  font-weight: 800;
-}
-.export-btn:hover{
-  border-color: var(--rawls-red);
-  background: rgba(186,12,47,.10);
-  color: var(--rawls-red);
-}
 
 .btn:hover{
   border-color: var(--rawls-red);
@@ -220,13 +212,26 @@ h1{
   transform: translateY(-1px);
   box-shadow: var(--shadow2);
 }
-.btn:active,.btn.active{
-  background: var(--rawls-red);
-  border-color: var(--rawls-red-dark);
-  color:#fff;
+
+.btn:active{
   transform: scale(.99);
-  box-shadow: 0 0 0 3px rgba(186,12,47,.16);
 }
+
+/* Export button: calm but “primary-ish” */
+.export-btn{
+  border-color: rgba(186,12,47,.35);
+  background: rgba(186,12,47,.06);
+  color: var(--rawls-red);
+  font-weight: 900;
+}
+.export-btn:hover{
+  border-color: var(--rawls-red);
+  background: rgba(186,12,47,.10);
+}
+
+/* Keep export dropdown aligned */
+.export-wrap{ position:relative; display:inline-flex; }
+
 
 /* Filters */
 .filters{
@@ -543,10 +548,30 @@ a:focus-visible, button:focus-visible, input:focus-visible{
     </div>
   </div>
 
-  <div class="">
-    <div class="-left">
-      <span id="resultsCount">Loading publications…</span>
+ <div class="toolbar">
+  <div class="toolbar-left">
+    <span id="resultsCount">Loading publications…</span>
+  </div>
+
+  <div class="toolbar-right">
+    <div class="export-wrap">
+      <button class="btn export-btn" id="exportBtn" type="button" aria-haspopup="true" aria-expanded="false">
+        Export ▾
+      </button>
+
+      <div class="export-menu" id="exportMenu" role="menu" aria-label="Export options">
+        <button type="button" class="export-item" data-export="xlsx" role="menuitem">XLSX (data)</button>
+        <button type="button" class="export-item" data-export="csv"  role="menuitem">CSV (data)</button>
+        <button type="button" class="export-item" data-export="summary" role="menuitem">XLSX (summary)</button>
+      </div>
     </div>
+
+    <button class="btn" id="clearFilters" type="button">
+      <span aria-hidden="true">✕</span> Clear filters
+    </button>
+  </div>
+</div>
+
 
     <div class="toolbar-right">
 <div class="export-wrap">
