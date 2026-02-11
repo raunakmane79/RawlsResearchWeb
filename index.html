@@ -442,6 +442,42 @@ a:focus-visible, button:focus-visible, input:focus-visible{
   box-shadow:0 0 0 4px rgba(186,12,47,.18);
   border-color: var(--rawls-red);
 }
+/* Export dropdown */
+.export-wrap{ position:relative; display:inline-flex; }
+.export-menu{
+  position:absolute;
+  right:0;
+  top: calc(100% + 8px);
+  min-width: 190px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow2);
+  padding: 6px;
+  display:none;
+  z-index: 999;
+}
+.export-menu.open{ display:block; }
+
+.export-item{
+  width:100%;
+  text-align:left;
+  border:0;
+  background:transparent;
+  padding:10px 10px;
+  border-radius:10px;
+  font-weight:800;
+  font-size:.9rem;
+  color:#20222a;
+  cursor:pointer;
+}
+.export-item:hover{
+  background: rgba(186,12,47,.08);
+  color: var(--rawls-red);
+}
+.export-item:active{
+  background: rgba(186,12,47,.14);
+}
 
   </style>
 </head>
@@ -495,7 +531,18 @@ a:focus-visible, button:focus-visible, input:focus-visible{
     </div>
 
     <div class="toolbar-right">
- <button class="btn active" id="exportBtn" type="button"> Export</button>
+<div class="export-wrap">
+  <button class="btn active" id="exportBtn" type="button" aria-haspopup="true" aria-expanded="false">
+    Export ▾
+  </button>
+
+  <div class="export-menu" id="exportMenu" role="menu" aria-label="Export options">
+    <button type="button" class="export-item" data-export="xlsx" role="menuitem">XLSX (data)</button>
+    <button type="button" class="export-item" data-export="csv"  role="menuitem">CSV (data)</button>
+    <button type="button" class="export-item" data-export="summary" role="menuitem">XLSX (summary)</button>
+  </div>
+</div>
+
   <button class="btn" id="clearFilters" type="button"><span>&#10006;</span> Clear filters</button>
 </div>
     </div>
@@ -795,15 +842,23 @@ a:focus-visible, button:focus-visible, input:focus-visible{
   }
 
   // Simple export chooser (no modal needed)
-  function exportChooser() {
-    // If you prefer a nicer modal like earlier, tell me and I'll drop it in.
-    const choice = prompt(
-      "Export options:\n1 = XLSX (data)\n2 = CSV (data)\n3 = XLSX (summary)\n\nType 1, 2, or 3:"
-    );
-    if (choice === "1") exportDataAsXlsx();
-    else if (choice === "2") exportDataAsCsv();
-    else if (choice === "3") exportSummaryOnlyXlsx();
-  }
+ // ---------- EXPORT DROPDOWN (replaces prompt) ----------
+function closeExportMenu(){
+  const menu = document.getElementById("exportMenu");
+  if(menu) menu.classList.remove("open");
+  const btn = document.getElementById("exportBtn");
+  if(btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function toggleExportMenu(){
+  const menu = document.getElementById("exportMenu");
+  const btn = document.getElementById("exportBtn");
+  if(!menu || !btn) return;
+
+  const isOpen = menu.classList.toggle("open");
+  btn.setAttribute("aria-expanded", String(isOpen));
+}
+
 
   let data = [];
   let currentRows = [];
@@ -1366,7 +1421,36 @@ function ingestWorkbook(workbook) {
 
 
     elements.clearFilters.addEventListener("click", clearAllFilters);
-elements.exportBtn.addEventListener("click", exportChooser);
+// Export dropdown open/close
+elements.exportBtn.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  toggleExportMenu();
+});
+
+// Pick an export option
+document.getElementById("exportMenu").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-export]");
+  if(!btn) return;
+
+  const choice = btn.getAttribute("data-export");
+  closeExportMenu();
+
+  if(choice === "xlsx") exportDataAsXlsx();
+  else if(choice === "csv") exportDataAsCsv();
+  else if(choice === "summary") exportSummaryOnlyXlsx();
+});
+
+// Close when clicking outside
+document.addEventListener("click", (e)=>{
+  const wrap = document.querySelector(".export-wrap");
+  if(wrap && !wrap.contains(e.target)) closeExportMenu();
+});
+
+// Close with Escape
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape") closeExportMenu();
+});
+
 
 
 
