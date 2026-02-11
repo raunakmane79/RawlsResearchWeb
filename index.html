@@ -522,6 +522,25 @@ a:focus-visible, button:focus-visible, input:focus-visible{
 .export-item:active{
   background: rgba(186,12,47,.14);
 }
+/* ===== Typography softener (paste at END of <style>) ===== */
+body{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header-btn{ font-weight: 600; letter-spacing: .01em; }
+.btn{ font-weight: 650; }
+.export-item{ font-weight: 600; }
+
+.filters-title{ font-weight: 700; letter-spacing: .06em; }
+label{ font-weight: 650; letter-spacing: .06em; }
+
+th{ font-weight: 650; letter-spacing: .06em; }
+
+.badge{ font-weight: 650; }
+
+/* Optional: remove “shouty” caps */
+label, th, .filters-title{ text-transform: none; }
 
 
   </style>
