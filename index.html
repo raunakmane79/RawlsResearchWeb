@@ -482,9 +482,10 @@ a:focus-visible, button:focus-visible, input:focus-visible{
     </div>
 
     <div class="toolbar-right">
-      <button class="btn" id="clearFilters" type="button"><span>&#10006;</span> Clear filters</button>
-    </div>
-  </div>
+ <button class="btn active" id="exportBtn" type="button"> Export</button>
+  <button class="btn" id="clearFilters" type="button"><span>&#10006;</span> Clear filters</button>
+</div>
+
 
   <div class="filters">
     <div class="filters-header">
@@ -612,6 +613,36 @@ a:focus-visible, button:focus-visible, input:focus-visible{
 </main>
 
 <script>
+  function exportToExcel() {
+  const rows = (currentRows && currentRows.length) ? currentRows : data;
+
+  const out = rows.map(r => ({
+    "Last Name": r.lastName || "",
+    "First Name": r.firstName || "",
+    "Start Date at Rawls": r.startDateAtRawls || "",
+    "End Date at Rawls": r.endDateAtRawls || "",
+    "Position": r.position || "",
+    "Area": r.area || "",
+    "Acceptance Date": r.pubdate || "",
+    "Year": r.year || "",
+    "Article Title": r.articleTitle || "",
+    "Journal": r.journalName || "",
+    "Rawls Journal List Ranking": r.ranking || "",
+    "UTD": r.utdJournal || "",
+    "Financial Times": r.ftJournal || "",
+    "Author Rank": r.authorRank || "",
+    "Number of Authors": r.numAuthors || "",
+    "Article Link": r.articleLink || ""
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(out);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Results");
+
+  const stamp = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Rawls_Publications_Export_${stamp}.xlsx`);
+}
+
   let data = [];
   let currentRows = [];
 
@@ -633,6 +664,7 @@ a:focus-visible, button:focus-visible, input:focus-visible{
     resultsBody: document.getElementById("resultsBody"),
     resultsCount: document.getElementById("resultsCount"),
     clearFilters: document.getElementById("clearFilters"),
+    exportBtn: document.getElementById("exportBtn"),
     areaMulti: document.getElementById("areaMulti"),
     positionMulti: document.getElementById("positionMulti"),
     yearMulti: document.getElementById("yearMulti"),
@@ -1172,6 +1204,8 @@ function ingestWorkbook(workbook) {
 
 
     elements.clearFilters.addEventListener("click", clearAllFilters);
+    elements.exportBtn.addEventListener("click", exportToExcel);
+
 
     elements.advancedToggle.addEventListener("click", ()=>{
       const open = elements.advancedPanel.classList.toggle("collapsed") === false;
