@@ -627,35 +627,183 @@ a:focus-visible, button:focus-visible, input:focus-visible{
 </main>
 
 <script>
-  function exportToExcel() {
-  const rows = (currentRows && currentRows.length) ? currentRows : data;
+  // ---------- EXPORT SUITE (XLSX / CSV / SUMMARY) ----------
+  function getExportRows() {
+    return (currentRows && currentRows.length) ? currentRows : data;
+  }
 
-  const out = rows.map(r => ({
-    "Last Name": r.lastName || "",
-    "First Name": r.firstName || "",
-    "Start Date at Rawls": r.startDateAtRawls || "",
-    "End Date at Rawls": r.endDateAtRawls || "",
-    "Position": r.position || "",
-    "Area": r.area || "",
-    "Acceptance Date": r.pubdate || "",
-    "Year": r.year || "",
-    "Article Title": r.articleTitle || "",
-    "Journal": r.journalName || "",
-    "Rawls Journal List Ranking": r.ranking || "",
-    "UTD": r.utdJournal || "",
-    "Financial Times": r.ftJournal || "",
-    "Author Rank": r.authorRank || "",
-    "Number of Authors": r.numAuthors || "",
-    "Article Link": r.articleLink || ""
-  }));
+  function buildExportData(rows) {
+    // Single source of truth for column order + values
+    return rows.map(r => ({
+      "Last Name": r.lastName || "",
+      "First Name": r.firstName || "",
+      "Start Date at Rawls": r.startDateAtRawls || "",
+      "End Date at Rawls": r.endDateAtRawls || "",
+      "Position": r.position || "",
+      "Area": r.area || "",
+      "Acceptance Date": r.pubdate || "",
+      "Year": r.year || "",
+      "Article Title": r.articleTitle || "",
+      "Journal": r.journalName || "",
+      "Rawls Journal List Ranking": r.ranking || "",
+      "UTD": r.utdJournal || "",
+      "Financial Times": r.ftJournal || "",
+      "Author Rank": r.authorRank || "",
+      "Number of Authors": r.numAuthors || "",
+      "Article Link": r.articleLink || ""
+    }));
+  }
 
-  const ws = XLSX.utils.json_to_sheet(out);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Results");
+  function downloadXlsx(filename, sheetName, jsonRows) {
+    const ws = XLSX.utils.json_to_sheet(jsonRows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, filename);
+  }
 
-  const stamp = new Date().toISOString().slice(0,10);
-  XLSX.writeFile(wb, `Rawls_Publications_Export_${stamp}.xlsx`);
-}
+  function exportDataAsXlsx() {
+    const rows = getExportRows();
+    if (!rows || rows.length === 0) { alert("There are no rows to export."); return; }
+
+    const out = buildExportData(rows);
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadXlsx(`Rawls_Publications_Export_${stamp}.xlsx`, "Results", out);
+  }
+
+  function exportDataAsCsv() {
+    const rows = getExportRows();
+    if (!rows || rows.length === 0) { alert("There are no rows to export."); return; }
+
+    const out = buildExportData(rows);
+    const ws = XLSX.utils.json_to_sheet(out);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Rawls_Publications_Export.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportSummaryOnlyXlsx() {
+    const rows = getExportRows();
+    if (!rows || rows.length === 0) { alert("There are no rows to summarize."); return; }
+
+    const wb = XLSX.utils.book_new();
+
+    // Overview sets
+    const facultySet = new Set();
+    const yearSet = new Set();
+    const areaSet = new Set();
+
+    rows.forEach(r => {
+      const f = `${(r.lastName || "").trim()}, ${(r.firstName || "").trim()}`.replace(/^,\s*|,\s*$/g, "").trim();
+      if (f) facultySet.add(f);
+      if (r.year) yearSet.add(String(r.year));
+      if (r.area) areaSet.add(String(r.area));
+    });
+
+    const overview = [
+      { Metric: "Total articles (filtered)", Value: rows.length },
+      { Metric: "Distinct faculty (filtered)", Value: facultySet.size },
+      { Metric: "Distinct years (filtered)", Value: yearSet.size },
+      { Metric: "Distinct areas (filtered)", Value: areaSet.size }
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(overview), "Summary_Overview");
+
+    // By Faculty
+    const facultySummary = {};
+    rows.forEach(r => {
+      const f = `${(r.lastName || "").trim()}, ${(r.firstName || "").trim()}`.replace(/^,\s*|,\s*$/g, "").trim();
+      if (!f) return;
+      facultySummary[f] = (facultySummary[f] || 0) + 1;
+    });
+    const facultyRows = Object.keys(facultySummary).sort().map(name => ({
+      "Faculty": name,
+      "Total Articles": facultySummary[name]
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyRows), "By_Faculty");
+
+    // By Year
+    const yearSummary = {};
+    rows.forEach(r => {
+      const y = String(r.year || "").trim();
+      if (!y) return;
+      yearSummary[y] = (yearSummary[y] || 0) + 1;
+    });
+    const yearRows = Object.keys(yearSummary).sort().map(y => ({
+      "Year": y,
+      "Total Articles": yearSummary[y]
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(yearRows), "By_Year");
+
+    // By Area + Year
+    const areaYearSummary = {};
+    rows.forEach(r => {
+      const a = String(r.area || "").trim();
+      const y = String(r.year || "").trim();
+      if (!a || !y) return;
+      if (!areaYearSummary[a]) areaYearSummary[a] = {};
+      areaYearSummary[a][y] = (areaYearSummary[a][y] || 0) + 1;
+    });
+    const areaYearRows = [];
+    Object.keys(areaYearSummary).sort().forEach(a => {
+      Object.keys(areaYearSummary[a]).sort().forEach(y => {
+        areaYearRows.push({ "Area": a, "Year": y, "Total Articles": areaYearSummary[a][y] });
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(areaYearRows), "By_Area_Year");
+
+    // Optional: Category counts (Ranking 5*, 5, UTD Yes, FT Yes)
+    const catSummary = {};
+    rows.forEach(r => {
+      const cats = [];
+      if (String(r.ranking).trim() === "5*") cats.push("5*");
+      if (String(r.ranking).trim() === "5")  cats.push("5");
+      if (String(r.utdJournal).trim() === "Yes") cats.push("UTD");
+      if (String(r.ftJournal).trim() === "Yes")  cats.push("FT");
+
+      const a = String(r.area || "").trim();
+      const y = String(r.year || "").trim();
+      const f = `${(r.lastName || "").trim()}, ${(r.firstName || "").trim()}`.replace(/^,\s*|,\s*$/g, "").trim();
+      if (!a || !y || !f || cats.length === 0) return;
+
+      cats.forEach(cat => {
+        const key = `${cat}||${a}||${y}||${f}`;
+        catSummary[key] = (catSummary[key] || 0) + 1;
+      });
+    });
+
+    const catRows = Object.keys(catSummary).sort().map(key => {
+      const [cat, area, year, faculty] = key.split("||");
+      return {
+        "Category (5*,5,UTD,FT)": cat,
+        "Area": area,
+        "Year": year,
+        "Faculty": faculty,
+        "Total Articles": catSummary[key]
+      };
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), "By_Category_Area_Year_Fac");
+
+    const stamp = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `Rawls_Publications_Summary_${stamp}.xlsx`);
+  }
+
+  // Simple export chooser (no modal needed)
+  function exportChooser() {
+    // If you prefer a nicer modal like earlier, tell me and I'll drop it in.
+    const choice = prompt(
+      "Export options:\n1 = XLSX (data)\n2 = CSV (data)\n3 = XLSX (summary)\n\nType 1, 2, or 3:"
+    );
+    if (choice === "1") exportDataAsXlsx();
+    else if (choice === "2") exportDataAsCsv();
+    else if (choice === "3") exportSummaryOnlyXlsx();
+  }
 
   let data = [];
   let currentRows = [];
@@ -1218,7 +1366,8 @@ function ingestWorkbook(workbook) {
 
 
     elements.clearFilters.addEventListener("click", clearAllFilters);
-    elements.exportBtn.addEventListener("click", exportToExcel);
+elements.exportBtn.addEventListener("click", exportChooser);
+
 
 
     elements.advancedToggle.addEventListener("click", ()=>{
