@@ -1540,12 +1540,11 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
       frag.appendChild(tr);
     });
 
-    elements.resultsBody.innerHTML="";
-    elements.resultsBody.appendChild(frag);
-    elements.resultsCount.textContent = `Showing ${rows.length} result${rows.length === 1 ? "" : "s"}`;
+    elements.resultsBody.innerHTML = "";
+elements.resultsBody.appendChild(frag);
 
- ${rows.length} results`;
-  }
+elements.resultsCount.textContent = `Showing ${rows.length} result${rows.length === 1 ? "" : "s"}`;
+
 
  function applyFilters(){
   let firstQ = elements.firstNameSearch.value.trim();
