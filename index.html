@@ -1679,97 +1679,67 @@ function excelDateToJS(value) {
 }
 
 function ingestWorkbook(workbook) {
-  const best = findBestSheet(workbook);
-  const sheetName = best.name;
-  const sheet = workbook.Sheets[sheetName];
+  // ✅ Force: Sheet 14 (1-based) => index 13 (0-based)
+  const sheetIndex = 13;
 
-  if (!sheet) {
-    showLoadHint(`❌ No readable sheet found.`);
+  const sheetName = workbook.SheetNames[sheetIndex];
+  if (!sheetName) {
+    showLoadHint(`❌ Sheet 14 not found. This file only has ${workbook.SheetNames.length} sheets.`);
     return;
   }
 
-  // Read using the detected header row
-  const rawRows = XLSX.utils.sheet_to_json(sheet, {
-    range: best.headerRow, // header row included here
+  const sheet = workbook.Sheets[sheetName];
+  console.log("Using sheet:", sheetName);
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    range: "A2:Q1048576", // start after header
+    header: [
+      "lastname",
+      "firstname",
+      "startDateAtRawls",
+      "endDateAtRawls",
+      "position",
+      "area",
+      "accdate",
+      "pubdate",
+      "year",
+      "articleTitle",
+      "journalName",
+      "ranking",
+      "utdJournal",
+      "ftJournal",
+      "authorRank",
+      "numAuthors",
+      "articleLink"
+    ],
     defval: ""
   });
 
-  // Normalize headers and map flexibly (supports different column names)
-  data = rawRows.map((row) => {
-    const r = normalizeRowKeys(row);
-
-    const person = pick(r, ["personname", "author", "faculty", "name"]);
-    const split = splitPersonName(person);
-
-    const lastName = pick(r, ["lastname", "last name"]) || split.last;
-    const firstName = pick(r, ["firstname", "first name"]) || split.first;
-
-    const startRaw = pick(r, ["start date at rawls", "startdateatrawls", "start date"]);
-    const endRaw   = pick(r, ["end date at rawls", "enddateatrawls", "end date"]);
-
-    const accRaw   = pick(r, ["acceptance date", "accdate", "accept date"]);
-    const pubRaw   = pick(r, ["publication date", "pubdate", "pub date"]);
-
-    const position = pick(r, ["position", "title"]);
-    const area     = pick(r, ["area", "discipline"]);
-
-    const year     = pick(r, ["year", "pub year", "publication year"]);
-
-    const articleTitle = pick(r, ["article title", "title"]);
-    const journalName  = pick(r, ["journal name", "journal"]);
-
-    const ranking  = pick(r, ["ranking", "rawls journal list ranking", "journal ranking"]);
-    const utd      = pick(r, ["utd journal", "utd"]);
-    const ft       = pick(r, ["financial times journal", "financial times", "ft"]);
-
-    const authorRank = pick(r, ["author rank", "authorrank"]);
-    const numAuthors = pick(r, ["number of authors", "numauthors", "authors"]);
-
-    const articleLink = pick(r, ["article link", "openaccessurl", "url", "link"]);
-
-    const startDateAtRawls = excelDateToJS(startRaw);
-    const endDateAtRawls   = excelDateToJS(endRaw);
-    const accdate          = excelDateToJS(accRaw);
-    const pubdate          = excelDateToJS(pubRaw);
-
-    return {
-      lastName: String(lastName || "").trim(),
-      firstName: String(firstName || "").trim(),
-
-      startDateAtRawls,
-      endDateAtRawls,
-
-      position: String(position || "").trim(),
-      area: String(area || "").trim(),
-
-      accdate,
-      accdateTime: toTime(accdate),
-
-      pubdate,
-      pubdateTime: toTime(pubdate),
-
-      year: String(year || "").trim(),
-
-      articleTitle: String(articleTitle || "").trim(),
-      journalName: String(journalName || "").trim(),
-
-      ranking: String(ranking || "").trim(),
-      utdJournal: String(utd || "").trim(),
-      ftJournal: String(ft || "").trim(),
-
-      authorRank: String(authorRank || "").trim(),
-      numAuthors: String(numAuthors || "").trim(),
-
-      articleLink: String(articleLink || "").trim()
-    };
-  });
-
-  console.log("Using sheet:", sheetName, "Rows:", data.length);
+  data = rows.map(r => ({
+    lastName: r.lastname,
+    firstName: r.firstname,
+    startDateAtRawls: excelDateToJS(r.startDateAtRawls),
+    endDateAtRawls: excelDateToJS(r.endDateAtRawls),
+    position: r.position,
+    area: r.area,
+    accdate: excelDateToJS(r.accdate),
+    pubdate: excelDateToJS(r.pubdate),
+    year: String(r.year),
+    articleTitle: r.articleTitle,
+    journalName: r.journalName,
+    ranking: String(r.ranking),
+    utdJournal: String(r.utdJournal),
+    ftJournal: String(r.ftJournal),
+    authorRank: String(r.authorRank),
+    numAuthors: String(r.numAuthors),
+    articleLink: String(r.articleLink)
+  }));
 
   populateMultiSelects();
   renderTable(sortRows(data));
   elements.loadHint.style.display = "none";
 }
+
 
   async function tryLoadViaFetch(){
   const candidates = [
