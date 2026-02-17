@@ -975,6 +975,7 @@ input[type="checkbox"]{
           <th>End Date at Rawls</th>
           <th>Position</th>
           <th>Area</th>
+          <th class="sortable" data-sort="accdate">Acceptance Date <button class="sort-arrow" type="button" aria-label="Sort by acceptance date">↕</button></th>
           <th class="sortable" data-sort="pubdate">Publication Date <button class="sort-arrow" type="button" aria-label="Sort by publication date">↕</button></th>
           <th>Year</th>
           <th>Article Title</th>
@@ -1007,6 +1008,7 @@ input[type="checkbox"]{
       "End Date at Rawls": r.endDateAtRawls || "",
       "Position": r.position || "",
       "Area": r.area || "",
+      "Acceptance Date": r.accdate || "",  
       "Publication Date": r.pubdate || "",
       "Year": r.year || "",
       "Article Title": r.articleTitle || "",
@@ -1246,11 +1248,20 @@ function compareValues(a, b, key){
     return ta - tb;
   }
 
-  // default string compare (firstName/lastName)
+  // ✅ NEW
+  if(key === "accdate"){
+    const da = parseDateLoose(a.accdate);
+    const db = parseDateLoose(b.accdate);
+    const ta = da ? da.getTime() : -Infinity;
+    const tb = db ? db.getTime() : -Infinity;
+    return ta - tb;
+  }
+
   const sa = fold(a[key] || "");
   const sb = fold(b[key] || "");
   return sa.localeCompare(sb);
 }
+
 
 function sortRows(rows){
   const { key, dir } = sortState;
@@ -1677,7 +1688,7 @@ function ingestWorkbook(workbook) {
   console.log("Using forced sheet:", sheetName);
 
   const rows = XLSX.utils.sheet_to_json(sheet, {
-   range: "A2:P1048576", // ✅ START FROM ROW 2 (skip header row)
+  range: "A2:Q1048576", // ✅ START FROM ROW 2 (skip header row)
     header: [
       "lastname",
       "firstname",
@@ -1685,6 +1696,7 @@ function ingestWorkbook(workbook) {
       "endDateAtRawls",
       "position",
       "area",
+      "accdate", 
       "pubdate",
       "year",
       "articleTitle",
@@ -1709,6 +1721,8 @@ function ingestWorkbook(workbook) {
 
     position: r.position,
     area: r.area,
+    accdate: excelDateToJS(r.accdate),
+    accdateTime: toTime(excelDateToJS(r.accdate)),
     pubdate: excelDateToJS(r.pubdate),
     pubdateTime: toTime(excelDateToJS(r.pubdate)),
     year: String(r.year),
