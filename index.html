@@ -1225,7 +1225,8 @@ currentNo: document.getElementById("currentNo"),
   return d ? d.getTime() : -Infinity;
 }
 
-let sortState = { key: "pubdate", dir: "desc" }; // default: Acceptance Date (recent first)
+let sortState = { key: "accdate", dir: "desc" };
+
 
 
 function parseDateLoose(v){
@@ -1512,7 +1513,7 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
    if(!rows.length){
   elements.resultsBody.innerHTML = `
     <tr>
-      <td colspan="16" style="padding:26px;">
+      <td colspan="17" style="padding:26px;">
         <div style="
           border:1px solid rgba(186,12,47,.18);
           background:rgba(186,12,47,.05);
@@ -1534,24 +1535,26 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
     rows.forEach(r=>{
       const tr=document.createElement("tr");
       const url=safeUrl(r.articleLink);
-      tr.innerHTML=`
-        <td>${r.lastName||""}</td>
-        <td>${r.firstName||""}</td>
-        <td>${r.startDateAtRawls||""}</td>
-        <td>${r.endDateAtRawls||""}</td>
-        <td>${r.position||""}</td>
-        <td>${r.area||""}</td>
-        <td>${r.pubdate||""}</td>
-        <td>${r.year||""}</td>
-        <td>${r.articleTitle||""}</td>
-        <td>${r.journalName||""}</td>
-        <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
-        <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-        <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
-<td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
-<td>${r.numAuthors ? `<span class="badge badge-blue">${r.numAuthors}</span>` : ""}</td>
-        <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
-      `;
+   tr.innerHTML = `
+  <td>${r.lastName||""}</td>
+  <td>${r.firstName||""}</td>
+  <td>${r.startDateAtRawls||""}</td>
+  <td>${r.endDateAtRawls||""}</td>
+  <td>${r.position||""}</td>
+  <td>${r.area||""}</td>
+  <td>${r.accdate||""}</td>
+  <td>${r.pubdate||""}</td>
+  <td>${r.year||""}</td>
+  <td>${r.articleTitle||""}</td>
+  <td>${r.journalName||""}</td>
+  <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+  <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+  <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+  <td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
+  <td>${r.numAuthors ? `<span class="badge badge-blue">${r.numAuthors}</span>` : ""}</td>
+  <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
+`;
+
       frag.appendChild(tr);
     });
 
@@ -1681,7 +1684,8 @@ function ingestWorkbook(workbook) {
   const sheet = workbook.Sheets[sheetName];
 
   if (!sheet) {
-    showLoadHint(`❌ Sheet "13" not found.`);
+    showLoadHint(`❌ Sheet "${sheetName}" not found.`);
+
     return;
   }
 
@@ -1858,7 +1862,9 @@ document.querySelectorAll("th.sortable").forEach(th=>{
       sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
     }else{
       sortState.key = key;
-     sortState.dir = (key === "pubdate") ? "desc" : "asc";
+    const isDateKey = (key === "pubdate" || key === "accdate");
+sortState.dir = isDateKey ? "desc" : "asc";
+
     }
 
     // update arrow symbols
@@ -1873,11 +1879,10 @@ document.querySelectorAll("th.sortable").forEach(th=>{
     elements.tryFetchBtn.addEventListener("click", ()=>tryLoadViaFetch());
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   attachListeners();
 
-  // default UI indicator: Acceptance Date ↓
-  const th = document.querySelector('th.sortable[data-sort="pubdate"]');
+  const th = document.querySelector('th.sortable[data-sort="accdate"]');
   if (th) {
     document.querySelectorAll("th.sortable .sort-arrow").forEach(btn => btn.textContent = "↕");
     const arrow = th.querySelector(".sort-arrow");
@@ -1886,6 +1891,7 @@ document.querySelectorAll("th.sortable").forEach(th=>{
 
   tryLoadViaFetch();
 });
+
 
 
 
