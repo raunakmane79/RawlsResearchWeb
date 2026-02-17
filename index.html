@@ -975,7 +975,7 @@ input[type="checkbox"]{
           <th>End Date at Rawls</th>
           <th>Position</th>
           <th>Area</th>
-          <th class="sortable" data-sort="pubdate">Acceptance Date <button class="sort-arrow" type="button" aria-label="Sort by acceptance date">↕</button></th>
+          <th class="sortable" data-sort="pubdate">Publication Date <button class="sort-arrow" type="button" aria-label="Sort by publication date">↕</button></th>
           <th>Year</th>
           <th>Article Title</th>
           <th>Journal</th>
@@ -1007,7 +1007,7 @@ input[type="checkbox"]{
       "End Date at Rawls": r.endDateAtRawls || "",
       "Position": r.position || "",
       "Area": r.area || "",
-      "Acceptance Date": r.pubdate || "",
+      "Publication Date": r.pubdate || "",
       "Year": r.year || "",
       "Article Title": r.articleTitle || "",
       "Journal": r.journalName || "",
@@ -1666,7 +1666,7 @@ function excelDateToJS(value) {
 
 function ingestWorkbook(workbook) {
 
-  const sheetName = "13";
+  const sheetName = "14";
   const sheet = workbook.Sheets[sheetName];
 
   if (!sheet) {
