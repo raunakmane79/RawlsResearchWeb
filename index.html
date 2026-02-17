@@ -1679,15 +1679,25 @@ function excelDateToJS(value) {
 }
 
 function ingestWorkbook(workbook) {
-
-  const sheetName = "14";
+  const best = findBestSheet(workbook);
+  const sheetName = best.name;
   const sheet = workbook.Sheets[sheetName];
 
   if (!sheet) {
-    showLoadHint(`❌ Sheet "${sheetName}" not found.`);
-
+    showLoadHint(`❌ No readable sheet found.`);
     return;
   }
+
+  // if you found a headerRow, you can start after it
+  const startRow = best.headerRow + 1;
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    range: startRow, // starts after header row
+    defval: ""
+  });
+
+  // then normalizeRowKeys(row) + pick(...) to map columns robustly
+}
 
   console.log("Using forced sheet:", sheetName);
 
