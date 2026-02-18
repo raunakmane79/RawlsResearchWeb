@@ -896,11 +896,17 @@ input[type="checkbox"]{
       </div>
 
       <div class="filter-group">
-        <label>Year of Publication</label>
-        <div class="multi-select" id="yearMulti"></div>
-        <span class="filter-hint">Filter by publication year.</span>
-      </div>
-    </div>
+  <label>Year of Acceptance</label>
+  <div class="multi-select" id="accYearMulti"></div>
+  <span class="filter-hint">Filter by acceptance year.</span>
+</div>
+
+<div class="filter-group">
+  <label>Year of Publication</label>
+  <div class="multi-select" id="yearMulti"></div>
+  <span class="filter-hint">Filter by publication year.</span>
+</div>
+
 
     <div class="filters-advanced collapsed" id="advancedPanel">
       <div class="filter-group">
@@ -1213,6 +1219,8 @@ function toggleExportMenu(){
     tryFetchBtn: document.getElementById("tryFetchBtn"),
     currentYes: document.getElementById("currentYes"),
 currentNo: document.getElementById("currentNo"),
+    accYearMulti: document.getElementById("accYearMulti"),
+
 
 
   };
@@ -1238,6 +1246,10 @@ function parseDateLoose(v){
   if(!isNaN(d.getTime())) return d;
 
   return null;
+}
+function getYearFromDateLoose(v){
+  const d = parseDateLoose(v);
+  return d ? String(d.getFullYear()) : "";
 }
 
 function compareValues(a, b, key){
@@ -1502,11 +1514,20 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
     return {getValues, clear};
   }
 
-  function populateMultiSelects(){
-    multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d=>d.area), "All Areas");
-    multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d=>d.position), "All Positions");
-    multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d=>d.year), "All Years");
-  }
+ function populateMultiSelects(){
+  multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d=>d.area), "All Areas");
+  multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d=>d.position), "All Positions");
+
+  // ✅ NEW: Acceptance year derived from Acceptance Date
+  multiSelectControls.accYear = buildMultiSelect(
+    elements.accYearMulti,
+    data.map(d => getYearFromDateLoose(d.accdate)),
+    "All Acceptance Years"
+  );
+
+  // Publication year from your existing Year column
+  multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d=>d.year), "All Publication Years");
+}
 
   function renderTable(rows){
     currentRows = rows.slice();
@@ -1593,6 +1614,8 @@ const curY = elements.currentYes.checked, curN = elements.currentNo.checked;
   const kq = elements.keywordSearch.value.toLowerCase();
   const tq = elements.titleSearch.value.toLowerCase();
   const jq = elements.journalSearch.value.toLowerCase();
+const accYearVals = multiSelectControls.accYear ? multiSelectControls.accYear.getValues() : [];
+const yearVals    = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
 
   const rows = data.filter(d=>{
     const first = d.firstName || "";
@@ -1604,6 +1627,15 @@ const curY = elements.currentYes.checked, curN = elements.currentNo.checked;
     for(const t of lastTokens){
       if(!tokenMatchOneField(t, last, exact) && !tokenMatchOneField(t, first, exact)) return false;
     }
+    // ✅ Acceptance Year filter (from Acceptance Date)
+if (accYearVals.length){
+  const ay = getYearFromDateLoose(d.accdate);
+  if(!accYearVals.includes(ay)) return false;
+}
+
+// Publication Year filter (existing Year column)
+if (yearVals.length && !yearVals.includes(String(d.year))) return false;
+
 // Currently at Rawls filter: Yes => End Date is N/A, No => End Date is NOT N/A
 const endVal = fold(d.endDateAtRawls || "");
 const isNAEnd =
@@ -1659,6 +1691,9 @@ if ((curY || curN) && !((curY && isNAEnd) || (curN && !isNAEnd))) return false;
     elements.author1.checked = false;
     elements.author2.checked = false;
     elements.currentYes.checked = elements.currentNo.checked = false;
+    if(multiSelectControls.accYear) multiSelectControls.accYear.clear();
+if(multiSelectControls.year)    multiSelectControls.year.clear();
+
 
 
     renderTable(sortRows(data));
