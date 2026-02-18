@@ -1679,12 +1679,11 @@ function excelDateToJS(value) {
 }
 
 function ingestWorkbook(workbook) {
-  // ✅ Force: Sheet 14 (1-based) => index 13 (0-based)
-  const sheetIndex = 3;
+  // ✅ Pull specifically from sheet named "14"
+  const sheetName = workbook.SheetNames.find(n => String(n).trim() === "14");
 
-  const sheetName = workbook.SheetNames[sheetIndex];
   if (!sheetName) {
-    showLoadHint(`❌ Sheet 14 not found. This file only has ${workbook.SheetNames.length} sheets.`);
+    showLoadHint(`❌ Sheet named "14" not found. Available: ${workbook.SheetNames.join(", ")}`);
     return;
   }
 
@@ -1739,6 +1738,7 @@ function ingestWorkbook(workbook) {
   renderTable(sortRows(data));
   elements.loadHint.style.display = "none";
 }
+
 
 
   async function tryLoadViaFetch(){
