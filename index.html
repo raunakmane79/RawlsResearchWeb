@@ -907,7 +907,7 @@ input[type="checkbox"]{
   <span class="filter-hint">Filter by publication year.</span>
 </div>
 
-
+    </div>
     <div class="filters-advanced collapsed" id="advancedPanel">
       <div class="filter-group">
         <label>Article Title</label>
@@ -1604,7 +1604,6 @@ elements.resultsCount.textContent = `Showing ${rows.length} result${rows.length 
 
   const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
   const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
-  const yearVals = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
 
   const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
   const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
