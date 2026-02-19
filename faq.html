@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rawls Faculty Publications Database · FAQs</title>
+
+  <style>
+    :root{
+      --rawls-red:#ba0c2f;
+      --rawls-red-dark:#8c001a;
+      --rawls-black:#101114;
+
+      --surface:#ffffff;
+      --surface-2:#fbfbfd;
+
+      --ink:#101114;
+      --ink-2:#2c2f38;
+      --muted:#5b5f6a;
+
+      --border:#e7e8ee;
+      --border2:#dde0e8;
+
+      --shadow-soft: 0 12px 36px rgba(15, 20, 35, .10);
+      --shadow-pop: 0 10px 24px rgba(15, 20, 35, .14);
+
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1000px 700px at 12% 0%, #ffffff 0%, #f5f6fa 55%, #eef1f7 100%);
+    }
+
+    /* Top header (matches your app) */
+    .rawls-header{
+      background: linear-gradient(90deg, #0b0b0c 0%, #121316 50%, #0b0b0c 100%);
+      border-bottom: 4px solid var(--rawls-red);
+      color:#fff;
+      padding: 14px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 10px 26px rgba(0,0,0,.20);
+    }
+    .rawls-header-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      max-width:1360px;
+      margin:0 auto;
+      flex-wrap:wrap;
+    }
+    .rawls-header-left{display:flex;align-items:center;gap:14px;min-width:0}
+    .rawls-logo{height:54px;width:auto;object-fit:contain;flex-shrink:0}
+    .rawls-header-brand{display:flex;flex-direction:column;line-height:1.15}
+    .rawls-header-brand-main{font-weight:900;font-size:1.05rem;letter-spacing:.02em}
+    .rawls-header-brand-sub{font-size:.78rem;color:#cfcfd4;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+
+    .rawls-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+    .header-btn{
+      border-radius:999px;
+      padding:9px 14px;
+      font-size:.84rem;
+      font-weight:650;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
+      white-space:nowrap;
+      min-height:34px;
+      cursor:pointer;
+    }
+    .header-btn:hover{
+      transform:translateY(-1px);
+      background: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.30);
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    }
+    .header-btn.primary{
+      background: var(--rawls-red);
+      border-color: var(--rawls-red);
+    }
+    .header-btn.primary:hover{
+      background: var(--rawls-red-dark);
+      border-color: var(--rawls-red-dark);
+    }
+    .header-btn.icon{padding:7px 10px;width:38px;height:34px}
+    .icon-svg{width:16px;height:16px;fill:currentColor;display:block}
+
+    /* Main card */
+    .app{
+      max-width:1320px;
+      margin:18px auto 32px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border:1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      overflow:hidden;
+    }
+    .app::before{content:"";display:block;height:6px;background:var(--rawls-red);}
+
+    .app-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:18px 20px 12px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+      flex-wrap:wrap;
+    }
+    .app-header-left{min-width:0}
+    h1{
+      margin:0;
+      font-weight:900;
+      font-size:1.65rem;
+      letter-spacing:.005em;
+      color: var(--rawls-red);
+    }
+    .app-subtitle{
+      margin-top:6px;
+      font-size:.95rem;
+      line-height:1.35;
+      color: var(--muted);
+    }
+
+    /* FAQ toolbar */
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 20px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+      flex-wrap:wrap;
+    }
+    .toolbar-left{
+      display:flex;align-items:center;gap:10px;min-width:0;
+      color: var(--muted);
+      font-size:.92rem;
+      font-weight:650;
+    }
+    .toolbar-left .dot{
+      width:8px;height:8px;border-radius:999px;background:var(--rawls-red);
+      box-shadow: 0 0 0 3px rgba(186,12,47,.14);
+      flex-shrink:0;
+    }
+    .toolbar-right{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    }
+
+    .btn{
+      border-radius:999px;
+      border:1px solid var(--border2);
+      padding:10px 14px;
+      font-size:.88rem;
+      font-weight:650;
+      background:#fff;
+      color:#111;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      line-height:1;
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-pop)}
+    .btn:active{transform:translateY(0px) scale(.99)}
+    .btn-solid{
+      background: var(--rawls-red);
+      border-color: var(--rawls-red);
+      color:#fff;
+    }
+    .btn-solid:hover{
+      background: var(--rawls-red-dark);
+      border-color: var(--rawls-red-dark);
+    }
+    .btn-ghost{
+      background:#fff;
+      border-color: var(--border2);
+      color:#1a1c22;
+    }
+    .btn-ghost:hover{
+      border-color: rgba(186,12,47,.45);
+      color: var(--rawls-red);
+      background: rgba(186,12,47,.05);
+    }
+
+    /* FAQ content */
+    .content{
+      padding: 16px 20px 22px;
+    }
+
+    .hint{
+      padding:12px 12px;
+      border:1px dashed rgba(186,12,47,.35);
+      border-radius:12px;
+      background:rgba(186,12,47,.05);
+      color:#5b0a19;
+      font-size:.92rem;
+      margin: 0 0 14px;
+    }
+
+    .faq-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    details.faq{
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+      box-shadow: 0 10px 26px rgba(15,20,35,.06);
+      overflow:hidden;
+      transition: box-shadow .14s ease, transform .14s ease, border-color .14s ease;
+    }
+    details.faq[open]{
+      border-color: rgba(186,12,47,.28);
+      box-shadow: var(--shadow-pop);
+    }
+
+    summary.faq-q{
+      list-style:none;
+      cursor:pointer;
+      padding: 14px 14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      user-select:none;
+    }
+    summary.faq-q::-webkit-details-marker{display:none}
+
+    .q-left{
+      display:flex;
+      gap: 10px;
+      min-width:0;
+      align-items:flex-start;
+    }
+
+    .q-badge{
+      flex-shrink:0;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:28px;
+      height:28px;
+      border-radius:999px;
+      border: 1px solid rgba(186,12,47,.25);
+      background: rgba(186,12,47,.06);
+      color: var(--rawls-red);
+      font-weight:900;
+      font-size:.9rem;
+      margin-top:1px;
+    }
+
+    .q-text{
+      font-weight:850;
+      color: var(--ink-2);
+      font-size: .98rem;
+      line-height:1.3;
+      word-break: break-word;
+    }
+
+    .chev{
+      flex-shrink:0;
+      width:34px;height:34px;
+      border-radius:999px;
+      border:1px solid var(--border2);
+      background:#fff;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      color:#3f424c;
+      transition: transform .18s ease, border-color .14s ease, color .14s ease, background .14s ease;
+    }
+    details.faq:hover{transform: translateY(-1px)}
+    details.faq:hover .chev{
+      border-color: rgba(186,12,47,.45);
+      color: var(--rawls-red);
+      background: rgba(186,12,47,.05);
+    }
+    details.faq[open] .chev{transform: rotate(180deg)}
+
+    .faq-a{
+      padding: 0 14px 14px 14px;
+      border-top: 1px solid rgba(16,17,20,.08);
+      color:#3f424c;
+      font-size:.94rem;
+      line-height:1.45;
+      white-space: pre-wrap; /* preserve your text formatting */
+    }
+
+    /* Better keyboard focus */
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 4px rgba(186,12,47,.18);
+      border-color: var(--rawls-red);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      details.faq:hover{transform:none}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="rawls-header">
+    <div class="rawls-header-inner">
+      <div class="rawls-header-left">
+        <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
+        <div class="rawls-header-brand">
+          <span class="rawls-header-brand-main">Rawls College Research</span>
+          <span class="rawls-header-brand-sub">Rawls College of Business · Texas Tech University</span>
+        </div>
+      </div>
+
+      <div class="rawls-header-actions">
+        <a href="index.html" class="header-btn" id="homeBtn">Database</a>
+        <a href="rrp.html" target="_blank" class="header-btn" id="productivityBtn">Productivity</a>
+
+        <a href="https://github.com/raunakmane79/RawlsResearchWeb/blob/main/rruc.png?raw=true"
+           target="_blank"
+           class="header-btn"
+           id="aboutBtn">About</a>
+
+        <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
+           target="_blank"
+           class="header-btn icon"
+           id="linkedinBtn"
+           aria-label="Rawls Research on LinkedIn"
+           title="LinkedIn">
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.23 0zM7.06 20.45H3.56V9h3.5v11.45zM5.31 7.43c-1.12 0-2.03-.92-2.03-2.05s.91-2.05 2.03-2.05c1.13 0 2.04.92 2.04 2.05s-.91 2.05-2.04 2.05zM20.45 20.45h-3.5v-5.57c0-1.33-.03-3.03-1.85-3.03-1.85 0-2.13 1.45-2.13 2.94v5.66h-3.5V9h3.36v1.56h.05c.47-.89 1.61-1.83 3.31-1.83 3.54 0 4.19 2.33 4.19 5.36v6.36z"/>
+          </svg>
+        </a>
+
+        <button class="header-btn primary" id="expandAllBtn" type="button">Expand All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app">
+    <div class="app-header">
+      <div class="app-header-left">
+        <h1>FAQs</h1>
+        <div class="app-subtitle">Find answers to common questions about the Rawls Faculty Publications Database.</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="faqCount">9 FAQs</span>
+      </div>
+
+      <div class="toolbar-right">
+        <button class="btn btn-solid" id="expandBtn" type="button">Expand All</button>
+        <button class="btn btn-ghost" id="collapseBtn" type="button">Collapse All</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="hint">Tip: Click a question to expand it. Use “Expand All” when you want to scan everything.</div>
+
+      <section class="faq-grid" id="faqGrid">
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q:What is the purpose of this page?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: To store in an organized manner the Rawls Faculty &amp; Staff the peer-reviewed, research-categorized, ​pdf icon 5* and 5-ranked publications by Rawls authors at any point of their careers.  In addition, the information can be searched, filtered, and extracted.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q:How far in time do these publications go?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: The earliest publication available that is counted is from the year 2000.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q:What is the source of the entries stored in this page?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: The source is a curated mix of data coming from Academic Analytics, Faculty Success, and author-submitted notifications sent to the Rawls Research unit any time a new 5* or 5 publication by one or more Rawls authors gets accepted for publication.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q: A article of mine meeting the criteria (5* or 5 research-related article) has been accepted for publication. What information do I need to provide to add it to the database?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: Please click on the “New Submission” button to fill out a form with all the necessary information and the page will be updated within 72 hours.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q: One of the publications already listed has an error, is not really research (editorial, commentary, etc.) or is missing additional information. How do I get it updated?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: Please click on the “Request Modification” button to fill out a form with all the necessary updates. The page will be updated within 72 hours.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q: I am a new Faculty at Rawls, and I would like to add my past publications that meet the criteria to the database.</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: Please click on the “New Submission” button to fill out a form with all the necessary information and the page will be updated within 72 hours. If you have more than 3 past publications, you can also send us a spreadsheet with all your publications, but please ensure all of the form questions are addressed for each publication. Once submitted, the page will be updated within 5 business days.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q: I will be leaving Rawls; will my publication information remain in this database?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: Yes, we will keep this information as part of each Rawls Area productivity.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q: Who has access to this database?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: This database will be stored internally, within Rawls servers. The database is TTU password protected. However, you can export the results of your search to a spreadsheet format and save it in your personal device.</div>
+        </details>
+
+        <details class="faq">
+          <summary class="faq-q">
+            <div class="q-left">
+              <span class="q-badge">Q</span>
+              <div class="q-text">Q: Will data from this page be used as part of my Faculty Evaluation?</div>
+            </div>
+            <span class="chev" aria-hidden="true">▾</span>
+          </summary>
+          <div class="faq-a">A: XXXX</div>
+        </details>
+
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Expand / collapse all (interactive)
+    const allDetails = () => Array.from(document.querySelectorAll("details.faq"));
+
+    function setAll(open){
+      allDetails().forEach(d => d.open = open);
+      syncExpandLabel();
+    }
+
+    function syncExpandLabel(){
+      const items = allDetails();
+      const opened = items.filter(d => d.open).length;
+      const btnTop = document.getElementById("expandAllBtn");
+      const btnMid = document.getElementById("expandBtn");
+      if(btnTop) btnTop.textContent = (opened === items.length) ? "Collapse All" : "Expand All";
+      if(btnMid) btnMid.textContent = (opened === items.length) ? "Collapse All" : "Expand All";
+    }
+
+    document.getElementById("expandBtn").addEventListener("click", ()=>{
+      const items = allDetails();
+      const allOpen = items.every(d => d.open);
+      setAll(!allOpen);
+    });
+
+    document.getElementById("collapseBtn").addEventListener("click", ()=> setAll(false));
+
+    document.getElementById("expandAllBtn").addEventListener("click", ()=>{
+      const items = allDetails();
+      const allOpen = items.every(d => d.open);
+      setAll(!allOpen);
+    });
+
+    // Keep label in sync if user opens/closes individual items
+    document.addEventListener("toggle", (e)=>{
+      if(e.target && e.target.matches && e.target.matches("details.faq")){
+        syncExpandLabel();
+      }
+    }, true);
+
+    // Count label
+    document.getElementById("faqCount").textContent = `${allDetails().length} FAQs`;
+
+    // Keyboard convenience: "/" focuses first FAQ
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey){
+        const first = document.querySelector("details.faq summary");
+        if(first){
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    syncExpandLabel();
+  </script>
+</body>
+</html>
