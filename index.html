@@ -783,6 +783,120 @@ tr:hover{
 input[type="checkbox"]{
   accent-color: var(--rawls-red);
 }
+/* ===============================
+   TUTORIAL / WALKTHROUGH
+================================ */
+.tour-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(10,12,16,.62);
+  z-index: 5000;
+}
+
+.tour-spotlight{
+  position: fixed;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 9999px rgba(10,12,16,.62),
+    0 16px 44px rgba(0,0,0,.35);
+  outline: 2px solid rgba(255,255,255,.35);
+  z-index: 5001;
+  pointer-events: none;
+  transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+}
+
+.tour-card{
+  position: fixed;
+  width: min(360px, calc(100vw - 28px));
+  background: #fff;
+  border: 1px solid rgba(16,17,20,.10);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0,0,0,.24);
+  z-index: 5002;
+  padding: 14px 14px 12px;
+}
+
+.tour-title{
+  font-weight: 900;
+  font-size: .98rem;
+  margin: 0 0 6px;
+  color: #101114;
+}
+
+.tour-text{
+  margin: 0 0 12px;
+  font-size: .92rem;
+  line-height: 1.35;
+  color: #3f424c;
+}
+
+.tour-actions{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.tour-actions-left{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.tour-step{
+  font-size: .85rem;
+  color: #6a6f7b;
+  font-weight: 700;
+}
+
+.tour-btn{
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  padding: 9px 12px;
+  font-size: .88rem;
+  font-weight: 650;
+  background: #fff;
+  cursor: pointer;
+  transition: .14s;
+}
+
+.tour-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-pop);
+}
+
+.tour-btn.primary{
+  background: var(--rawls-red);
+  border-color: var(--rawls-red);
+  color: #fff;
+}
+.tour-btn.primary:hover{
+  background: var(--rawls-red-dark);
+  border-color: var(--rawls-red-dark);
+}
+
+.tour-btn.ghost{
+  background: rgba(186,12,47,.05);
+  border-color: rgba(186,12,47,.25);
+  color: var(--rawls-red);
+}
+
+.tour-close-x{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:1px solid rgba(16,17,20,.10);
+  background:#fff;
+  cursor:pointer;
+  font-weight:900;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .tour-spotlight{ transition:none; }
+}
 
 
   </style>
@@ -799,6 +913,7 @@ input[type="checkbox"]{
     </div>
 
     <div class="rawls-header-actions">
+      <button class="header-btn" id="tutorialBtn" type="button">Tutorial</button>
       <a href="rrp.html" target="_blank" class="header-btn">Productivity</a>
       <a href="https://github.com/raunakmane79/RawlsResearchWeb/blob/main/rruc.png?raw=true" target="_blank" class="header-btn">About</a>
 
@@ -1916,6 +2031,291 @@ document.addEventListener("DOMContentLoaded", () => {
 
   tryLoadViaFetch();
 });
+/* ===============================
+   TUTORIAL / WALKTHROUGH MODE
+================================ */
+(function(){
+  const TOUR_SEEN_KEY = "rawls_pubdb_tour_seen_v1";
+
+  const tour = {
+    steps: [],
+    index: 0,
+    overlay: null,
+    spotlight: null,
+    card: null,
+    isOpen: false
+  };
+
+  function qs(sel){ return document.querySelector(sel); }
+
+  function getRect(el){
+    const r = el.getBoundingClientRect();
+    return {
+      top: r.top,
+      left: r.left,
+      width: r.width,
+      height: r.height,
+      right: r.right,
+      bottom: r.bottom
+    };
+  }
+
+  function scrollIntoViewIfNeeded(el){
+    const r = el.getBoundingClientRect();
+    const pad = 90; // keep space for sticky header
+    const inView = r.top >= pad && r.bottom <= (window.innerHeight - 40);
+    if(!inView){
+      el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    }
+  }
+
+  function buildSteps(){
+    // Pick elements safely (skip step if missing)
+    const steps = [
+      {
+        el: () => qs(".filters"),
+        title: "Search & Filter Panel",
+        text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
+      },
+      {
+        el: () => qs("#keywordSearch"),
+        title: "Keyword Search",
+        text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
+      },
+      {
+        el: () => qs("#firstNameSearch"),
+        title: "Author Name Search",
+        text: "Type first/last name to filter. You can also enter “E Walden” in the first box — it auto-splits into first + last."
+      },
+      {
+        el: () => qs("#exactNameMatch"),
+        title: "Match Entire Cell Contents",
+        text: "Turn this on when you want stricter matching for author names, while still allowing minor typos."
+      },
+      {
+        el: () => qs("#accYearMulti .multi-select-header"),
+        title: "Acceptance Year Filter",
+        text: "Filters by year derived from Acceptance Date (not the publication year)."
+      },
+      {
+        el: () => qs("#yearMulti .multi-select-header"),
+        title: "Publication Year Filter",
+        text: "Filters using your “Year” column (publication year)."
+      },
+      {
+        el: () => qs("#advancedToggle"),
+        title: "Advanced Filters",
+        text: "Expand this to filter by Area, Position, rankings (5/5*), UTD/FT status, author rank, and “Currently at Rawls”."
+      },
+      {
+        el: () => qs("#exportBtn"),
+        title: "Export",
+        text: "Export the filtered results to Excel or CSV, or export a Summary workbook with counts by faculty, year, and area."
+      },
+      {
+        el: () => qs("#clearFilters"),
+        title: "Clear Filters",
+        text: "Resets all filters and shows the full dataset again."
+      },
+      {
+        el: () => qs(".table-container"),
+        title: "Results Table",
+        text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
+      }
+    ];
+
+    // Only include steps with existing elements
+    tour.steps = steps.filter(s => {
+      const el = s.el();
+      return !!el;
+    });
+  }
+
+  function createUI(){
+    tour.overlay = document.createElement("div");
+    tour.overlay.className = "tour-overlay";
+
+    tour.spotlight = document.createElement("div");
+    tour.spotlight.className = "tour-spotlight";
+
+    tour.card = document.createElement("div");
+    tour.card.className = "tour-card";
+    tour.card.innerHTML = `
+      <button class="tour-close-x" type="button" aria-label="Close tutorial">✕</button>
+      <div class="tour-title"></div>
+      <div class="tour-text"></div>
+      <div class="tour-actions">
+        <div class="tour-actions-left">
+          <button class="tour-btn" type="button" data-tour="back">Back</button>
+          <button class="tour-btn primary" type="button" data-tour="next">Next</button>
+          <button class="tour-btn ghost" type="button" data-tour="skip">Skip</button>
+        </div>
+        <div class="tour-step"></div>
+      </div>
+    `;
+
+    document.body.appendChild(tour.overlay);
+    document.body.appendChild(tour.spotlight);
+    document.body.appendChild(tour.card);
+
+    // overlay click does nothing (prevents accidental close)
+    tour.overlay.addEventListener("click", (e)=> e.stopPropagation());
+
+    // buttons
+    tour.card.querySelector(".tour-close-x").addEventListener("click", closeTour);
+    tour.card.querySelector('[data-tour="back"]').addEventListener("click", prevStep);
+    tour.card.querySelector('[data-tour="next"]').addEventListener("click", nextStep);
+    tour.card.querySelector('[data-tour="skip"]').addEventListener("click", closeTour);
+
+    // escape to close
+    document.addEventListener("keydown", onKeydown);
+    window.addEventListener("resize", rerender);
+  }
+
+  function destroyUI(){
+    if(tour.overlay) tour.overlay.remove();
+    if(tour.spotlight) tour.spotlight.remove();
+    if(tour.card) tour.card.remove();
+    tour.overlay = tour.spotlight = tour.card = null;
+
+    document.removeEventListener("keydown", onKeydown);
+    window.removeEventListener("resize", rerender);
+  }
+
+  function onKeydown(e){
+    if(!tour.isOpen) return;
+    if(e.key === "Escape") closeTour();
+    if(e.key === "ArrowRight") nextStep();
+    if(e.key === "ArrowLeft") prevStep();
+  }
+
+  function openTour({ force=false } = {}){
+    if(tour.isOpen) return;
+
+    if(!force){
+      try{
+        if(localStorage.getItem(TOUR_SEEN_KEY) === "1") return;
+      }catch(_){}
+    }
+
+    buildSteps();
+    if(!tour.steps.length) return;
+
+    tour.index = 0;
+    tour.isOpen = true;
+    createUI();
+    renderStep();
+  }
+
+  function closeTour(){
+    if(!tour.isOpen) return;
+    tour.isOpen = false;
+
+    try{ localStorage.setItem(TOUR_SEEN_KEY, "1"); }catch(_){}
+
+    destroyUI();
+  }
+
+  function prevStep(){
+    if(!tour.isOpen) return;
+    tour.index = Math.max(0, tour.index - 1);
+    renderStep();
+  }
+
+  function nextStep(){
+    if(!tour.isOpen) return;
+    if(tour.index >= tour.steps.length - 1){
+      closeTour();
+      return;
+    }
+    tour.index++;
+    renderStep();
+  }
+
+  function rerender(){
+    if(!tour.isOpen) return;
+    renderStep(true);
+  }
+
+  function placeCardNear(rect){
+    const card = tour.card;
+    const margin = 12;
+
+    // preferred: right side of highlight
+    let top = rect.top;
+    let left = rect.right + margin;
+
+    // if off-screen, place left
+    const cardWidth = card.offsetWidth || 360;
+    if(left + cardWidth > window.innerWidth - margin){
+      left = Math.max(margin, rect.left - cardWidth - margin);
+    }
+
+    // clamp vertical
+    const cardHeight = card.offsetHeight || 180;
+    if(top + cardHeight > window.innerHeight - margin){
+      top = Math.max(margin, window.innerHeight - cardHeight - margin);
+    }
+    if(top < margin) top = margin;
+
+    card.style.left = `${left}px`;
+    card.style.top  = `${top}px`;
+  }
+
+  function renderStep(skipScroll){
+    const step = tour.steps[tour.index];
+    if(!step) return;
+
+    const el = step.el();
+    if(!el) return;
+
+    if(!skipScroll) scrollIntoViewIfNeeded(el);
+
+    // wait a tick for scroll animation / layout
+    setTimeout(()=>{
+      const rect = getRect(el);
+
+      // spotlight padding
+      const pad = 8;
+      tour.spotlight.style.top = `${Math.max(8, rect.top - pad)}px`;
+      tour.spotlight.style.left = `${Math.max(8, rect.left - pad)}px`;
+      tour.spotlight.style.width = `${Math.min(window.innerWidth - 16, rect.width + pad*2)}px`;
+      tour.spotlight.style.height = `${Math.min(window.innerHeight - 16, rect.height + pad*2)}px`;
+
+      // text
+      tour.card.querySelector(".tour-title").textContent = step.title;
+      tour.card.querySelector(".tour-text").textContent = step.text;
+      tour.card.querySelector(".tour-step").textContent = `${tour.index + 1} / ${tour.steps.length}`;
+
+      // next button label
+      const nextBtn = tour.card.querySelector('[data-tour="next"]');
+      nextBtn.textContent = (tour.index === tour.steps.length - 1) ? "Done" : "Next";
+
+      // back disabled
+      const backBtn = tour.card.querySelector('[data-tour="back"]');
+      backBtn.disabled = (tour.index === 0);
+      backBtn.style.opacity = backBtn.disabled ? ".55" : "1";
+      backBtn.style.pointerEvents = backBtn.disabled ? "none" : "auto";
+
+      // position card
+      placeCardNear(rect);
+    }, 180);
+  }
+
+  // Hook up your button once DOM is ready
+  document.addEventListener("DOMContentLoaded", ()=>{
+    const btn = document.getElementById("tutorialBtn");
+    if(btn){
+      btn.addEventListener("click", ()=>openTour({ force:true }));
+    }
+
+    // Optional: auto-open the first time a user visits
+    // openTour();
+  });
+
+  // Expose for debugging if needed
+  window.RawlsTour = { open: openTour, close: closeTour };
+})();
 
 
 
