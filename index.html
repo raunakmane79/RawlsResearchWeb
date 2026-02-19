@@ -2068,61 +2068,98 @@ document.addEventListener("DOMContentLoaded", () => {
       el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
     }
   }
+function runExit(i){
+  const s = tour.steps[i];
+  if(s && typeof s.onExit === "function"){
+    try{ s.onExit(); }catch(e){ console.warn(e); }
+  }
+}
+function runEnter(i){
+  const s = tour.steps[i];
+  if(s && typeof s.onEnter === "function"){
+    try{ s.onEnter(); }catch(e){ console.warn(e); }
+  }
+}
 
   function buildSteps(){
-    // Pick elements safely (skip step if missing)
-    const steps = [
-      {
-        el: () => qs(".filters"),
-        title: "Search & Filter Panel",
-        text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
-      },
-      {
-        el: () => qs("#keywordSearch"),
-        title: "Keyword Search",
-        text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
-      },
-      {
-        el: () => qs("#firstNameSearch"),
-        title: "Author Name Search",
-        text: "Type first/last name to filter. You can also enter “E Walden” in the first box — it auto-splits into first + last."
-      },
-      {
-        el: () => qs("#exactNameMatch"),
-        title: "Match Entire Cell Contents",
-        text: "Turn this on when you want stricter matching for author names, while still allowing minor typos."
-      },
-      {
-        el: () => qs("#accYearMulti .multi-select-header"),
-        title: "Acceptance Year Filter",
-        text: "Filters by year derived from Acceptance Date (not the publication year)."
-      },
-      {
-        el: () => qs("#yearMulti .multi-select-header"),
-        title: "Publication Year Filter",
-        text: "Filters using your “Year” column (publication year)."
-      },
-      {
-        el: () => qs("#advancedToggle"),
-        title: "Advanced Filters",
-        text: "Expand this to filter by Area, Position, rankings (5/5*), UTD/FT status, author rank, and “Currently at Rawls”."
-      },
-      {
-        el: () => qs("#exportBtn"),
-        title: "Export",
-        text: "Export the filtered results to Excel or CSV, or export a Summary workbook with counts by faculty, year, and area."
-      },
-      {
-        el: () => qs("#clearFilters"),
-        title: "Clear Filters",
-        text: "Resets all filters and shows the full dataset again."
-      },
-      {
-        el: () => qs(".table-container"),
-        title: "Results Table",
-        text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
-      }
-    ];
+  const steps = [
+    {
+      el: () => qs(".filters"),
+      title: "Search & Filter Panel",
+      text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
+    },
+    {
+      el: () => qs("#keywordSearch"),
+      title: "Keyword Search",
+      text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
+    },
+    {
+      el: () => qs("#advancedToggle"),
+      title: "Advanced Filters",
+      text: "I’ll open this for you now — here you can filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
+      onEnter: () => openAdvancedFilters(),
+      onExit:  () => closeAdvancedFilters()
+    },
+    {
+      el: () => qs("#exportBtn"),
+      title: "Export",
+      text: "I’ll open the Export menu — choose Excel, CSV, or a Summary workbook with counts by faculty, year, and area.",
+      onEnter: () => openExportMenu(),
+      onExit:  () => closeExportMenu()
+    },
+    {
+      el: () => qs("#clearFilters"),
+      title: "Clear Filters",
+      text: "Resets all filters and shows the full dataset again."
+    },
+    {
+      el: () => qs(".table-container"),
+      title: "Results Table",
+      text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
+    }
+  ];
+
+  tour.steps = steps.filter(s => !!s.el());
+}
+function openAdvancedFilters(){
+  const panel = qs("#advancedPanel");
+  const toggle = qs("#advancedToggle");
+  if(!panel || !toggle) return;
+
+  // Your code uses "collapsed" to hide. Remove it to open.
+  panel.classList.remove("collapsed");
+  toggle.classList.add("open");
+  toggle.setAttribute("aria-expanded", "true");
+}
+
+function closeAdvancedFilters(){
+  const panel = qs("#advancedPanel");
+  const toggle = qs("#advancedToggle");
+  if(!panel || !toggle) return;
+
+  panel.classList.add("collapsed");
+  toggle.classList.remove("open");
+  toggle.setAttribute("aria-expanded", "false");
+}
+
+function openExportMenu(){
+  // Uses your existing functions if present
+  const menu = qs("#exportMenu");
+  const btn  = qs("#exportBtn");
+  if(!menu || !btn) return;
+
+  menu.classList.add("open");
+  btn.setAttribute("aria-expanded", "true");
+}
+
+function closeExportMenu(){
+  const menu = qs("#exportMenu");
+  const btn  = qs("#exportBtn");
+  if(!menu || !btn) return;
+
+  menu.classList.remove("open");
+  btn.setAttribute("aria-expanded", "false");
+}
 
     // Only include steps with existing elements
     tour.steps = steps.filter(s => {
@@ -2153,6 +2190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="tour-step"></div>
       </div>
     `;
+
 
     document.body.appendChild(tour.overlay);
     document.body.appendChild(tour.spotlight);
@@ -2204,7 +2242,9 @@ document.addEventListener("DOMContentLoaded", () => {
     tour.index = 0;
     tour.isOpen = true;
     createUI();
-    renderStep();
+runEnter(tour.index);
+renderStep();
+
   }
 
   function closeTour(){
@@ -2216,21 +2256,34 @@ document.addEventListener("DOMContentLoaded", () => {
     destroyUI();
   }
 
-  function prevStep(){
-    if(!tour.isOpen) return;
-    tour.index = Math.max(0, tour.index - 1);
-    renderStep();
+ function prevStep(){
+  if(!tour.isOpen) return;
+  runExit(tour.index);
+  tour.index = Math.max(0, tour.index - 1);
+  runEnter(tour.index);
+  renderStep();
+}
+
+
+ function nextStep(){
+  if(!tour.isOpen) return;
+
+  // leaving current step
+  runExit(tour.index);
+// safety cleanup
+closeExportMenu();
+closeAdvancedFilters();
+
+  if(tour.index >= tour.steps.length - 1){
+    closeTour();
+    return;
   }
 
-  function nextStep(){
-    if(!tour.isOpen) return;
-    if(tour.index >= tour.steps.length - 1){
-      closeTour();
-      return;
-    }
-    tour.index++;
-    renderStep();
-  }
+  tour.index++;
+  runEnter(tour.index);
+  renderStep();
+}
+
 
   function rerender(){
     if(!tour.isOpen) return;
