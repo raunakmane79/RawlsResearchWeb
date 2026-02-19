@@ -937,6 +937,21 @@ input[type="checkbox"]{
   </svg>
 </a>
 
+<a id="productivityBtn" href="rrp.html" target="_blank" class="header-btn">Productivity</a>
+
+<a id="aboutBtn"
+   href="https://github.com/raunakmane79/RawlsResearchWeb/blob/main/rruc.png?raw=true"
+   target="_blank"
+   class="header-btn">About</a>
+
+<a id="linkedinBtn"
+   href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
+   target="_blank"
+   class="header-btn icon"
+   aria-label="Rawls Research on LinkedIn"
+   title="LinkedIn">
+  ...
+</a>
 
   
     </div>
@@ -2066,6 +2081,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function scrollIntoViewIfNeeded(el){
+     if(el.closest(".rawls-header")) return; // ✅ don't scroll for sticky header items
     const r = el.getBoundingClientRect();
     const pad = 90; // keep space for sticky header
     const inView = r.top >= pad && r.bottom <= (window.innerHeight - 40);
@@ -2156,7 +2172,23 @@ document.addEventListener("DOMContentLoaded", () => {
       el: () => qs(".table-container"),
       title: "Results Table",
       text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
-    }
+    },
+    {
+  el: () => qs("#productivityBtn"),
+  title: "Productivity",
+  text: "Open the Productivity page for related tools and workflows."
+},
+{
+  el: () => qs("#aboutBtn"),
+  title: "About",
+  text: "Learn what this dashboard is and how to use it."
+},
+{
+  el: () => qs("#linkedinBtn"),
+  title: "LinkedIn",
+  text: "Visit Rawls Research on LinkedIn for updates and highlights."
+},
+
   ];
 
   tour.steps = steps.filter(s => !!s.el());
