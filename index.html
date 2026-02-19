@@ -2034,6 +2034,9 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ===============================
    TUTORIAL / WALKTHROUGH MODE
 ================================ */
+/* ===============================
+   TUTORIAL / WALKTHROUGH MODE
+================================ */
 (function(){
   const TOUR_SEEN_KEY = "rawls_pubdb_tour_seen_v1";
 
@@ -2050,122 +2053,104 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getRect(el){
     const r = el.getBoundingClientRect();
-    return {
-      top: r.top,
-      left: r.left,
-      width: r.width,
-      height: r.height,
-      right: r.right,
-      bottom: r.bottom
-    };
+    return { top:r.top, left:r.left, width:r.width, height:r.height, right:r.right, bottom:r.bottom };
   }
 
   function scrollIntoViewIfNeeded(el){
     const r = el.getBoundingClientRect();
     const pad = 90; // keep space for sticky header
     const inView = r.top >= pad && r.bottom <= (window.innerHeight - 40);
-    if(!inView){
-      el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    if(!inView) el.scrollIntoView({ behavior:"smooth", block:"center", inline:"nearest" });
+  }
+
+  function runExit(i){
+    const s = tour.steps[i];
+    if(s && typeof s.onExit === "function"){
+      try{ s.onExit(); }catch(e){ console.warn(e); }
     }
   }
-function runExit(i){
-  const s = tour.steps[i];
-  if(s && typeof s.onExit === "function"){
-    try{ s.onExit(); }catch(e){ console.warn(e); }
+  function runEnter(i){
+    const s = tour.steps[i];
+    if(s && typeof s.onEnter === "function"){
+      try{ s.onEnter(); }catch(e){ console.warn(e); }
+    }
   }
-}
-function runEnter(i){
-  const s = tour.steps[i];
-  if(s && typeof s.onEnter === "function"){
-    try{ s.onEnter(); }catch(e){ console.warn(e); }
+
+  function openAdvancedFilters(){
+    const panel = qs("#advancedPanel");
+    const toggle = qs("#advancedToggle");
+    if(!panel || !toggle) return;
+    panel.classList.remove("collapsed");
+    toggle.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
   }
-}
+
+  function closeAdvancedFilters(){
+    const panel = qs("#advancedPanel");
+    const toggle = qs("#advancedToggle");
+    if(!panel || !toggle) return;
+    panel.classList.add("collapsed");
+    toggle.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  function openExportMenu(){
+    const menu = qs("#exportMenu");
+    const btn  = qs("#exportBtn");
+    if(!menu || !btn) return;
+    menu.classList.add("open");
+    btn.setAttribute("aria-expanded", "true");
+  }
+
+  // IMPORTANT: keep this name local (inside IIFE). It won't break your global closeExportMenu().
+  function closeExportMenuLocal(){
+    const menu = qs("#exportMenu");
+    const btn  = qs("#exportBtn");
+    if(!menu || !btn) return;
+    menu.classList.remove("open");
+    btn.setAttribute("aria-expanded", "false");
+  }
 
   function buildSteps(){
-  const steps = [
-    {
-      el: () => qs(".filters"),
-      title: "Search & Filter Panel",
-      text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
-    },
-    {
-      el: () => qs("#keywordSearch"),
-      title: "Keyword Search",
-      text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
-    },
-    {
-      el: () => qs("#advancedToggle"),
-      title: "Advanced Filters",
-      text: "I’ll open this for you now — here you can filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
-      onEnter: () => openAdvancedFilters(),
-      onExit:  () => closeAdvancedFilters()
-    },
-    {
-      el: () => qs("#exportBtn"),
-      title: "Export",
-      text: "I’ll open the Export menu — choose Excel, CSV, or a Summary workbook with counts by faculty, year, and area.",
-      onEnter: () => openExportMenu(),
-      onExit:  () => closeExportMenu()
-    },
-    {
-      el: () => qs("#clearFilters"),
-      title: "Clear Filters",
-      text: "Resets all filters and shows the full dataset again."
-    },
-    {
-      el: () => qs(".table-container"),
-      title: "Results Table",
-      text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
-    }
-  ];
+    const steps = [
+      {
+        el: () => qs(".filters"),
+        title: "Search & Filter Panel",
+        text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
+      },
+      {
+        el: () => qs("#keywordSearch"),
+        title: "Keyword Search",
+        text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
+      },
+      {
+        el: () => qs("#advancedToggle"),
+        title: "Advanced Filters",
+        text: "I’ll open this for you now — here you can filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
+        onEnter: () => openAdvancedFilters(),
+        onExit:  () => closeAdvancedFilters()
+      },
+      {
+        el: () => qs("#exportBtn"),
+        title: "Export",
+        text: "I’ll open the Export menu — choose Excel, CSV, or a Summary workbook with counts by faculty, year, and area.",
+        onEnter: () => openExportMenu(),
+        onExit:  () => closeExportMenuLocal()
+      },
+      {
+        el: () => qs("#clearFilters"),
+        title: "Clear Filters",
+        text: "Resets all filters and shows the full dataset again."
+      },
+      {
+        el: () => qs(".table-container"),
+        title: "Results Table",
+        text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
+      }
+    ];
 
-  tour.steps = steps.filter(s => !!s.el());
-}
-function openAdvancedFilters(){
-  const panel = qs("#advancedPanel");
-  const toggle = qs("#advancedToggle");
-  if(!panel || !toggle) return;
-
-  // Your code uses "collapsed" to hide. Remove it to open.
-  panel.classList.remove("collapsed");
-  toggle.classList.add("open");
-  toggle.setAttribute("aria-expanded", "true");
-}
-
-function closeAdvancedFilters(){
-  const panel = qs("#advancedPanel");
-  const toggle = qs("#advancedToggle");
-  if(!panel || !toggle) return;
-
-  panel.classList.add("collapsed");
-  toggle.classList.remove("open");
-  toggle.setAttribute("aria-expanded", "false");
-}
-
-function openExportMenu(){
-  // Uses your existing functions if present
-  const menu = qs("#exportMenu");
-  const btn  = qs("#exportBtn");
-  if(!menu || !btn) return;
-
-  menu.classList.add("open");
-  btn.setAttribute("aria-expanded", "true");
-}
-
-function closeExportMenu(){
-  const menu = qs("#exportMenu");
-  const btn  = qs("#exportBtn");
-  if(!menu || !btn) return;
-
-  menu.classList.remove("open");
-  btn.setAttribute("aria-expanded", "false");
-}
-
-    // Only include steps with existing elements
-    tour.steps = steps.filter(s => {
-      const el = s.el();
-      return !!el;
-    });
+    // ✅ Only keep steps whose element exists
+    tour.steps = steps.filter(s => !!s.el());
   }
 
   function createUI(){
@@ -2191,21 +2176,17 @@ function closeExportMenu(){
       </div>
     `;
 
-
     document.body.appendChild(tour.overlay);
     document.body.appendChild(tour.spotlight);
     document.body.appendChild(tour.card);
 
-    // overlay click does nothing (prevents accidental close)
     tour.overlay.addEventListener("click", (e)=> e.stopPropagation());
 
-    // buttons
     tour.card.querySelector(".tour-close-x").addEventListener("click", closeTour);
     tour.card.querySelector('[data-tour="back"]').addEventListener("click", prevStep);
     tour.card.querySelector('[data-tour="next"]').addEventListener("click", nextStep);
     tour.card.querySelector('[data-tour="skip"]').addEventListener("click", closeTour);
 
-    // escape to close
     document.addEventListener("keydown", onKeydown);
     window.addEventListener("resize", rerender);
   }
@@ -2231,9 +2212,7 @@ function closeExportMenu(){
     if(tour.isOpen) return;
 
     if(!force){
-      try{
-        if(localStorage.getItem(TOUR_SEEN_KEY) === "1") return;
-      }catch(_){}
+      try{ if(localStorage.getItem(TOUR_SEEN_KEY) === "1") return; }catch(_){}
     }
 
     buildSteps();
@@ -2242,48 +2221,47 @@ function closeExportMenu(){
     tour.index = 0;
     tour.isOpen = true;
     createUI();
-runEnter(tour.index);
-renderStep();
 
+    runEnter(tour.index);
+    renderStep();
   }
 
   function closeTour(){
     if(!tour.isOpen) return;
-    tour.isOpen = false;
 
+    // ✅ run exit on current step + cleanup opened UI
+    runExit(tour.index);
+    closeExportMenuLocal();
+    closeAdvancedFilters();
+
+    tour.isOpen = false;
     try{ localStorage.setItem(TOUR_SEEN_KEY, "1"); }catch(_){}
 
     destroyUI();
   }
 
- function prevStep(){
-  if(!tour.isOpen) return;
-  runExit(tour.index);
-  tour.index = Math.max(0, tour.index - 1);
-  runEnter(tour.index);
-  renderStep();
-}
-
-
- function nextStep(){
-  if(!tour.isOpen) return;
-
-  // leaving current step
-  runExit(tour.index);
-// safety cleanup
-closeExportMenu();
-closeAdvancedFilters();
-
-  if(tour.index >= tour.steps.length - 1){
-    closeTour();
-    return;
+  function prevStep(){
+    if(!tour.isOpen) return;
+    runExit(tour.index);
+    tour.index = Math.max(0, tour.index - 1);
+    runEnter(tour.index);
+    renderStep();
   }
 
-  tour.index++;
-  runEnter(tour.index);
-  renderStep();
-}
+  function nextStep(){
+    if(!tour.isOpen) return;
 
+    runExit(tour.index);
+
+    if(tour.index >= tour.steps.length - 1){
+      closeTour();
+      return;
+    }
+
+    tour.index++;
+    runEnter(tour.index);
+    renderStep();
+  }
 
   function rerender(){
     if(!tour.isOpen) return;
@@ -2294,17 +2272,14 @@ closeAdvancedFilters();
     const card = tour.card;
     const margin = 12;
 
-    // preferred: right side of highlight
     let top = rect.top;
     let left = rect.right + margin;
 
-    // if off-screen, place left
     const cardWidth = card.offsetWidth || 360;
     if(left + cardWidth > window.innerWidth - margin){
       left = Math.max(margin, rect.left - cardWidth - margin);
     }
 
-    // clamp vertical
     const cardHeight = card.offsetHeight || 180;
     if(top + cardHeight > window.innerHeight - margin){
       top = Math.max(margin, window.innerHeight - cardHeight - margin);
@@ -2324,49 +2299,37 @@ closeAdvancedFilters();
 
     if(!skipScroll) scrollIntoViewIfNeeded(el);
 
-    // wait a tick for scroll animation / layout
     setTimeout(()=>{
       const rect = getRect(el);
-
-      // spotlight padding
       const pad = 8;
+
       tour.spotlight.style.top = `${Math.max(8, rect.top - pad)}px`;
       tour.spotlight.style.left = `${Math.max(8, rect.left - pad)}px`;
       tour.spotlight.style.width = `${Math.min(window.innerWidth - 16, rect.width + pad*2)}px`;
       tour.spotlight.style.height = `${Math.min(window.innerHeight - 16, rect.height + pad*2)}px`;
 
-      // text
       tour.card.querySelector(".tour-title").textContent = step.title;
       tour.card.querySelector(".tour-text").textContent = step.text;
       tour.card.querySelector(".tour-step").textContent = `${tour.index + 1} / ${tour.steps.length}`;
 
-      // next button label
       const nextBtn = tour.card.querySelector('[data-tour="next"]');
       nextBtn.textContent = (tour.index === tour.steps.length - 1) ? "Done" : "Next";
 
-      // back disabled
       const backBtn = tour.card.querySelector('[data-tour="back"]');
       backBtn.disabled = (tour.index === 0);
       backBtn.style.opacity = backBtn.disabled ? ".55" : "1";
       backBtn.style.pointerEvents = backBtn.disabled ? "none" : "auto";
 
-      // position card
       placeCardNear(rect);
     }, 180);
   }
 
-  // Hook up your button once DOM is ready
   document.addEventListener("DOMContentLoaded", ()=>{
     const btn = document.getElementById("tutorialBtn");
-    if(btn){
-      btn.addEventListener("click", ()=>openTour({ force:true }));
-    }
-
-    // Optional: auto-open the first time a user visits
-    // openTour();
+    if(btn) btn.addEventListener("click", ()=>openTour({ force:true }));
+    // openTour(); // optional auto-open first time
   });
 
-  // Expose for debugging if needed
   window.RawlsTour = { open: openTour, close: closeTour };
 })();
 
