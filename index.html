@@ -2329,16 +2329,6 @@ function placeCardNear(rect){
 }
 
 
-    const cardHeight = card.offsetHeight || 180;
-    if(top + cardHeight > window.innerHeight - margin){
-      top = Math.max(margin, window.innerHeight - cardHeight - margin);
-    }
-    if(top < margin) top = margin;
-
-    card.style.left = `${left}px`;
-    card.style.top  = `${top}px`;
-  }
-
   function renderStep(skipScroll){
     const step = tour.steps[tour.index];
     if(!step) return;
