@@ -283,20 +283,19 @@
     }
     details.faq[open] .chev{transform: rotate(180deg)}
 
-    .faq-a{
-      padding: 14px 16px 16px;
-      border-top: 1px solid rgba(16,17,20,.08);
-      background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
-      border-left: 4px solid rgba(186,12,47,.35);
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
+   .faq-a{
+  padding: 14px 16px 16px;
+  border-top: 1px solid rgba(16,17,20,.08);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+  border-left: 4px solid rgba(186,12,47,.35);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
 
-      color: #2f3340;
-      font-size: .98rem;
-      line-height: 1.55;
-      white-space: pre-wrap; /* preserve your formatting */
-    }
-
+  color: #2f3340;
+  font-size: .98rem;
+  line-height: 1.55;
+  white-space: normal; /* ✅ FIX: don’t preserve indentation/newlines */
+}
     /* Better keyboard focus */
     a:focus-visible, button:focus-visible, summary:focus-visible{
       outline:none;
