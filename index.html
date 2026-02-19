@@ -786,22 +786,30 @@ input[type="checkbox"]{
 /* ===============================
    TUTORIAL / WALKTHROUGH
 ================================ */
+/* ===============================
+   TUTORIAL / WALKTHROUGH
+================================ */
 .tour-overlay{
   position: fixed;
   inset: 0;
-  background: rgba(10,12,16,.62);
+  /* lighter so content stays visible */
+  background: rgba(10,12,16,.38);
   z-index: 5000;
 }
 
 .tour-spotlight{
   position: fixed;
   border-radius: 14px;
+
+  /* lighter “outside dim” + stronger focus shadow */
   box-shadow:
-    0 0 0 9999px rgba(10,12,16,.62),
-    0 16px 44px rgba(0,0,0,.35);
-  outline: 2px solid rgba(255,255,255,.35);
+    0 0 0 9999px rgba(10,12,16,.38),
+    0 18px 56px rgba(0,0,0,.40);
+
+  outline: 2px solid rgba(255,255,255,.45);
   z-index: 5001;
   pointer-events: none;
+
   transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
 }
 
@@ -815,6 +823,7 @@ input[type="checkbox"]{
   z-index: 5002;
   padding: 14px 14px 12px;
 }
+
 
 .tour-title{
   font-weight: 900;
@@ -2112,46 +2121,53 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildSteps(){
-    const steps = [
-      {
-        el: () => qs(".filters"),
-        title: "Search & Filter Panel",
-        text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
-      },
-      {
-        el: () => qs("#keywordSearch"),
-        title: "Keyword Search",
-        text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
-      },
-      {
-        el: () => qs("#advancedToggle"),
-        title: "Advanced Filters",
-        text: "I’ll open this for you now — here you can filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
-        onEnter: () => openAdvancedFilters(),
-        onExit:  () => closeAdvancedFilters()
-      },
-      {
-        el: () => qs("#exportBtn"),
-        title: "Export",
-        text: "I’ll open the Export menu — choose Excel, CSV, or a Summary workbook with counts by faculty, year, and area.",
-        onEnter: () => openExportMenu(),
-        onExit:  () => closeExportMenuLocal()
-      },
-      {
-        el: () => qs("#clearFilters"),
-        title: "Clear Filters",
-        text: "Resets all filters and shows the full dataset again."
-      },
-      {
-        el: () => qs(".table-container"),
-        title: "Results Table",
-        text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
-      }
-    ];
+  const steps = [
+    {
+      el: () => qs(".filters"),
+      title: "Quick Glimpse",
+      text: "Here’s the full filter system at a glance — primary filters + advanced filters opened.",
+      onEnter: () => openAdvancedFilters(),
+      onExit:  () => closeAdvancedFilters()
+    },
+    {
+      el: () => qs(".filters"),
+      title: "Search & Filter Panel",
+      text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
+    },
+    {
+      el: () => qs("#keywordSearch"),
+      title: "Keyword Search",
+      text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
+    },
+    {
+      el: () => qs("#advancedToggle"),
+      title: "Advanced Filters",
+      text: "I’ll open this for you now — filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
+      onEnter: () => openAdvancedFilters(),
+      onExit:  () => closeAdvancedFilters()
+    },
+    {
+      el: () => qs("#exportBtn"),
+      title: "Export",
+      text: "I’ll open the Export menu — choose Excel, CSV, or a Summary workbook with counts by faculty, year, and area.",
+      onEnter: () => openExportMenu(),
+      onExit:  () => closeExportMenuLocal()
+    },
+    {
+      el: () => qs("#clearFilters"),
+      title: "Clear Filters",
+      text: "Resets all filters and shows the full dataset again."
+    },
+    {
+      el: () => qs(".table-container"),
+      title: "Results Table",
+      text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
+    }
+  ];
 
-    // ✅ Only keep steps whose element exists
-    tour.steps = steps.filter(s => !!s.el());
-  }
+  tour.steps = steps.filter(s => !!s.el());
+}
+
 
   function createUI(){
     tour.overlay = document.createElement("div");
@@ -2268,17 +2284,50 @@ document.addEventListener("DOMContentLoaded", () => {
     renderStep(true);
   }
 
-  function placeCardNear(rect){
-    const card = tour.card;
-    const margin = 12;
+function placeCardNear(rect){
+  const card = tour.card;
+  const margin = 12;
 
-    let top = rect.top;
-    let left = rect.right + margin;
+  const cardW = card.offsetWidth || 360;
+  const cardH = card.offsetHeight || 180;
 
-    const cardWidth = card.offsetWidth || 360;
-    if(left + cardWidth > window.innerWidth - margin){
-      left = Math.max(margin, rect.left - cardWidth - margin);
-    }
+  const spaces = {
+    right:  window.innerWidth  - rect.right  - margin,
+    left:   rect.left          - margin,
+    bottom: window.innerHeight - rect.bottom - margin,
+    top:    rect.top           - margin
+  };
+
+  // preferred order
+  const order = ["right","left","bottom","top"];
+  const best = order
+    .map(pos => ({ pos, space: spaces[pos] }))
+    .sort((a,b)=> b.space - a.space)[0].pos;
+
+  let left = margin, top = margin;
+
+  if(best === "right"){
+    left = rect.right + margin;
+    top  = rect.top;
+  } else if(best === "left"){
+    left = rect.left - cardW - margin;
+    top  = rect.top;
+  } else if(best === "bottom"){
+    left = rect.left;
+    top  = rect.bottom + margin;
+  } else { // top
+    left = rect.left;
+    top  = rect.top - cardH - margin;
+  }
+
+  // clamp to viewport
+  left = Math.min(Math.max(margin, left), window.innerWidth  - cardW - margin);
+  top  = Math.min(Math.max(margin, top),  window.innerHeight - cardH - margin);
+
+  card.style.left = `${left}px`;
+  card.style.top  = `${top}px`;
+}
+
 
     const cardHeight = card.offsetHeight || 180;
     if(top + cardHeight > window.innerHeight - margin){
