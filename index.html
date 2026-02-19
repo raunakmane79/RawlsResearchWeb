@@ -2126,63 +2126,64 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.setAttribute("aria-expanded", "false");
   }
 
-  function buildSteps(){
+ function buildSteps(){
   const steps = [
     {
       el: () => qs(".filters"),
       title: "Search & Filter Panel",
-      text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
+      text: "Use this panel to narrow results. Apply keyword, author, or advanced filters."
     },
     {
       el: () => qs("#keywordSearch"),
       title: "Keyword Search",
-      text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
+      text: "Search by article title or journal name. This is the quickest way to find topics, journals, or keywords."
     },
-   {
-  el: () => qs("#advancedPanel"),
-  title: "Advanced Filters",
-  text: "I’ll open this for you now — filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
-  onEnter: () => openAdvancedFilters(),
-  onExit:  () => closeAdvancedFilters()
-},
+    {
+      el: () => qs("#advancedPanel"),
+      title: "Advanced Filters",
+      text: "Filter by area, position, rankings, UTD/FT lists, author rank, and Rawls status.",
+      onEnter: () => openAdvancedFilters(),
+      onExit:  () => closeAdvancedFilters()
+    },
 
     {
       el: () => qs("#exportBtn"),
       title: "Export",
-      text: "I’ll open the Export menu — choose Excel, CSV, or a Summary workbook with counts by faculty, year, and area.",
+      text: "Export results as Excel, CSV, or a summary workbook with counts by faculty, year, and area.",
       onEnter: () => openExportMenu(),
       onExit:  () => closeExportMenuLocal()
     },
     {
       el: () => qs("#clearFilters"),
       title: "Clear Filters",
-      text: "Resets all filters and shows the full dataset again."
+      text: "Reset all filters and return to the full dataset."
     },
     {
       el: () => qs(".table-container"),
       title: "Results Table",
-      text: "Your results appear here. Use the sort arrows in headers like Last/First/Acceptance Date to sort."
+      text: "View filtered publications here. Use column headers to sort results."
     },
     {
-  el: () => qs("#productivityBtn"),
-  title: "Productivity",
-  text: "Open the Productivity page for related tools and workflows."
-},
-{
-  el: () => qs("#aboutBtn"),
-  title: "About",
-  text: "Learn what this dashboard is and how to use it."
-},
-{
-  el: () => qs("#linkedinBtn"),
-  title: "LinkedIn",
-  text: "Visit Rawls Research on LinkedIn for updates and highlights."
-},
+      el: () => qs("#productivityBtn"),
+      title: "Productivity",
+      text: "Open productivity tools and related workflows."
+    },
+    {
+      el: () => qs("#aboutBtn"),
+      title: "About",
+      text: "Learn more about the Rawls Research database."
+    },
+    {
+      el: () => qs("#linkedinBtn"),
+      title: "LinkedIn",
+      text: "Visit Rawls Research on LinkedIn for updates and highlights."
+    },
 
   ];
 
   tour.steps = steps.filter(s => !!s.el());
 }
+
 
 
   function createUI(){
