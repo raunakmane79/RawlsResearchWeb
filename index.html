@@ -921,12 +921,17 @@ input[type="checkbox"]{
 
     <div class="rawls-header-actions">
       <button class="header-btn" id="tutorialBtn" type="button">Tour</button>
-      <a href="rrp.html" target="_blank" class="header-btn">Productivity</a>
-      <a href="https://github.com/raunakmane79/RawlsResearchWeb/blob/main/rruc.png?raw=true" target="_blank" class="header-btn">About</a>
+     <a href="rrp.html" target="_blank" class="header-btn" id="productivityBtn">Productivity</a>
 
-    <a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
+<a href="https://github.com/raunakmane79/RawlsResearchWeb/blob/main/rruc.png?raw=true"
+   target="_blank"
+   class="header-btn"
+   id="aboutBtn">About</a>
+
+<a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
    target="_blank"
    class="header-btn icon"
+   id="linkedinBtn"
    aria-label="Rawls Research on LinkedIn"
    title="LinkedIn">
   <!-- ✅ OPTION A: Classic LinkedIn “in” logo -->
@@ -2064,13 +2069,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return { top:r.top, left:r.left, width:r.width, height:r.height, right:r.right, bottom:r.bottom };
   }
 
-  function scrollIntoViewIfNeeded(el){
-     if(el.closest(".rawls-header")) return; // ✅ don't scroll for sticky header items
-    const r = el.getBoundingClientRect();
-    const pad = 90; // keep space for sticky header
-    const inView = r.top >= pad && r.bottom <= (window.innerHeight - 40);
-    if(!inView) el.scrollIntoView({ behavior:"smooth", block:"center", inline:"nearest" });
-  }
+ function scrollIntoViewIfNeeded(el){
+  if(el.closest(".rawls-header") || el.closest(".rawls-header-actions")) return;
+  const r = el.getBoundingClientRect();
+  const pad = 90;
+  const inView = r.top >= pad && r.bottom <= (window.innerHeight - 40);
+  if(!inView) el.scrollIntoView({ behavior:"smooth", block:"center", inline:"nearest" });
+}
+
 
   function runExit(i){
     const s = tour.steps[i];
