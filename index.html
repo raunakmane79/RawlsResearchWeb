@@ -2124,13 +2124,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const steps = [
     {
       el: () => qs(".filters"),
-      title: "Quick Glimpse",
-      text: "Here’s the full filter system at a glance — primary filters + advanced filters opened.",
-      onEnter: () => openAdvancedFilters(),
-      onExit:  () => closeAdvancedFilters()
-    },
-    {
-      el: () => qs(".filters"),
       title: "Search & Filter Panel",
       text: "This is where you filter publications. Use keyword + author fields for quick searching, and open Advanced filters for more options."
     },
@@ -2139,13 +2132,14 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Keyword Search",
       text: "Search inside the Article Title or Journal fields. Great for finding journals, topics, or keywords."
     },
-    {
-      el: () => qs("#advancedToggle"),
-      title: "Advanced Filters",
-      text: "I’ll open this for you now — filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
-      onEnter: () => openAdvancedFilters(),
-      onExit:  () => closeAdvancedFilters()
-    },
+   {
+  el: () => qs("#advancedPanel"),
+  title: "Advanced Filters",
+  text: "I’ll open this for you now — filter by Area, Position, rankings (5/5*), UTD/FT, author rank, and “Currently at Rawls”.",
+  onEnter: () => openAdvancedFilters(),
+  onExit:  () => closeAdvancedFilters()
+},
+
     {
       el: () => qs("#exportBtn"),
       title: "Export",
