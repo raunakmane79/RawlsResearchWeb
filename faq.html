@@ -142,23 +142,12 @@
     .toolbar{
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:flex-end; /* right aligned only */
       gap:12px;
       padding:12px 20px;
       border-bottom:1px solid var(--border);
       background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
       flex-wrap:wrap;
-    }
-    .toolbar-left{
-      display:flex;align-items:center;gap:10px;min-width:0;
-      color: var(--muted);
-      font-size:.92rem;
-      font-weight:650;
-    }
-    .toolbar-left .dot{
-      width:8px;height:8px;border-radius:999px;background:var(--rawls-red);
-      box-shadow: 0 0 0 3px rgba(186,12,47,.14);
-      flex-shrink:0;
     }
     .toolbar-right{
       display:flex;align-items:center;gap:10px;flex-wrap:wrap;
@@ -205,32 +194,32 @@
 
     /* FAQ content */
     .content{
-      padding: 16px 20px 22px;
+      padding: 18px 22px 26px;
     }
 
     .hint{
-      padding:12px 12px;
-      border:1px dashed rgba(186,12,47,.35);
-      border-radius:12px;
-      background:rgba(186,12,47,.05);
-      color:#5b0a19;
+      border: 1px solid rgba(186,12,47,.18);
+      background: rgba(186,12,47,.04);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #3a0b15;
+      line-height: 1.45;
+      margin: 0 0 16px;
       font-size:.92rem;
-      margin: 0 0 14px;
     }
 
     .faq-grid{
       display:grid;
       grid-template-columns: 1fr;
-      gap: 10px;
+      gap: 12px;
     }
 
     details.faq{
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: 16px;
       background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
       box-shadow: 0 10px 26px rgba(15,20,35,.06);
       overflow:hidden;
-      transition: box-shadow .14s ease, transform .14s ease, border-color .14s ease;
     }
     details.faq[open]{
       border-color: rgba(186,12,47,.28);
@@ -240,20 +229,20 @@
     summary.faq-q{
       list-style:none;
       cursor:pointer;
-      padding: 14px 14px;
+      padding: 16px 16px;
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content:space-between;
-      gap: 12px;
+      gap: 14px;
       user-select:none;
     }
     summary.faq-q::-webkit-details-marker{display:none}
 
     .q-left{
       display:flex;
-      gap: 10px;
+      gap: 12px;
       min-width:0;
-      align-items:flex-start;
+      align-items:center;
     }
 
     .q-badge{
@@ -261,30 +250,30 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:28px;
-      height:28px;
+      width:26px;
+      height:26px;
       border-radius:999px;
-      border: 1px solid rgba(186,12,47,.25);
+      border: 1px solid rgba(186,12,47,.22);
       background: rgba(186,12,47,.06);
       color: var(--rawls-red);
       font-weight:900;
-      font-size:.9rem;
-      margin-top:1px;
+      font-size:.82rem;
     }
 
     .q-text{
-      font-weight:850;
-      color: var(--ink-2);
-      font-size: .98rem;
-      line-height:1.3;
+      font-weight: 800;
+      color: #1b1d22;
+      font-size: 1.02rem;
+      line-height: 1.35;
       word-break: break-word;
+      max-width: 980px;
     }
 
     .chev{
       flex-shrink:0;
-      width:34px;height:34px;
+      width:36px;height:36px;
       border-radius:999px;
-      border:1px solid var(--border2);
+      border:1px solid rgba(16,17,20,.12);
       background:#fff;
       display:inline-flex;
       align-items:center;
@@ -292,25 +281,24 @@
       color:#3f424c;
       transition: transform .18s ease, border-color .14s ease, color .14s ease, background .14s ease;
     }
-    details.faq:hover{transform: translateY(-1px)}
-    details.faq:hover .chev{
-      border-color: rgba(186,12,47,.45);
-      color: var(--rawls-red);
-      background: rgba(186,12,47,.05);
-    }
     details.faq[open] .chev{transform: rotate(180deg)}
 
     .faq-a{
-      padding: 0 14px 14px 14px;
+      padding: 14px 16px 16px;
       border-top: 1px solid rgba(16,17,20,.08);
-      color:#3f424c;
-      font-size:.94rem;
-      line-height:1.45;
-      white-space: pre-wrap; /* preserve your text formatting */
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+      border-left: 4px solid rgba(186,12,47,.35);
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+
+      color: #2f3340;
+      font-size: .98rem;
+      line-height: 1.55;
+      white-space: pre-wrap; /* preserve your formatting */
     }
 
     /* Better keyboard focus */
-    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible{
+    a:focus-visible, button:focus-visible, summary:focus-visible{
       outline:none;
       box-shadow:0 0 0 4px rgba(186,12,47,.18);
       border-color: var(--rawls-red);
@@ -318,7 +306,31 @@
 
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important; }
-      details.faq:hover{transform:none}
+    }
+
+    @media (max-width: 560px){
+      summary.faq-q{ padding: 16px 14px; }
+      .q-text{ font-size: 1rem; }
+    }
+
+    /* Footer note */
+    .faq-footer{
+      margin-top: 14px;
+      border: 1px solid rgba(16,17,20,.10);
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #3f424c;
+      line-height: 1.5;
+      box-shadow: 0 10px 26px rgba(15,20,35,.06);
+    }
+    .faq-footer a{
+      color: var(--rawls-red);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .faq-footer a:hover{
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -368,11 +380,6 @@
     </div>
 
     <div class="toolbar">
-      <div class="toolbar-left">
-        <span class="dot" aria-hidden="true"></span>
-        <span id="faqCount">9 FAQs</span>
-      </div>
-
       <div class="toolbar-right">
         <button class="btn btn-solid" id="expandBtn" type="button">Expand All</button>
         <button class="btn btn-ghost" id="collapseBtn" type="button">Collapse All</button>
@@ -380,7 +387,7 @@
     </div>
 
     <div class="content">
-      <div class="hint">Tip: Click a question to expand it. Use “Expand All” when you want to scan everything.</div>
+    
 
       <section class="faq-grid" id="faqGrid">
 
@@ -484,11 +491,14 @@
         </details>
 
       </section>
+
+      <div class="faq-footer">
+        For more questions mail: <a href="mailto:Laura.Bilbao@ttu.edu">Laura.Bilbao@ttu.edu</a>
+      </div>
     </div>
   </main>
 
   <script>
-    // Expand / collapse all (interactive)
     const allDetails = () => Array.from(document.querySelectorAll("details.faq"));
 
     function setAll(open){
@@ -499,10 +509,14 @@
     function syncExpandLabel(){
       const items = allDetails();
       const opened = items.filter(d => d.open).length;
+
       const btnTop = document.getElementById("expandAllBtn");
       const btnMid = document.getElementById("expandBtn");
-      if(btnTop) btnTop.textContent = (opened === items.length) ? "Collapse All" : "Expand All";
-      if(btnMid) btnMid.textContent = (opened === items.length) ? "Collapse All" : "Expand All";
+
+      const allOpen = (opened === items.length && items.length > 0);
+
+      if(btnTop) btnTop.textContent = allOpen ? "Collapse All" : "Expand All";
+      if(btnMid) btnMid.textContent = allOpen ? "Collapse All" : "Expand All";
     }
 
     document.getElementById("expandBtn").addEventListener("click", ()=>{
@@ -519,28 +533,15 @@
       setAll(!allOpen);
     });
 
-    // Keep label in sync if user opens/closes individual items
+    // Keep labels synced when user toggles individual FAQs
     document.addEventListener("toggle", (e)=>{
       if(e.target && e.target.matches && e.target.matches("details.faq")){
         syncExpandLabel();
       }
     }, true);
 
-    // Count label
-    document.getElementById("faqCount").textContent = `${allDetails().length} FAQs`;
-
-    // Keyboard convenience: "/" focuses first FAQ
-    document.addEventListener("keydown", (e)=>{
-      if(e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey){
-        const first = document.querySelector("details.faq summary");
-        if(first){
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    });
-
     syncExpandLabel();
   </script>
 </body>
 </html>
+
