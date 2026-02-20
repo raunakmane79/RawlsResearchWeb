@@ -535,7 +535,7 @@
 
     async function loadExcelAndRender(){
   const status = document.getElementById("rrpStatus");
-  const pill = document.getElementById("lastUpdated");
+
 
   const fromEl = document.getElementById("dateFrom");
   const toEl   = document.getElementById("dateTo");
@@ -669,8 +669,8 @@
     buildBar("chartUTD",   areas, areas.map(a => byArea[a].utd),      "utd",      labelToColor);
     buildBar("chartFT",    areas, areas.map(a => byArea[a].ft),       "ft",       labelToColor);
 
-    const now = new Date();
-    pill.textContent = `Last updated: ${now.toLocaleString()}`;
+   
+ 
 
     // Status message
     if (from || to){
@@ -684,7 +684,6 @@
   }catch(e){
     console.error(e);
     status.textContent = "Charts are temporarily unavailable. Please try again.";
-    pill.textContent = "Last updated: —";
   }
 }
 
