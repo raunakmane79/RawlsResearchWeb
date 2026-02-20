@@ -975,8 +975,8 @@ input[type="checkbox"]{
     </div>
 
     <div class="app-header-actions">
-      <a href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
-      <a href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
+     <a id="newSubmissionBtn" href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+<a id="requestModificationBtn" href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
     </div>
   </div>
 
@@ -2147,13 +2147,15 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.setAttribute("aria-expanded", "false");
   }
 
- function buildSteps(){
+function buildSteps(){
   const steps = [
     {
       el: () => qs(".filters"),
       title: "Search & Filter Panel",
       text: "Use this panel to filter the results. Apply keyword, author, or advanced filters."
     },
+
+  
     {
       el: () => qs("#keywordSearch"),
       title: "Keyword Search",
@@ -2166,7 +2168,6 @@ document.addEventListener("DOMContentLoaded", () => {
       onEnter: () => openAdvancedFilters(),
       onExit:  () => closeAdvancedFilters()
     },
-
     {
       el: () => qs("#exportBtn"),
       title: "Export",
@@ -2184,6 +2185,20 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Results Table",
       text: "View filtered publications here. Use column headers to sort results."
     },
+      // ✅ NEW STEP: New Submission
+    {
+      el: () => qs('.app-header-actions .header-btn.primary'),
+      title: "New Submission",
+      text: "Submit a new publication entry using this form."
+    },
+
+    // ✅ NEW STEP: Request Modification
+    {
+      el: () => qs('.app-header-actions .header-btn:not(.primary)'),
+      title: "Request Modification",
+      text: "Request edits to an existing record using this form."
+    },
+
     {
       el: () => qs("#productivityBtn"),
       title: "Productivity",
@@ -2199,12 +2214,10 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "LinkedIn",
       text: "Visit Rawls Research on LinkedIn for updates and highlights."
     },
-
   ];
 
   tour.steps = steps.filter(s => !!s.el());
 }
-
 
 
   function createUI(){
