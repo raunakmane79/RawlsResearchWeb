@@ -1,0 +1,2431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rawls Faculty Publications Database</title>
+
+  <!-- XLSX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+ :root{
+  --rawls-red:#ba0c2f;
+  --rawls-red-dark:#8c001a;
+  --rawls-black:#101114;
+
+  --bg0:#f5f6f8;
+  --bg1:#ffffff;
+
+  --text:#141414;
+  --muted:#5b5f6a;
+
+  --border:#e6e7ea;
+  --border2:#dfe2e7;
+
+  --shadow: 0 14px 40px rgba(15, 20, 35, .12);
+  --shadow2: 0 8px 22px rgba(15, 20, 35, .10);
+
+  --radius: 14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(900px 600px at 10% 0%, #ffffff 0%, #f4f5f8 55%, #eef1f6 100%);
+}
+
+/* Top header */
+.rawls-header{
+  background: linear-gradient(90deg, #0b0b0c 0%, #121316 50%, #0b0b0c 100%);
+  border-bottom: 4px solid var(--rawls-red);
+  color:#fff;
+  padding:12px 22px;
+  position:sticky;
+  top:0;
+  z-index:1000;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+}
+.rawls-header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  max-width:1320px;
+  margin:0 auto;
+  flex-wrap:wrap;
+}
+
+.rawls-header-left{display:flex;align-items:center;gap:14px;min-width:0}
+.rawls-logo{height:57px;width:auto;object-fit:contain;flex-shrink:0}
+.rawls-header-brand{display:flex;flex-direction:column;line-height:1.15}
+.rawls-header-brand-main{font-weight:800;font-size:1.05rem;letter-spacing:.02em}
+.rawls-header-brand-sub{font-size:.78rem;color:#cfcfd4;letter-spacing:.08em;text-transform:uppercase}
+
+    /* --- Make only action buttons less bold --- */
+
+/* Header buttons (New Submission / Request Modification) */
+.app-header-actions .header-btn{
+  font-weight:600 !important;
+}
+
+/* Toolbar buttons (Export / Clear filters) */
+.toolbar .btn{
+  font-weight:600 !important;
+}
+
+/* Export dropdown items */
+.export-item{
+  font-weight:600 !important;
+}
+.app-header-actions .header-btn,
+.toolbar .btn{
+  letter-spacing:.02em;
+}
+
+.rawls-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.header-btn{
+  border-radius:999px;
+  padding:7px 14px;
+  font-size:.84rem;
+  font-weight:650;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.22);
+  color:#fff;
+  background: rgba(255,255,255,.06);
+  transition:.15s;
+  white-space:nowrap;
+}
+.header-btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.10)}
+.header-btn.primary{background:var(--rawls-red);border-color:var(--rawls-red)}
+.header-btn.primary:hover{background:var(--rawls-red-dark);border-color:var(--rawls-red-dark)}
+
+/* Icon button */
+.header-btn.icon{padding:7px 10px;width:38px;height:34px}
+.icon-svg{width:16px;height:16px;fill:currentColor;display:block}
+
+/* App card */
+.app{
+  max-width:1320px;
+  margin:18px auto 32px;
+  background: var(--bg1);
+  border-radius: var(--radius);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+.app::before{
+  content:"";
+  display:block;
+  height:5px;
+  background: var(--rawls-red);
+}
+
+/* App header */
+.app-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding:18px 20px 12px;
+  border-bottom:1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+}
+.app-header-left{min-width:0}
+h1{
+  margin:0;
+  font-weight:900;
+  font-size:1.55rem;
+  letter-spacing:.01em;
+  color: var(--rawls-red);
+}
+.app-subtitle{
+  margin-top:6px;
+  font-size:.92rem;
+  color: var(--muted);
+}
+
+.app-header-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.app-header-actions .header-btn{
+  color: #111;
+  background:#fff;
+  border:1px solid var(--border2);
+}
+.app-header-actions .header-btn:hover{
+  border-color: var(--rawls-red);
+  color: var(--rawls-red);
+}
+.app-header-actions .header-btn.primary{
+  color:#fff;
+  background: var(--rawls-red);
+  border-color: var(--rawls-red);
+}
+.app-header-actions .header-btn.primary:hover{
+  background: var(--rawls-red-dark);
+  border-color: var(--rawls-red-dark);
+  color:#fff;
+}
+
+/*  */
+/* Toolbar (results + export/clear on the right) */
+/* Toolbar (results count + actions) */
+.toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 20px;
+  border-bottom:1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+}
+
+.toolbar-left{
+  font-size:.92rem;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+#resultsCount{
+  font-weight:800;
+  color:#2c2f38;
+}
+
+.toolbar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* Buttons (toolbar) */
+/* Toolbar buttons: more solid + on-brand */
+.btn{
+  border-radius:999px;
+  border:1px solid var(--border2);
+  padding:9px 14px;
+  font-size:.88rem;
+  font-weight:850;
+  background:#fff;
+  color:#111;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  line-height:1;
+  transition:.15s;
+  white-space:nowrap;
+  box-shadow:none;
+}
+
+.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow2);
+}
+
+/* Solid primary (Export) */
+.btn-solid{
+  background: var(--rawls-red);
+  border-color: var(--rawls-red);
+  color:#fff;
+}
+.btn-solid:hover{
+  background: var(--rawls-red-dark);
+  border-color: var(--rawls-red-dark);
+  color:#fff;
+}
+
+/* Clean secondary (Clear filters) */
+.btn-ghost{
+  background:#fff;
+  border-color: var(--border2);
+  color:#1a1c22;
+}
+.btn-ghost:hover{
+  border-color: rgba(186,12,47,.45);
+  color: var(--rawls-red);
+  background: rgba(186,12,47,.05);
+}
+
+/* Ensure toolbar alignment stays tight */
+.toolbar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+
+/* Filters */
+.filters{
+  margin:0 20px 16px;
+  padding:14px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(15,20,35,.06);
+  position:relative;
+  z-index: 50;
+}
+.filters-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.filters-title{
+  font-size:.86rem;
+  font-weight:850;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:#4c4f59;
+}
+
+.advanced-toggle{
+  border-radius:999px;
+  border:1px solid var(--border2);
+  padding:7px 12px;
+  font-size:.85rem;
+  background:#fff;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#3f424c;
+  transition:.15s;
+}
+.advanced-toggle:hover{border-color:var(--rawls-red);color:var(--rawls-red);transform:translateY(-1px)}
+.advanced-toggle.open{
+  background:var(--rawls-red);
+  border-color:var(--rawls-red-dark);
+  color:#fff;
+  box-shadow:0 0 0 3px rgba(186,12,47,.16);
+}
+.advanced-toggle-icon{transition:transform .2s ease}
+.advanced-toggle.open .advanced-toggle-icon{transform:rotate(180deg)}
+
+.filters-primary,.filters-advanced{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:12px 16px;
+}
+.filters-advanced{
+  margin-top:12px;
+  padding:14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#ffffff 0%, #fafafb 100%);
+  border:1px solid rgba(186,12,47,.18);
+}
+.filters-advanced.collapsed{display:none}
+
+.filter-group{display:flex;flex-direction:column;gap:6px}
+label{
+  font-weight:800;
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.10em;
+  color:#51545f;
+}
+
+input[type="text"]{
+  padding:9px 10px;
+  border-radius:10px;
+  border:1px solid var(--border2);
+  font-size:.92rem;
+  background:#fbfbfc;
+  transition:.15s;
+}
+input[type="text"]:focus{
+  outline:none;
+  border-color:var(--rawls-red);
+  box-shadow:0 0 0 3px rgba(186,12,47,.14);
+  background:#fff;
+}
+
+.checkbox-group{display:flex;gap:12px;flex-wrap:wrap;font-size:.9rem;color:#444}
+.name-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.name-options{display:flex;flex-wrap:wrap;gap:12px;margin-top:4px;font-size:.85rem;color:#525663}
+.filter-hint{font-size:.78rem;color:#6a6f7b}
+
+/* Multi-select */
+.multi-select{position:relative;font-size:.92rem}
+.multi-select-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:9px 10px;
+  border-radius:10px;
+  border:1px solid var(--border2);
+  background:#fbfbfc;
+  cursor:pointer;
+  min-height:38px;
+  transition:.15s;
+}
+.multi-select.open .multi-select-header{
+  border-color:var(--rawls-red);
+  box-shadow:0 0 0 3px rgba(186,12,47,.14);
+  background:#fff;
+}
+.multi-select-label{color:#4f525d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.multi-select-placeholder{color:#8a8f9b}
+.multi-select-menu{
+  position:absolute;
+  left:0;right:0;
+  margin-top:6px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow: var(--shadow2);
+  border:1px solid var(--border);
+  max-height:240px;
+  overflow-y:auto;
+  padding:8px 0;
+  z-index:200;
+  display:none;
+}
+.multi-select.open .multi-select-menu{display:block}
+.multi-select-option{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:.92rem}
+.multi-select-option:hover{background:#f6f7fa}
+.multi-select-option input{margin:0}
+
+/* Load hint */
+.hint{
+  padding:12px 12px;
+  border:1px dashed rgba(186,12,47,.35);
+  border-radius:12px;
+  background:rgba(186,12,47,.05);
+  color:#5b0a19;
+  font-size:.92rem;
+}
+.hint strong{color:#4a0814}
+.file-input{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+
+/* Table */
+.table-container{
+  margin: 0 20px 20px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background:#fff;
+  overflow:auto;
+  max-height: 540px;
+  box-shadow: 0 10px 26px rgba(15,20,35,.06);
+}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:1100px}
+th,td{
+  padding:12px 12px;
+  border-bottom:1px solid #eef0f4;
+  text-align:left;
+  vertical-align:top;
+}
+th{
+  background:#fbfbfd;
+  font-size:.74rem;
+  text-transform:uppercase;
+  letter-spacing:.10em;
+  color:#4c4f59;
+  position:sticky;
+  top:0;
+  z-index:10;
+  border-bottom:1px solid var(--border);
+}
+tr:nth-child(even){background:#fcfcfe}
+tr:hover{background:#f6f7fb}
+
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+.sort-arrow{
+  margin-left:8px;
+  border:1px solid var(--border2);
+  background:#fff;
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:.85rem;
+  line-height:1;
+  cursor:pointer;
+}
+th.sortable:hover .sort-arrow{border-color:var(--rawls-red);color:var(--rawls-red)}
+
+/* Badges + links */
+.badge{
+  display:inline-block;
+  padding:3px 9px;
+  border-radius:999px;
+  font-size:.78rem;
+  font-weight:850;
+  margin-right:4px;
+  white-space:nowrap;
+}
+.badge-blue{background:#f3f5f8;color:#2f3440;border:1px solid #e2e6ee}
+.badge-green{background:#e8f5e9;color:#2e7d32;border:1px solid rgba(46,125,50,.25)}
+.badge-no{background:#f3f4f6;color:#777;border:1px solid #e0e0e0}
+
+.link-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--border2);
+  background:#fff;
+  color:var(--rawls-red);
+  font-weight:900;
+  font-size:.80rem;
+  text-decoration:none;
+  transition:.15s;
+  white-space:nowrap;
+}
+.link-btn:hover{
+  background:var(--rawls-red);
+  border-color:var(--rawls-red);
+  color:#fff;
+  transform:translateY(-1px);
+}
+.link-btn.disabled{opacity:.5;pointer-events:none}
+
+/* Better keyboard focus */
+a:focus-visible, button:focus-visible, input:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 4px rgba(186,12,47,.18);
+  border-color: var(--rawls-red);
+}
+/* Export dropdown */
+.export-wrap{ position:relative; display:inline-flex; }
+
+.export-menu{
+  position:absolute;
+  right:0;
+  top: calc(100% + 10px);
+  min-width: 210px;
+  background:#fff;
+  border:1px solid rgba(186,12,47,.18);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(15, 20, 35, .16);
+  padding: 6px;
+  display:none;
+  z-index: 999;
+}
+
+.export-menu.open{ display:block; }
+
+.export-item{
+  width:100%;
+  text-align:left;
+  border:0;
+  background:transparent;
+  padding:10px 12px;
+  border-radius:12px;
+  font-weight:850;
+  font-size:.9rem;
+  color:#20222a;
+  cursor:pointer;
+}
+
+.export-item:hover{
+  background: rgba(186,12,47,.08);
+  color: var(--rawls-red);
+}
+
+.export-item:active{
+  background: rgba(186,12,47,.14);
+}
+/* ===============================
+   PREMIUM TTU / RAWLS OVERRIDES
+   Paste at END of your <style>
+================================ */
+
+/* Better design tokens */
+:root{
+  --rawls-red:#ba0c2f;
+  --rawls-red-dark:#8c001a;
+  --rawls-black:#101114;
+
+  --surface:#ffffff;
+  --surface-2:#fbfbfd;
+  --ink:#101114;
+  --ink-2:#2c2f38;
+  --muted:#5b5f6a;
+
+  --border:#e7e8ee;
+  --border2:#dde0e8;
+
+  --shadow-soft: 0 12px 36px rgba(15, 20, 35, .10);
+  --shadow-pop: 0 10px 24px rgba(15, 20, 35, .14);
+
+  --radius: 16px;
+  --radius-sm: 12px;
+}
+
+body{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1000px 700px at 12% 0%, #ffffff 0%, #f5f6fa 55%, #eef1f7 100%);
+}
+
+/* Smoother header */
+.rawls-header{
+  padding: 14px 22px;
+  border-bottom: 4px solid var(--rawls-red);
+  box-shadow: 0 10px 26px rgba(0,0,0,.20);
+}
+.rawls-header-inner{ max-width: 1360px; }
+.rawls-logo{ height: 54px; }
+.rawls-header-brand-main{
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+.rawls-header-brand-sub{
+  opacity: .92;
+}
+
+/* Header buttons: less “chunky”, more premium */
+.header-btn{
+  font-weight: 650;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(10px);
+}
+.header-btn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.12);
+}
+
+/* App card: more “product” feel */
+.app{
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+.app::before{ height: 6px; }
+
+/* App header typography */
+h1{
+  font-size: 1.65rem;
+  letter-spacing: .005em;
+}
+.app-subtitle{
+  font-size: .95rem;
+  line-height: 1.35;
+}
+
+/* “New Submission / Request Modification” look cleaner */
+.app-header-actions .header-btn{
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-weight: 650 !important;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+.app-header-actions .header-btn:hover{
+  box-shadow: var(--shadow-pop);
+}
+
+/* Toolbar: make it feel like a native app strip */
+.toolbar{
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+  padding: 12px 20px;
+}
+#resultsCount{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+#resultsCount::before{
+  content:"";
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--rawls-red);
+  box-shadow: 0 0 0 3px rgba(186,12,47,.14);
+}
+
+/* Buttons: consistent sizing + premium hover */
+.btn{
+  font-weight: 650 !important;
+  border-radius: 999px;
+  padding: 10px 14px;
+  border: 1px solid var(--border2);
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-pop);
+}
+.btn:active{ transform: translateY(0px) scale(.99); }
+
+/* Export dropdown: nicer motion */
+.export-menu{
+  animation: pop .12s ease-out;
+  transform-origin: top right;
+}
+@keyframes pop{
+  from{ opacity:0; transform: translateY(-4px) scale(.98); }
+  to{ opacity:1; transform: translateY(0) scale(1); }
+}
+.export-item{
+  font-weight: 650 !important;
+  border-radius: 12px;
+}
+.export-item:hover{
+  background: rgba(186,12,47,.08);
+}
+
+/* Filters card: more premium + better hierarchy */
+.filters{
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+  box-shadow: 0 10px 26px rgba(15,20,35,.06);
+}
+.filters-title{
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+label{
+  font-weight: 800;
+  letter-spacing: .11em;
+}
+
+/* Inputs: cleaner focus + subtle depth */
+input[type="text"]{
+  background: #ffffff;
+  border: 1px solid var(--border2);
+  box-shadow: 0 1px 0 rgba(16,17,20,.03);
+}
+input[type="text"]:focus{
+  border-color: rgba(186,12,47,.85);
+  box-shadow: 0 0 0 4px rgba(186,12,47,.14);
+}
+
+/* Multi-select: feels more “SaaS” */
+.multi-select-header{
+  background: #ffffff;
+  border: 1px solid var(--border2);
+}
+.multi-select.open .multi-select-header{
+  border-color: rgba(186,12,47,.85);
+}
+.multi-select-menu{
+  border-radius: 14px;
+  border: 1px solid rgba(16,17,20,.10);
+}
+
+/* Table: more legible + premium sticky header */
+.table-container{
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 28px rgba(15,20,35,.06);
+}
+th{
+  background: linear-gradient(180deg, #ffffff 0%, #f6f7fb 100%);
+  border-bottom: 1px solid var(--border);
+}
+tr:hover{
+  background: #f5f7ff;
+}
+
+/* Badges: less heavy + more modern */
+.badge{
+  font-weight: 750;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.badge-blue{
+  background: #f3f5f9;
+  border: 1px solid #e3e7f1;
+  color:#2a2f3a;
+}
+.badge-green{
+  background: rgba(46,125,50,.10);
+  border: 1px solid rgba(46,125,50,.22);
+}
+
+/* “Open” link button: looks premium */
+.link-btn{
+  font-weight: 800;
+  border: 1px solid rgba(186,12,47,.30);
+  background: rgba(186,12,47,.04);
+}
+.link-btn:hover{
+  box-shadow: var(--shadow-pop);
+}
+
+/* Scrollbar: subtle (Chrome/Edge) */
+.table-container::-webkit-scrollbar{ height: 10px; width: 10px; }
+.table-container::-webkit-scrollbar-thumb{
+  background: rgba(16,17,20,.18);
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.9);
+}
+.table-container::-webkit-scrollbar-track{ background: transparent; }
+/* Make <button class="header-btn"> look identical to <a class="header-btn"> */
+button.header-btn{
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  color:#fff;
+}
+
+/* Firefox extra button padding fix */
+button.header-btn::-moz-focus-inner{
+  border: 0;
+  padding: 0;
+}
+
+/* Optional: keep all header pills the same height */
+.header-btn{ min-height: 34px; }
+
+/* Reduced motion friendly */
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; animation:none !important; }
+}
+/* Make checked checkboxes Rawls red (instead of browser blue) */
+input[type="checkbox"]{
+  accent-color: var(--rawls-red);
+}
+
+/* ===============================
+   TUTORIAL / WALKTHROUGH
+================================ */
+.tour-overlay{
+  position: fixed;
+  inset: 0;
+  /* lighter so content stays visible */
+  background: rgba(10,12,16,.38);
+  z-index: 5000;
+}
+
+.tour-spotlight{
+  position: fixed;
+  border-radius: 14px;
+
+  /* lighter “outside dim” + stronger focus shadow */
+  box-shadow:
+    0 0 0 9999px rgba(10,12,16,.38),
+    0 18px 56px rgba(0,0,0,.40);
+
+  outline: 2px solid rgba(255,255,255,.45);
+  z-index: 5001;
+  pointer-events: none;
+
+  transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+}
+
+.tour-card{
+  position: fixed;
+  width: min(360px, calc(100vw - 28px));
+  background: #fff;
+  border: 1px solid rgba(16,17,20,.10);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0,0,0,.24);
+  z-index: 5002;
+  padding: 14px 14px 12px;
+}
+
+
+.tour-title{
+  font-weight: 900;
+  font-size: .98rem;
+  margin: 0 0 6px;
+  color: #101114;
+}
+
+.tour-text{
+  margin: 0 0 12px;
+  font-size: .92rem;
+  line-height: 1.35;
+  color: #3f424c;
+}
+
+.tour-actions{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.tour-actions-left{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.tour-step{
+  font-size: .85rem;
+  color: #6a6f7b;
+  font-weight: 700;
+}
+
+.tour-btn{
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  padding: 9px 12px;
+  font-size: .88rem;
+  font-weight: 650;
+  background: #fff;
+  cursor: pointer;
+  transition: .14s;
+}
+
+.tour-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-pop);
+}
+
+.tour-btn.primary{
+  background: var(--rawls-red);
+  border-color: var(--rawls-red);
+  color: #fff;
+}
+.tour-btn.primary:hover{
+  background: var(--rawls-red-dark);
+  border-color: var(--rawls-red-dark);
+}
+
+.tour-btn.ghost{
+  background: rgba(186,12,47,.05);
+  border-color: rgba(186,12,47,.25);
+  color: var(--rawls-red);
+}
+
+.tour-close-x{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:1px solid rgba(16,17,20,.10);
+  background:#fff;
+  cursor:pointer;
+  font-weight:900;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .tour-spotlight{ transition:none; }
+}
+
+
+  </style>
+</head>
+<body>
+<header class="rawls-header">
+  <div class="rawls-header-inner">
+    <div class="rawls-header-left">
+      <img class="rawls-logo" src="RawlsRlogo.jpeg" alt="Rawls College of Business logo">
+      <div class="rawls-header-brand">
+        <span class="rawls-header-brand-main">Rawls College Research</span>
+        <span class="rawls-header-brand-sub">Rawls College of Business · Texas Tech University</span>
+      </div>
+    </div>
+
+    <div class="rawls-header-actions">
+      <button class="header-btn" id="tutorialBtn" type="button">Tour</button>
+      <a href="faq.html" target="_blank" class="header-btn" id="faqBtn">FAQs</a>
+     <a href="rrp.html" target="_blank" class="header-btn" id="productivityBtn">Productivity</a>
+
+<a href="https://github.com/raunakmane79/RawlsResearchWeb/blob/main/rruc.png?raw=true"
+   target="_blank"
+   class="header-btn"
+   id="aboutBtn">About</a>
+
+<a href="https://www.linkedin.com/showcase/research-rawls-college-of-business/"
+   target="_blank"
+   class="header-btn icon"
+   id="linkedinBtn"
+   aria-label="Rawls Research on LinkedIn"
+   title="LinkedIn">
+  <!-- ✅ OPTION A: Classic LinkedIn “in” logo -->
+  <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.23 0zM7.06 20.45H3.56V9h3.5v11.45zM5.31 7.43c-1.12 0-2.03-.92-2.03-2.05s.91-2.05 2.03-2.05c1.13 0 2.04.92 2.04 2.05s-.91 2.05-2.04 2.05zM20.45 20.45h-3.5v-5.57c0-1.33-.03-3.03-1.85-3.03-1.85 0-2.13 1.45-2.13 2.94v5.66h-3.5V9h3.36v1.56h.05c.47-.89 1.61-1.83 3.31-1.83 3.54 0 4.19 2.33 4.19 5.36v6.36z"/>
+  </svg>
+</a>
+
+
+
+  
+    </div>
+  </div>
+</header>
+<main class="app">
+  <div class="app-header">
+    <div class="app-header-left">
+      <h1>Rawls Faculty Publications Database</h1>
+      <div class="app-subtitle">Search and filter faculty publications by author, year, journal, and ranking.</div>
+    </div>
+
+    <div class="app-header-actions">
+     <a id="newSubmissionBtn" href="https://forms.office.com/r/ccUbG1hRZT" target="_blank" class="header-btn primary">New Submission</a>
+<a id="requestModificationBtn" href="https://forms.office.com/r/CZ7cWYgSzP" target="_blank" class="header-btn">Request Modification</a>
+    </div>
+  </div>
+
+ <div class="toolbar">
+  <div class="toolbar-left">
+    <span id="resultsCount">Loading publications…</span>
+  </div>
+
+  <div class="toolbar-right">
+    <div class="export-wrap">
+      <button class="btn btn-solid" id="exportBtn" type="button" aria-haspopup="true" aria-expanded="false">
+        Export <span aria-hidden="true">▾</span>
+      </button>
+
+      <div class="export-menu" id="exportMenu" role="menu" aria-label="Export options">
+        <button type="button" class="export-item" data-export="xlsx" role="menuitem">Excel Sheet (.xlsx)</button>
+        <button type="button" class="export-item" data-export="csv"  role="menuitem">CSV File (.csv)</button>
+        <button type="button" class="export-item" data-export="summary" role="menuitem">Export Summary</button>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" id="clearFilters" type="button">
+      <span aria-hidden="true">✕</span> Clear filters
+    </button>
+  </div>
+</div>
+
+
+
+
+
+  <div class="filters">
+    <div class="filters-header">
+      <div class="filters-title">Search publications</div>
+      <button class="advanced-toggle" id="advancedToggle" type="button" aria-expanded="false">
+        <span class="advanced-toggle-icon">▾</span> Advanced filters
+      </button>
+    </div>
+
+    <div class="hint" id="loadHint" style="display:none;">
+      <strong>Database not loaded.</strong> If you are opening this file directly (file://), the browser blocks loading <code>Database.xlsx</code>.
+      <div class="file-input">
+        <span>Fix: choose your Excel file here:</span>
+        <input type="file" id="dbFile" accept=".xlsx,.xls" />
+        <button class="btn" id="tryFetchBtn" type="button">Try loading Database.xlsx again</button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Keyword (Title / Journal)</label>
+      <input type="text" id="keywordSearch" placeholder="Search in title or journal">
+    </div>
+
+    <div class="filters-primary">
+      <div class="filter-group author-group">
+        <label>Author Name</label>
+        <div class="name-inputs">
+          <input type="text" id="firstNameSearch" placeholder="First name">
+          <input type="text" id="lastNameSearch"  placeholder="Last name">
+        </div>
+        <div class="name-options">
+          <label class="name-option">
+            <input type="checkbox" id="exactNameMatch"> Match entire cell contents
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+  <label>Year of Acceptance</label>
+  <div class="multi-select" id="accYearMulti"></div>
+  <span class="filter-hint">Filter by acceptance year.</span>
+</div>
+
+<div class="filter-group">
+  <label>Year of Publication</label>
+  <div class="multi-select" id="yearMulti"></div>
+  <span class="filter-hint">Filter by publication year.</span>
+</div>
+
+    </div>
+    <div class="filters-advanced collapsed" id="advancedPanel">
+      <div class="filter-group">
+        <label>Article Title</label>
+        <input type="text" id="titleSearch" placeholder="Search by title">
+      </div>
+
+      <div class="filter-group">
+        <label>Journal Name</label>
+        <input type="text" id="journalSearch" placeholder="Search by journal">
+      </div>
+
+      <div class="filter-group">
+        <label>Area</label>
+        <div class="multi-select" id="areaMulti"></div>
+      </div>
+
+      <div class="filter-group">
+        <label>Position</label>
+        <div class="multi-select" id="positionMulti"></div>
+      </div>
+
+      <div class="filter-group">
+        <label>Rawls Journal List Rankings</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="rank5"> 5</label>
+          <label><input type="checkbox" id="rank5star"> 5*</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>UTD Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="utdYes"> Yes</label>
+          <label><input type="checkbox" id="utdNo"> No</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Financial Times Journal</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="ftYes"> Yes</label>
+          <label><input type="checkbox" id="ftNo"> No</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Author Rank</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="author1"> 1st Author</label>
+          <label><input type="checkbox" id="author2"> 2nd Author</label>
+        </div>
+      </div>
+      <div class="filter-group">
+  <label>Currently at Rawls</label>
+  <div class="checkbox-group">
+    <label><input type="checkbox" id="currentYes"> Yes</label>
+    <label><input type="checkbox" id="currentNo"> No</label>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="lastName">Last Name <button class="sort-arrow" type="button" aria-label="Sort by last name">↕</button></th>
+          <th class="sortable" data-sort="firstName">First Name <button class="sort-arrow" type="button" aria-label="Sort by first name">↕</button></th>
+          <th>Start Date at Rawls</th>
+          <th>End Date at Rawls</th>
+          <th>Position</th>
+          <th>Area</th>
+          <th class="sortable" data-sort="accdate">Acceptance Date <button class="sort-arrow" type="button" aria-label="Sort by acceptance date">↕</button></th>
+          <th class="sortable" data-sort="pubdate">Publication Date <button class="sort-arrow" type="button" aria-label="Sort by publication date">↕</button></th>
+          <th>Year</th>
+          <th>Article Title</th>
+          <th>Journal</th>
+          <th>Rawls Journal List Ranking</th>
+          <th>UTD</th>
+          <th>Financial Times</th>
+          <th>Author Rank</th>
+          <th>Number of Authors</th>
+          <th>Article Link</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  // ---------- EXPORT SUITE (XLSX / CSV / SUMMARY) ----------
+  function getExportRows() {
+    return (currentRows && currentRows.length) ? currentRows : data;
+  }
+
+  function buildExportData(rows) {
+    // Single source of truth for column order + values
+    return rows.map(r => ({
+      "Last Name": r.lastName || "",
+      "First Name": r.firstName || "",
+      "Start Date at Rawls": r.startDateAtRawls || "",
+      "End Date at Rawls": r.endDateAtRawls || "",
+      "Position": r.position || "",
+      "Area": r.area || "",
+      "Acceptance Date": r.accdate || "",  
+      "Publication Date": r.pubdate || "",
+      "Year": r.year || "",
+      "Article Title": r.articleTitle || "",
+      "Journal": r.journalName || "",
+      "Rawls Journal List Ranking": r.ranking || "",
+      "UTD": r.utdJournal || "",
+      "Financial Times": r.ftJournal || "",
+      "Author Rank": r.authorRank || "",
+      "Number of Authors": r.numAuthors || "",
+      "Article Link": r.articleLink || ""
+    }));
+  }
+
+  function downloadXlsx(filename, sheetName, jsonRows) {
+    const ws = XLSX.utils.json_to_sheet(jsonRows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, filename);
+  }
+
+  function exportDataAsXlsx() {
+    const rows = getExportRows();
+    if (!rows || rows.length === 0) { alert("There are no rows to export."); return; }
+
+    const out = buildExportData(rows);
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadXlsx(`Rawls_Publications_Export_${stamp}.xlsx`, "Results", out);
+  }
+
+  function exportDataAsCsv() {
+    const rows = getExportRows();
+    if (!rows || rows.length === 0) { alert("There are no rows to export."); return; }
+
+    const out = buildExportData(rows);
+    const ws = XLSX.utils.json_to_sheet(out);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Rawls_Publications_Export.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportSummaryOnlyXlsx() {
+    const rows = getExportRows();
+    if (!rows || rows.length === 0) { alert("There are no rows to summarize."); return; }
+
+    const wb = XLSX.utils.book_new();
+
+    // Overview sets
+    const facultySet = new Set();
+    const yearSet = new Set();
+    const areaSet = new Set();
+
+    rows.forEach(r => {
+      const f = `${(r.lastName || "").trim()}, ${(r.firstName || "").trim()}`.replace(/^,\s*|,\s*$/g, "").trim();
+      if (f) facultySet.add(f);
+      if (r.year) yearSet.add(String(r.year));
+      if (r.area) areaSet.add(String(r.area));
+    });
+
+    const overview = [
+      { Metric: "Total articles (filtered)", Value: rows.length },
+      { Metric: "Distinct faculty (filtered)", Value: facultySet.size },
+      { Metric: "Distinct years (filtered)", Value: yearSet.size },
+      { Metric: "Distinct areas (filtered)", Value: areaSet.size }
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(overview), "Summary_Overview");
+
+    // By Faculty
+    const facultySummary = {};
+    rows.forEach(r => {
+      const f = `${(r.lastName || "").trim()}, ${(r.firstName || "").trim()}`.replace(/^,\s*|,\s*$/g, "").trim();
+      if (!f) return;
+      facultySummary[f] = (facultySummary[f] || 0) + 1;
+    });
+    const facultyRows = Object.keys(facultySummary).sort().map(name => ({
+      "Faculty": name,
+      "Total Articles": facultySummary[name]
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(facultyRows), "By_Faculty");
+
+    // By Year
+    const yearSummary = {};
+    rows.forEach(r => {
+      const y = String(r.year || "").trim();
+      if (!y) return;
+      yearSummary[y] = (yearSummary[y] || 0) + 1;
+    });
+    const yearRows = Object.keys(yearSummary).sort().map(y => ({
+      "Year": y,
+      "Total Articles": yearSummary[y]
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(yearRows), "By_Year");
+
+    // By Area + Year
+    const areaYearSummary = {};
+    rows.forEach(r => {
+      const a = String(r.area || "").trim();
+      const y = String(r.year || "").trim();
+      if (!a || !y) return;
+      if (!areaYearSummary[a]) areaYearSummary[a] = {};
+      areaYearSummary[a][y] = (areaYearSummary[a][y] || 0) + 1;
+    });
+    const areaYearRows = [];
+    Object.keys(areaYearSummary).sort().forEach(a => {
+      Object.keys(areaYearSummary[a]).sort().forEach(y => {
+        areaYearRows.push({ "Area": a, "Year": y, "Total Articles": areaYearSummary[a][y] });
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(areaYearRows), "By_Area_Year");
+
+    // Optional: Category counts (Ranking 5*, 5, UTD Yes, FT Yes)
+    const catSummary = {};
+    rows.forEach(r => {
+      const cats = [];
+      if (String(r.ranking).trim() === "5*") cats.push("5*");
+      if (String(r.ranking).trim() === "5")  cats.push("5");
+      if (String(r.utdJournal).trim() === "Yes") cats.push("UTD");
+      if (String(r.ftJournal).trim() === "Yes")  cats.push("FT");
+
+      const a = String(r.area || "").trim();
+      const y = String(r.year || "").trim();
+      const f = `${(r.lastName || "").trim()}, ${(r.firstName || "").trim()}`.replace(/^,\s*|,\s*$/g, "").trim();
+      if (!a || !y || !f || cats.length === 0) return;
+
+      cats.forEach(cat => {
+        const key = `${cat}||${a}||${y}||${f}`;
+        catSummary[key] = (catSummary[key] || 0) + 1;
+      });
+    });
+
+    const catRows = Object.keys(catSummary).sort().map(key => {
+      const [cat, area, year, faculty] = key.split("||");
+      return {
+        "Category (5*,5,UTD,FT)": cat,
+        "Area": area,
+        "Year": year,
+        "Faculty": faculty,
+        "Total Articles": catSummary[key]
+      };
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), "By_Category_Area_Year_Fac");
+
+    const stamp = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `Rawls_Publications_Summary_${stamp}.xlsx`);
+  }
+
+  // Simple export chooser (no modal needed)
+ // ---------- EXPORT DROPDOWN (replaces prompt) ----------
+function closeExportMenu(){
+  const menu = document.getElementById("exportMenu");
+  if(menu) menu.classList.remove("open");
+  const btn = document.getElementById("exportBtn");
+  if(btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function toggleExportMenu(){
+  const menu = document.getElementById("exportMenu");
+  const btn = document.getElementById("exportBtn");
+  if(!menu || !btn) return;
+
+  const isOpen = menu.classList.toggle("open");
+  btn.setAttribute("aria-expanded", String(isOpen));
+}
+
+
+  let data = [];
+  let currentRows = [];
+
+  const elements = {
+    lastNameSearch: document.getElementById("lastNameSearch"),
+    firstNameSearch: document.getElementById("firstNameSearch"),
+    exactNameMatch: document.getElementById("exactNameMatch"),
+    keywordSearch: document.getElementById("keywordSearch"),
+    titleSearch: document.getElementById("titleSearch"),
+    journalSearch: document.getElementById("journalSearch"),
+    utdYes: document.getElementById("utdYes"),
+    utdNo: document.getElementById("utdNo"),
+    ftYes: document.getElementById("ftYes"),
+    ftNo: document.getElementById("ftNo"),
+    rank5: document.getElementById("rank5"),
+    rank5star: document.getElementById("rank5star"),
+    author1: document.getElementById("author1"),
+    author2: document.getElementById("author2"),
+    resultsBody: document.getElementById("resultsBody"),
+    resultsCount: document.getElementById("resultsCount"),
+    clearFilters: document.getElementById("clearFilters"),
+    exportBtn: document.getElementById("exportBtn"),
+    areaMulti: document.getElementById("areaMulti"),
+    positionMulti: document.getElementById("positionMulti"),
+    yearMulti: document.getElementById("yearMulti"),
+    advancedToggle: document.getElementById("advancedToggle"),
+    advancedPanel: document.getElementById("advancedPanel"),
+    loadHint: document.getElementById("loadHint"),
+    dbFile: document.getElementById("dbFile"),
+    tryFetchBtn: document.getElementById("tryFetchBtn"),
+    currentYes: document.getElementById("currentYes"),
+currentNo: document.getElementById("currentNo"),
+    accYearMulti: document.getElementById("accYearMulti"),
+
+
+
+  };
+
+  const multiSelectControls = {};
+
+  // ---------- helpers ----------
+  function toTime(v){
+  const d = parseDateLoose(v);
+  return d ? d.getTime() : -Infinity;
+}
+
+let sortState = { key: "accdate", dir: "desc" };
+
+
+
+function parseDateLoose(v){
+  const s = String(v || "").trim();
+  if(!s) return null;
+
+  // If already a Date-ish string like "MM/DD/YYYY"
+  const d = new Date(s);
+  if(!isNaN(d.getTime())) return d;
+
+  return null;
+}
+function getYearFromDateLoose(v){
+  const d = parseDateLoose(v);
+  return d ? String(d.getFullYear()) : "";
+}
+
+function compareValues(a, b, key){
+  if(key === "pubdate"){
+    const da = parseDateLoose(a.pubdate);
+    const db = parseDateLoose(b.pubdate);
+    const ta = da ? da.getTime() : -Infinity;
+    const tb = db ? db.getTime() : -Infinity;
+    return ta - tb;
+  }
+
+  // ✅ NEW
+  if(key === "accdate"){
+    const da = parseDateLoose(a.accdate);
+    const db = parseDateLoose(b.accdate);
+    const ta = da ? da.getTime() : -Infinity;
+    const tb = db ? db.getTime() : -Infinity;
+    return ta - tb;
+  }
+
+  const sa = fold(a[key] || "");
+  const sb = fold(b[key] || "");
+  return sa.localeCompare(sb);
+}
+
+
+function sortRows(rows){
+  const { key, dir } = sortState;
+  if(!key) return rows;
+
+  const factor = dir === "asc" ? 1 : -1;
+
+  return rows.slice().sort((a,b)=>{
+    const c = compareValues(a,b,key);
+    if(c !== 0) return c * factor;
+
+    // tie-breakers to keep it stable-ish
+    const t1 = fold(a.lastName||"").localeCompare(fold(b.lastName||""));
+    if(t1 !== 0) return t1;
+    return fold(a.firstName||"").localeCompare(fold(b.firstName||""));
+  });
+}
+
+  
+  function canon(str){
+    return String(str||"").toLowerCase().replace(/\\s+/g," ").replace(/[^a-z0-9 ]/g,"").trim();
+  }
+ function fold(s){
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")  // ← FIXED
+    .replace(/\./g, "")
+    .trim()
+    .toLowerCase();
+}
+
+  function safeUrl(u){
+    const s=String(u||"").trim();
+    if(!s) return "";
+   if (/^https?:\/\//i.test(s)) return s;
+    return "";
+  }
+  function parseNameTokens(input){
+    const raw=String(input||"").trim();
+    return raw ? raw.split(/[\\s,]+/).filter(Boolean) : [];
+  }
+function isPrefixQuery(q){ return /\*$/.test(q); }
+function stripWildcard(q){ return q.replace(/\*+$/,""); }
+
+
+  function levenshtein(a,b){
+    a=fold(a); b=fold(b);
+    const m=a.length,n=b.length;
+    if(!m) return n; if(!n) return m;
+    const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));
+    for(let i=0;i<=m;i++) dp[i][0]=i;
+    for(let j=0;j<=n;j++) dp[0][j]=j;
+    for(let i=1;i<=m;i++){
+      for(let j=1;j<=n;j++){
+        const cost=a[i-1]===b[j-1]?0:1;
+        dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+cost);
+      }
+    }
+    return dp[m][n];
+  }
+function allowedEdits(qLen){
+  // conservative: short names only 1 typo; longer can tolerate 2
+  if(qLen <= 4) return 0;   // "ti" / "al" shouldn't fuzzy at all
+  if(qLen <= 7) return 1;   // eric/erik, walden/wolden
+  return 2;                 // longer names only
+}
+
+function fuzzyOK(q, w){
+  q = fold(q);
+  w = fold(w);
+
+  if(!q || !w) return false;
+
+  // Don't fuzzy match tiny queries
+  const maxEdits = allowedEdits(q.length);
+  if(maxEdits === 0) return false;
+
+  // Guardrail 1: same starting letter (prevents Walden -> Allen)
+  if(q[0] !== w[0]) return false;
+
+  // Guardrail 2: for longer queries, require same first 2 letters
+  // (keeps walden from drifting to waldron if edits would allow it)
+  if(q.length >= 6 && w.length >= 6 && q.slice(0,2) !== w.slice(0,2)) return false;
+
+  // Guardrail 3: avoid big length differences
+  if(Math.abs(q.length - w.length) > maxEdits) return false;
+
+  return levenshtein(q, w) <= maxEdits;
+}
+
+
+  function matchesInitial(queryToken, name){
+    const q=fold(queryToken), n=fold(name);
+    if(!q||!n) return false;
+    return q.length===1 && n[0]===q;
+  }
+function tokenMatchOneField(queryToken, candidate, exactMode){
+  const qRaw = String(queryToken||"").trim();
+  const cRaw = String(candidate||"");
+  const q = fold(qRaw);
+  const c = fold(cRaw);
+
+  if(!q) return true;
+  if(!c) return false;
+
+  const words = c.split(/[^a-z0-9]+/).filter(Boolean);
+
+  if(exactMode){
+    if(words.some(w => w === q || w.startsWith(q))) return true;
+    return words.some(w => fuzzyOK(q, w)); // ✅ allow minor typo
+  }
+
+  if(words.some(w => w.startsWith(q))) return true;
+  return words.some(w => fuzzyOK(q, w));
+}
+
+  // Our real Excel has personname like "LAST, FIRST M"
+  function splitPersonName(personname){
+    const s=String(personname||"").trim();
+    if(!s) return {first:"", last:""};
+    // expected "LAST, FIRST ..."
+    const parts=s.split(",");
+    if(parts.length>=2){
+      const last=parts[0].trim();
+      const first=parts.slice(1).join(",").trim().split(/\\s+/)[0] || "";
+      return {first, last};
+    }
+    // fallback: "First Last"
+    const tokens=s.split(/\\s+/).filter(Boolean);
+    if(tokens.length===1) return {first:"", last:tokens[0]};
+    return {first:tokens[0], last:tokens[tokens.length-1]};
+  }
+
+  function normalizeRowKeys(row){
+    const out={};
+    Object.keys(row||{}).forEach(k=>{ out[canon(k)]=row[k]; });
+    return out;
+  }
+
+  function pick(r, keys){
+    for(const k of keys){
+      const v=r[k];
+      if(v!==undefined && v!==null && String(v).trim()!=="") return v;
+    }
+    return "";
+  }
+
+  // choose best sheet by matching ANY of these headers (your Database.xlsx uses these)
+  function findBestSheet(workbook){
+  const want = [
+    "personname","start date at rawls","end date at rawls","position","area",
+    "publication date","pub date","year","article title","journal name",
+    "ranking","journal ranking","utd journal","financial times journal",
+    "openaccessurl","article link"
+  ];
+
+  let best = { name: workbook.SheetNames[0], score: -1, headerRow: 0 };
+
+  workbook.SheetNames.forEach(name=>{
+    const sheet = workbook.Sheets[name];
+    const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, blankrows: false });
+
+    // scan first 30 rows to find the best header row
+    for (let r = 0; r < Math.min(30, grid.length); r++) {
+      const headers = (grid[r] || []).map(canon);
+      const score = want.filter(h => headers.includes(h)).length;
+
+      if (score > best.score) {
+        best = { name, score, headerRow: r };
+      }
+    }
+  });
+
+  console.log("Using sheet:", best.name, "score:", best.score, "headerRow:", best.headerRow);
+  return best; // return object now
+}
+
+  function buildMultiSelect(container, values, placeholderText){
+    const unique = [...new Set(
+  values
+    .map(v => String(v || "").trim())
+    .filter(v => v !== "")
+)].sort();
+    container.innerHTML = `
+      <div class="multi-select-header">
+        <span class="multi-select-label multi-select-placeholder">${placeholderText}</span>
+        <span class="multi-select-arrow">▾</span>
+      </div>
+      <div class="multi-select-menu"></div>
+    `;
+    const header=container.querySelector(".multi-select-header");
+    const label=container.querySelector(".multi-select-label");
+    const menu=container.querySelector(".multi-select-menu");
+
+    unique.forEach(v=>{
+      const item=document.createElement("label");
+      item.className="multi-select-option";
+      const cb=document.createElement("input");
+      cb.type="checkbox"; cb.value=String(v);
+      const sp=document.createElement("span");
+      sp.textContent=String(v);
+      item.appendChild(cb); item.appendChild(sp);
+      menu.appendChild(item);
+    });
+
+    function getValues(){
+      return Array.from(menu.querySelectorAll("input:checked")).map(i=>i.value);
+    }
+    function updateLabel(trigger){
+      const selected=getValues();
+      if(!selected.length){
+        label.textContent=placeholderText;
+        label.classList.add("multi-select-placeholder");
+      }else if(selected.length<=2){
+        label.textContent=selected.join(", ");
+        label.classList.remove("multi-select-placeholder");
+      }else{
+        label.textContent=`${selected.length} selected`;
+        label.classList.remove("multi-select-placeholder");
+      }
+      if(trigger) applyFilters();
+    }
+
+    header.addEventListener("click", ()=>{
+      const isOpen=container.classList.contains("open");
+      document.querySelectorAll(".multi-select.open").forEach(el=>el.classList.remove("open"));
+      if(!isOpen) container.classList.add("open");
+    });
+    menu.addEventListener("change", ()=>updateLabel(true));
+    document.addEventListener("click",(e)=>{ if(!container.contains(e.target)) container.classList.remove("open"); });
+
+    function clear(){
+      menu.querySelectorAll("input:checked").forEach(i=>i.checked=false);
+      updateLabel(false);
+    }
+    updateLabel(false);
+    return {getValues, clear};
+  }
+
+ function populateMultiSelects(){
+  multiSelectControls.area = buildMultiSelect(elements.areaMulti, data.map(d=>d.area), "All Areas");
+  multiSelectControls.position = buildMultiSelect(elements.positionMulti, data.map(d=>d.position), "All Positions");
+
+  // ✅ NEW: Acceptance year derived from Acceptance Date
+  multiSelectControls.accYear = buildMultiSelect(
+    elements.accYearMulti,
+    data.map(d => getYearFromDateLoose(d.accdate)),
+    "All Acceptance Years"
+  );
+
+  // Publication year from your existing Year column
+  multiSelectControls.year = buildMultiSelect(elements.yearMulti, data.map(d=>d.year), "All Publication Years");
+}
+
+  function renderTable(rows){
+    currentRows = rows.slice();
+   if(!rows.length){
+  elements.resultsBody.innerHTML = `
+    <tr>
+      <td colspan="17" style="padding:26px;">
+        <div style="
+          border:1px solid rgba(186,12,47,.18);
+          background:rgba(186,12,47,.05);
+          border-radius:14px;
+          padding:16px 18px;
+          color:#3a0b15;
+          font-weight:650;">
+          No results found. Try clearing filters or broadening your search.
+        </div>
+      </td>
+    </tr>
+  `;
+  elements.resultsCount.textContent = `Showing 0 results`;
+  return;
+}
+
+    const frag=document.createDocumentFragment();
+
+    rows.forEach(r=>{
+      const tr=document.createElement("tr");
+      const url=safeUrl(r.articleLink);
+   tr.innerHTML = `
+  <td>${r.lastName||""}</td>
+  <td>${r.firstName||""}</td>
+  <td>${r.startDateAtRawls||""}</td>
+  <td>${r.endDateAtRawls||""}</td>
+  <td>${r.position||""}</td>
+  <td>${r.area||""}</td>
+  <td>${r.accdate||""}</td>
+  <td>${r.pubdate||""}</td>
+  <td>${r.year||""}</td>
+  <td>${r.articleTitle||""}</td>
+  <td>${r.journalName||""}</td>
+  <td>${r.ranking ? `<span class="badge badge-blue">${r.ranking}</span>` : ""}</td>
+  <td>${r.utdJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.utdJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+  <td>${r.ftJournal==="Yes" ? `<span class="badge badge-green">Yes</span>` : (r.ftJournal==="No" ? `<span class="badge badge-no">No</span>` : "")}</td>
+  <td>${r.authorRank ? `<span class="badge badge-blue">${r.authorRank}</span>` : ""}</td>
+  <td>${r.numAuthors ? `<span class="badge badge-blue">${r.numAuthors}</span>` : ""}</td>
+  <td>${url ? `<a class="link-btn" href="${url}" target="_blank" rel="noopener noreferrer">Open</a>` : `<span class="link-btn disabled">No link</span>`}</td>
+`;
+
+      frag.appendChild(tr);
+    });
+
+    elements.resultsBody.innerHTML = "";
+elements.resultsBody.appendChild(frag);
+
+elements.resultsCount.textContent = `Showing ${rows.length} result${rows.length === 1 ? "" : "s"}`;
+}
+
+ function applyFilters(){
+  let firstQ = elements.firstNameSearch.value.trim();
+  let lastQ  = elements.lastNameSearch.value.trim();
+  const exact = elements.exactNameMatch.checked;
+
+  // If user typed "E Walden" in FIRST box, split it
+  if(firstQ && !lastQ){
+    const parts = firstQ.split(/\s+/).filter(Boolean);
+    if(parts.length >= 2){
+      firstQ = parts[0];
+      lastQ  = parts.slice(1).join(" ");
+    }
+  }
+
+  const firstTokens = parseNameTokens(firstQ);
+  const lastTokens  = parseNameTokens(lastQ);
+
+  const areaVals = multiSelectControls.area ? multiSelectControls.area.getValues() : [];
+  const posVals  = multiSelectControls.position ? multiSelectControls.position.getValues() : [];
+
+  const utdY=elements.utdYes.checked, utdN=elements.utdNo.checked;
+  const ftY=elements.ftYes.checked, ftN=elements.ftNo.checked;
+  const r5=elements.rank5.checked, r5s=elements.rank5star.checked;
+const curY = elements.currentYes.checked, curN = elements.currentNo.checked;
+
+  const kq = elements.keywordSearch.value.toLowerCase();
+  const tq = elements.titleSearch.value.toLowerCase();
+  const jq = elements.journalSearch.value.toLowerCase();
+const accYearVals = multiSelectControls.accYear ? multiSelectControls.accYear.getValues() : [];
+const yearVals    = multiSelectControls.year ? multiSelectControls.year.getValues() : [];
+
+  const rows = data.filter(d=>{
+    const first = d.firstName || "";
+    const last  = d.lastName  || "";
+
+    for(const t of firstTokens){
+      if(!tokenMatchOneField(t, first, exact) && !tokenMatchOneField(t, last, exact)) return false;
+    }
+    for(const t of lastTokens){
+      if(!tokenMatchOneField(t, last, exact) && !tokenMatchOneField(t, first, exact)) return false;
+    }
+    // ✅ Acceptance Year filter (from Acceptance Date)
+if (accYearVals.length){
+  const ay = getYearFromDateLoose(d.accdate);
+  if(!accYearVals.includes(ay)) return false;
+}
+
+// Publication Year filter (existing Year column)
+if (yearVals.length && !yearVals.includes(String(d.year))) return false;
+
+// Currently at Rawls filter: Yes => End Date is N/A, No => End Date is NOT N/A
+const endVal = fold(d.endDateAtRawls || "");
+const isNAEnd =
+  !endVal ||
+  endVal === "n/a" ||
+  endVal === "na" ||
+  endVal === "n.a" ||
+  endVal === "n.a.";
+
+if ((curY || curN) && !((curY && isNAEnd) || (curN && !isNAEnd))) return false;
+
+    if(kq){
+      const inTitle = (d.articleTitle||"").toLowerCase().includes(kq);
+      const inJour  = (d.journalName||"").toLowerCase().includes(kq);
+      if(!inTitle && !inJour) return false;
+    }
+    if(tq && !String(d.articleTitle||"").toLowerCase().includes(tq)) return false;
+    if(jq && !String(d.journalName||"").toLowerCase().includes(jq)) return false;
+
+    if(areaVals.length && !areaVals.includes(d.area)) return false;
+    if(posVals.length  && !posVals.includes(d.position)) return false;
+    if(yearVals.length && !yearVals.includes(String(d.year))) return false;
+
+    if((utdY||utdN) && !((utdY && d.utdJournal==="Yes") || (utdN && d.utdJournal==="No"))) return false;
+    if((ftY||ftN)   && !((ftY && d.ftJournal==="Yes")  || (ftN && d.ftJournal==="No"))) return false;
+
+    if((r5 || r5s) && !((r5 && d.ranking==="5") || (r5s && d.ranking==="5*"))) return false;
+
+    const a1 = elements.author1.checked;
+    const a2 = elements.author2.checked;
+    if((a1 || a2) && !((a1 && String(d.authorRank)==="1") || (a2 && String(d.authorRank)==="2"))) return false;
+
+    return true;
+  });
+
+  renderTable(sortRows(rows));
+}
+
+
+  function clearAllFilters(){
+    elements.firstNameSearch.value="";
+    elements.lastNameSearch.value="";
+    elements.exactNameMatch.checked=false;
+    elements.keywordSearch.value="";
+    elements.titleSearch.value="";
+    elements.journalSearch.value="";
+    if(multiSelectControls.area) multiSelectControls.area.clear();
+    if(multiSelectControls.position) multiSelectControls.position.clear();
+    if(multiSelectControls.year) multiSelectControls.year.clear();
+    elements.utdYes.checked=elements.utdNo.checked=false;
+    elements.ftYes.checked=elements.ftNo.checked=false;
+    elements.rank5.checked=elements.rank5star.checked=false;
+    elements.author1.checked = false;
+    elements.author2.checked = false;
+    elements.currentYes.checked = elements.currentNo.checked = false;
+    if(multiSelectControls.accYear) multiSelectControls.accYear.clear();
+if(multiSelectControls.year)    multiSelectControls.year.clear();
+
+
+
+    renderTable(sortRows(data));
+
+  }
+
+  function showLoadHint(msg){
+    elements.loadHint.style.display="block";
+    elements.resultsCount.textContent = msg || "Database not loaded.";
+  }
+function excelDateToJS(value) {
+  if (!value) return "";
+  if (typeof value === "number") {
+    const date = new Date((value - 25569) * 86400 * 1000);
+    return date.toLocaleDateString("en-US");
+  }
+  return value; // already text
+}
+
+function ingestWorkbook(workbook) {
+  // ✅ Pull specifically from sheet named "14"
+  const sheetName = workbook.SheetNames.find(n => String(n).trim() === "14");
+
+  if (!sheetName) {
+    showLoadHint(`❌ Sheet named "14" not found. Available: ${workbook.SheetNames.join(", ")}`);
+    return;
+  }
+
+  const sheet = workbook.Sheets[sheetName];
+  console.log("Using sheet:", sheetName);
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    range: "A2:Q1048576", // start after header
+    header: [
+      "lastname",
+      "firstname",
+      "startDateAtRawls",
+      "endDateAtRawls",
+      "position",
+      "area",
+      "accdate",
+      "pubdate",
+      "year",
+      "articleTitle",
+      "journalName",
+      "ranking",
+      "utdJournal",
+      "ftJournal",
+      "authorRank",
+      "numAuthors",
+      "articleLink"
+    ],
+    defval: ""
+  });
+
+  data = rows.map(r => ({
+    lastName: r.lastname,
+    firstName: r.firstname,
+    startDateAtRawls: excelDateToJS(r.startDateAtRawls),
+    endDateAtRawls: excelDateToJS(r.endDateAtRawls),
+    position: r.position,
+    area: r.area,
+    accdate: excelDateToJS(r.accdate),
+    pubdate: excelDateToJS(r.pubdate),
+    year: String(r.year),
+    articleTitle: r.articleTitle,
+    journalName: r.journalName,
+    ranking: String(r.ranking),
+    utdJournal: String(r.utdJournal),
+    ftJournal: String(r.ftJournal),
+    authorRank: String(r.authorRank),
+    numAuthors: String(r.numAuthors),
+    articleLink: String(r.articleLink)
+  }));
+
+  populateMultiSelects();
+  renderTable(sortRows(data));
+  elements.loadHint.style.display = "none";
+}
+
+
+
+  async function tryLoadViaFetch(){
+  const candidates = [
+    "Database.xlsx",
+    "database.xlsx",
+    "DatabaseA.xlsx"
+  ];
+
+  for (const name of candidates) {
+    try {
+      const url = new URL(name, window.location.href).toString();
+      console.log("Trying:", url);
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`${name} -> HTTP ${res.status}`);
+
+      const buf = await res.arrayBuffer();
+      const workbook = XLSX.read(buf, { type:"array" });
+      ingestWorkbook(workbook);
+      console.log("Loaded successfully from:", name);
+      return;
+    } catch (err) {
+      console.warn("Failed:", err.message || err);
+    }
+  }
+
+  showLoadHint("❌ Could not load the Excel file. Check GitHub Pages folder + exact filename/case.");
+}
+
+
+  function attachListeners(){
+    const debounce=(fn,ms=120)=>{ let t; return ()=>{ clearTimeout(t); t=setTimeout(fn,ms); }; };
+    const debouncedApply = debounce(applyFilters, 120);
+
+    [elements.firstNameSearch, elements.lastNameSearch, elements.keywordSearch, elements.titleSearch, elements.journalSearch]
+      .forEach(el=>el.addEventListener("input", debouncedApply));
+
+[elements.exactNameMatch,
+ elements.utdYes, elements.utdNo,
+ elements.ftYes, elements.ftNo,
+ elements.rank5, elements.rank5star,
+ elements.author1, elements.author2,
+ elements.currentYes, elements.currentNo
+].forEach(el => el.addEventListener("input", applyFilters));
+
+
+
+    elements.clearFilters.addEventListener("click", clearAllFilters);
+// Export dropdown open/close
+elements.exportBtn.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  toggleExportMenu();
+});
+
+// Pick an export option
+document.getElementById("exportMenu").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-export]");
+  if(!btn) return;
+
+  const choice = btn.getAttribute("data-export");
+  closeExportMenu();
+
+  if(choice === "xlsx") exportDataAsXlsx();
+  else if(choice === "csv") exportDataAsCsv();
+  else if(choice === "summary") exportSummaryOnlyXlsx();
+});
+
+// Close when clicking outside
+document.addEventListener("click", (e)=>{
+  const wrap = document.querySelector(".export-wrap");
+  if(wrap && !wrap.contains(e.target)) closeExportMenu();
+});
+
+// Close with Escape
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape") closeExportMenu();
+});
+
+
+
+
+    elements.advancedToggle.addEventListener("click", ()=>{
+      const open = elements.advancedPanel.classList.toggle("collapsed") === false;
+      elements.advancedToggle.classList.toggle("open", open);
+      elements.advancedToggle.setAttribute("aria-expanded", String(open));
+    });
+
+
+    // upload fallback (works even on file://)
+    elements.dbFile.addEventListener("change", async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        const buf = await file.arrayBuffer();
+        const workbook = XLSX.read(buf, { type:"array" });
+        ingestWorkbook(workbook);
+      }catch(err){
+        console.error(err);
+        showLoadHint("❌ Could not read that Excel file. Make sure it's .xlsx and not protected.");
+      }
+      });
+// Click-to-sort on header arrows (Last, First, Acceptance Date)
+document.querySelectorAll("th.sortable").forEach(th=>{
+  th.addEventListener("click", (e)=>{
+    // allow clicks on the th OR the arrow button
+    const key = th.getAttribute("data-sort");
+    if(!key) return;
+
+    // toggle direction if clicking same column again
+    if(sortState.key === key){
+      sortState.dir = (sortState.dir === "asc") ? "desc" : "asc";
+    }else{
+      sortState.key = key;
+    const isDateKey = (key === "pubdate" || key === "accdate");
+sortState.dir = isDateKey ? "desc" : "asc";
+
+    }
+
+    // update arrow symbols
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn=>btn.textContent="↕");
+    const arrow = th.querySelector(".sort-arrow");
+    arrow.textContent = (sortState.dir === "asc") ? "↑" : "↓";
+
+    applyFilters();
+  });
+});
+
+    elements.tryFetchBtn.addEventListener("click", ()=>tryLoadViaFetch());
+  }
+
+document.addEventListener("DOMContentLoaded", () => {
+  attachListeners();
+
+  const th = document.querySelector('th.sortable[data-sort="accdate"]');
+  if (th) {
+    document.querySelectorAll("th.sortable .sort-arrow").forEach(btn => btn.textContent = "↕");
+    const arrow = th.querySelector(".sort-arrow");
+    if (arrow) arrow.textContent = "↓";
+  }
+
+  tryLoadViaFetch();
+});
+/* ===============================
+   TUTORIAL / WALKTHROUGH MODE
+================================ */
+/* ===============================
+   TUTORIAL / WALKTHROUGH MODE
+================================ */
+(function(){
+  const TOUR_SEEN_KEY = "rawls_pubdb_tour_seen_v1";
+
+  const tour = {
+    steps: [],
+    index: 0,
+    overlay: null,
+    spotlight: null,
+    card: null,
+    isOpen: false
+  };
+
+  function qs(sel){ return document.querySelector(sel); }
+
+  function getRect(el){
+    const r = el.getBoundingClientRect();
+    return { top:r.top, left:r.left, width:r.width, height:r.height, right:r.right, bottom:r.bottom };
+  }
+
+ function scrollIntoViewIfNeeded(el){
+  if(el.closest(".rawls-header") || el.closest(".rawls-header-actions")) return;
+  const r = el.getBoundingClientRect();
+  const pad = 90;
+  const inView = r.top >= pad && r.bottom <= (window.innerHeight - 40);
+  if(!inView) el.scrollIntoView({ behavior:"smooth", block:"center", inline:"nearest" });
+}
+
+
+  function runExit(i){
+    const s = tour.steps[i];
+    if(s && typeof s.onExit === "function"){
+      try{ s.onExit(); }catch(e){ console.warn(e); }
+    }
+  }
+  function runEnter(i){
+    const s = tour.steps[i];
+    if(s && typeof s.onEnter === "function"){
+      try{ s.onEnter(); }catch(e){ console.warn(e); }
+    }
+  }
+
+  function openAdvancedFilters(){
+    const panel = qs("#advancedPanel");
+    const toggle = qs("#advancedToggle");
+    if(!panel || !toggle) return;
+    panel.classList.remove("collapsed");
+    toggle.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
+  }
+
+  function closeAdvancedFilters(){
+    const panel = qs("#advancedPanel");
+    const toggle = qs("#advancedToggle");
+    if(!panel || !toggle) return;
+    panel.classList.add("collapsed");
+    toggle.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  function openExportMenu(){
+    const menu = qs("#exportMenu");
+    const btn  = qs("#exportBtn");
+    if(!menu || !btn) return;
+    menu.classList.add("open");
+    btn.setAttribute("aria-expanded", "true");
+  }
+
+  // IMPORTANT: keep this name local (inside IIFE). It won't break your global closeExportMenu().
+  function closeExportMenuLocal(){
+    const menu = qs("#exportMenu");
+    const btn  = qs("#exportBtn");
+    if(!menu || !btn) return;
+    menu.classList.remove("open");
+    btn.setAttribute("aria-expanded", "false");
+  }
+
+function buildSteps(){
+  const steps = [
+    {
+      el: () => qs(".filters"),
+      title: "Search & Filter Panel",
+      text: "Use this panel to filter the results. Apply keyword, author, or advanced filters."
+    },
+
+  
+    {
+      el: () => qs("#keywordSearch"),
+      title: "Keyword Search",
+      text: "Search by article title or journal name. This is the quickest way to find articles, journals, or keywords."
+    },
+    {
+      el: () => qs("#advancedPanel"),
+      title: "Advanced Filters",
+      text: "Filter by area, position, rankings, UTD/FT lists, and author rank.",
+      onEnter: () => openAdvancedFilters(),
+      onExit:  () => closeAdvancedFilters()
+    },
+    {
+      el: () => qs("#exportBtn"),
+      title: "Export",
+      text: "Export results as Excel, CSV, or a summary workbook with counts by faculty, year, and area.",
+      onEnter: () => openExportMenu(),
+      onExit:  () => closeExportMenuLocal()
+    },
+    {
+      el: () => qs("#clearFilters"),
+      title: "Clear Filters",
+      text: "Reset all filters and return to the full dataset."
+    },
+    {
+      el: () => qs(".table-container"),
+      title: "Results Table",
+      text: "View filtered publications here. Use column headers to sort results."
+    },
+      // ✅ NEW STEP: New Submission
+    {
+      el: () => qs('.app-header-actions .header-btn.primary'),
+      title: "New Submission",
+      text: "Submit a new publication entry using this form."
+    },
+
+    // ✅ NEW STEP: Request Modification
+    {
+      el: () => qs('.app-header-actions .header-btn:not(.primary)'),
+      title: "Request Modification",
+      text: "Request edits to an existing record using this form."
+    },
+
+    {
+      el: () => qs("#productivityBtn"),
+      title: "Productivity",
+      text: "This page shows Rawls Research Productivity across key publication categories, helping you quickly compare output by area and ranking"
+    },
+    {
+      el: () => qs("#aboutBtn"),
+      title: "About",
+      text: "Learn more about the Rawls Research database."
+    },
+    {
+      el: () => qs("#linkedinBtn"),
+      title: "LinkedIn",
+      text: "Visit Rawls Research on LinkedIn for updates and highlights."
+    },
+  ];
+
+  tour.steps = steps.filter(s => !!s.el());
+}
+
+
+  function createUI(){
+    tour.overlay = document.createElement("div");
+    tour.overlay.className = "tour-overlay";
+
+    tour.spotlight = document.createElement("div");
+    tour.spotlight.className = "tour-spotlight";
+
+    tour.card = document.createElement("div");
+    tour.card.className = "tour-card";
+    tour.card.innerHTML = `
+      <button class="tour-close-x" type="button" aria-label="Close tutorial">✕</button>
+      <div class="tour-title"></div>
+      <div class="tour-text"></div>
+      <div class="tour-actions">
+        <div class="tour-actions-left">
+          <button class="tour-btn" type="button" data-tour="back">Back</button>
+          <button class="tour-btn primary" type="button" data-tour="next">Next</button>
+          <button class="tour-btn ghost" type="button" data-tour="skip">Skip</button>
+        </div>
+        <div class="tour-step"></div>
+      </div>
+    `;
+
+    document.body.appendChild(tour.overlay);
+    document.body.appendChild(tour.spotlight);
+    document.body.appendChild(tour.card);
+
+    tour.overlay.addEventListener("click", (e)=> e.stopPropagation());
+
+    tour.card.querySelector(".tour-close-x").addEventListener("click", closeTour);
+    tour.card.querySelector('[data-tour="back"]').addEventListener("click", prevStep);
+    tour.card.querySelector('[data-tour="next"]').addEventListener("click", nextStep);
+    tour.card.querySelector('[data-tour="skip"]').addEventListener("click", closeTour);
+
+    document.addEventListener("keydown", onKeydown);
+    window.addEventListener("resize", rerender);
+  }
+
+  function destroyUI(){
+    if(tour.overlay) tour.overlay.remove();
+    if(tour.spotlight) tour.spotlight.remove();
+    if(tour.card) tour.card.remove();
+    tour.overlay = tour.spotlight = tour.card = null;
+
+    document.removeEventListener("keydown", onKeydown);
+    window.removeEventListener("resize", rerender);
+  }
+
+  function onKeydown(e){
+    if(!tour.isOpen) return;
+    if(e.key === "Escape") closeTour();
+    if(e.key === "ArrowRight") nextStep();
+    if(e.key === "ArrowLeft") prevStep();
+  }
+
+  function openTour({ force=false } = {}){
+    if(tour.isOpen) return;
+
+    if(!force){
+      try{ if(localStorage.getItem(TOUR_SEEN_KEY) === "1") return; }catch(_){}
+    }
+
+    buildSteps();
+    if(!tour.steps.length) return;
+
+    tour.index = 0;
+    tour.isOpen = true;
+    createUI();
+
+    runEnter(tour.index);
+    renderStep();
+  }
+
+  function closeTour(){
+    if(!tour.isOpen) return;
+
+    // ✅ run exit on current step + cleanup opened UI
+    runExit(tour.index);
+    closeExportMenuLocal();
+    closeAdvancedFilters();
+
+    tour.isOpen = false;
+    try{ localStorage.setItem(TOUR_SEEN_KEY, "1"); }catch(_){}
+
+    destroyUI();
+  }
+
+  function prevStep(){
+    if(!tour.isOpen) return;
+    runExit(tour.index);
+    tour.index = Math.max(0, tour.index - 1);
+    runEnter(tour.index);
+    renderStep();
+  }
+
+  function nextStep(){
+    if(!tour.isOpen) return;
+
+    runExit(tour.index);
+
+    if(tour.index >= tour.steps.length - 1){
+      closeTour();
+      return;
+    }
+
+    tour.index++;
+    runEnter(tour.index);
+    renderStep();
+  }
+
+  function rerender(){
+    if(!tour.isOpen) return;
+    renderStep(true);
+  }
+
+function placeCardNear(rect){
+  const card = tour.card;
+  const margin = 12;
+
+  const cardW = card.offsetWidth || 360;
+  const cardH = card.offsetHeight || 180;
+
+  const spaces = {
+    right:  window.innerWidth  - rect.right  - margin,
+    left:   rect.left          - margin,
+    bottom: window.innerHeight - rect.bottom - margin,
+    top:    rect.top           - margin
+  };
+
+  // preferred order
+  const order = ["right","left","bottom","top"];
+  const best = order
+    .map(pos => ({ pos, space: spaces[pos] }))
+    .sort((a,b)=> b.space - a.space)[0].pos;
+
+  let left = margin, top = margin;
+
+  if(best === "right"){
+    left = rect.right + margin;
+    top  = rect.top;
+  } else if(best === "left"){
+    left = rect.left - cardW - margin;
+    top  = rect.top;
+  } else if(best === "bottom"){
+    left = rect.left;
+    top  = rect.bottom + margin;
+  } else { // top
+    left = rect.left;
+    top  = rect.top - cardH - margin;
+  }
+
+  // clamp to viewport
+  left = Math.min(Math.max(margin, left), window.innerWidth  - cardW - margin);
+  top  = Math.min(Math.max(margin, top),  window.innerHeight - cardH - margin);
+
+  card.style.left = `${left}px`;
+  card.style.top  = `${top}px`;
+}
+
+
+  function renderStep(skipScroll){
+    const step = tour.steps[tour.index];
+    if(!step) return;
+
+    const el = step.el();
+    if(!el) return;
+
+    if(!skipScroll) scrollIntoViewIfNeeded(el);
+
+    setTimeout(()=>{
+      const rect = getRect(el);
+      const pad = 8;
+
+      tour.spotlight.style.top = `${Math.max(8, rect.top - pad)}px`;
+      tour.spotlight.style.left = `${Math.max(8, rect.left - pad)}px`;
+      tour.spotlight.style.width = `${Math.min(window.innerWidth - 16, rect.width + pad*2)}px`;
+      tour.spotlight.style.height = `${Math.min(window.innerHeight - 16, rect.height + pad*2)}px`;
+
+      tour.card.querySelector(".tour-title").textContent = step.title;
+      tour.card.querySelector(".tour-text").textContent = step.text;
+      tour.card.querySelector(".tour-step").textContent = `${tour.index + 1} / ${tour.steps.length}`;
+
+      const nextBtn = tour.card.querySelector('[data-tour="next"]');
+      nextBtn.textContent = (tour.index === tour.steps.length - 1) ? "Done" : "Next";
+
+      const backBtn = tour.card.querySelector('[data-tour="back"]');
+      backBtn.disabled = (tour.index === 0);
+      backBtn.style.opacity = backBtn.disabled ? ".55" : "1";
+      backBtn.style.pointerEvents = backBtn.disabled ? "none" : "auto";
+
+      placeCardNear(rect);
+    }, 180);
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    const btn = document.getElementById("tutorialBtn");
+    if(btn) btn.addEventListener("click", ()=>openTour({ force:true }));
+    // openTour(); // optional auto-open first time
+  });
+
+  window.RawlsTour = { open: openTour, close: closeTour };
+})();
+
+
+
+
+</script>
+</body>
+</html>
