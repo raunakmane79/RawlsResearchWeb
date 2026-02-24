@@ -663,6 +663,67 @@ h1{
   border: 1px solid var(--border2);
   transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
 }
+  /* ===============================
+   LOADING OVERLAY
+================================ */
+.loading-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 6000; /* above header + tour */
+  background: rgba(10,12,16,.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity .18s ease;
+}
+
+.loading-overlay.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-card{
+  width: min(420px, calc(100vw - 28px));
+  background: #fff;
+  border: 1px solid rgba(16,17,20,.10);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0,0,0,.24);
+  padding: 16px 18px;
+  text-align: center;
+}
+
+.loading-title{
+  font-weight: 900;
+  margin-top: 10px;
+  color: #101114;
+}
+
+.loading-sub{
+  margin-top: 6px;
+  color: #5b5f6a;
+  font-size: .92rem;
+  line-height: 1.35;
+}
+
+.loading-spinner{
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 4px solid rgba(16,17,20,.10);
+  border-top-color: var(--rawls-red);
+  margin: 0 auto;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{ transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .loading-spinner{ animation: none; }
+}  
 .btn:hover{
   transform: translateY(-1px);
   box-shadow: var(--shadow-pop);
@@ -929,6 +990,14 @@ input[type="checkbox"]{
   </style>
 </head>
 <body>
+  <!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" role="status" aria-live="polite" aria-label="Loading publications">
+  <div class="loading-card">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <div class="loading-title">Loading publications…</div>
+    <div class="loading-sub">Please wait while the database loads.</div>
+  </div>
+</div>
 <header class="rawls-header">
   <div class="rawls-header-inner">
     <div class="rawls-header-left">
@@ -1699,7 +1768,38 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
   elements.resultsCount.textContent = `Showing 0 results`;
   return;
 }
+// ---------- LOADING OVERLAY (min 6s) ----------
+const MIN_LOADING_MS = 6000;
+let loadingStart = Date.now();
 
+function showLoadingOverlay(){
+  loadingStart = Date.now();
+  const el = document.getElementById("loadingOverlay");
+  if(el) el.classList.remove("hidden");
+}
+
+function hideLoadingOverlayWhenReady(){
+  const el = document.getElementById("loadingOverlay");
+  if(!el) return;
+
+  const elapsed = Date.now() - loadingStart;
+  const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+
+  setTimeout(()=>{
+    el.classList.add("hidden");
+    // optional: remove from DOM after fade
+    setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 250);
+  }, remaining);
+}
+
+function setLoadingMessage(title, sub){
+  const overlay = document.getElementById("loadingOverlay");
+  if(!overlay) return;
+  const t = overlay.querySelector(".loading-title");
+  const s = overlay.querySelector(".loading-sub");
+  if(t && title) t.textContent = title;
+  if(s && sub) s.textContent = sub;
+}
     const frag=document.createDocumentFragment();
 
     rows.forEach(r=>{
@@ -1917,9 +2017,12 @@ function ingestWorkbook(workbook) {
     articleLink: String(r.articleLink)
   }));
 
-  populateMultiSelects();
+    populateMultiSelects();
   renderTable(sortRows(data));
   elements.loadHint.style.display = "none";
+
+  setLoadingMessage("Loaded!", "Database is ready.");
+  hideLoadingOverlayWhenReady();
 }
 
 
@@ -1949,7 +2052,10 @@ function ingestWorkbook(workbook) {
     }
   }
 
-  showLoadHint("❌ Could not load the Excel file. Check GitHub Pages folder + exact filename/case.");
+   showLoadHint("❌ Could not load the Excel file. Check GitHub Pages folder + exact filename/case.");
+
+  setLoadingMessage("Couldn’t load the database", "Please use the file picker to upload the Excel file.");
+  hideLoadingOverlayWhenReady();
 }
 
 
@@ -2055,6 +2161,8 @@ sortState.dir = isDateKey ? "desc" : "asc";
 
 document.addEventListener("DOMContentLoaded", () => {
   attachListeners();
+
+  showLoadingOverlay(); // ✅ add this
 
   const th = document.querySelector('th.sortable[data-sort="accdate"]');
   if (th) {
