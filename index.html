@@ -1218,6 +1218,38 @@ input[type="checkbox"]{
 </main>
 
 <script>
+  // ---------- LOADING OVERLAY (min 6s) ----------
+const MIN_LOADING_MS = 6000;
+let loadingStart = Date.now();
+
+function showLoadingOverlay(){
+  loadingStart = Date.now();
+  const el = document.getElementById("loadingOverlay");
+  if(el) el.classList.remove("hidden");
+}
+
+function hideLoadingOverlayWhenReady(){
+  const el = document.getElementById("loadingOverlay");
+  if(!el) return;
+
+  const elapsed = Date.now() - loadingStart;
+  const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+
+  setTimeout(()=>{
+    el.classList.add("hidden");
+    // optional: remove from DOM after fade
+    setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 250);
+  }, remaining);
+}
+
+function setLoadingMessage(title, sub){
+  const overlay = document.getElementById("loadingOverlay");
+  if(!overlay) return;
+  const t = overlay.querySelector(".loading-title");
+  const s = overlay.querySelector(".loading-sub");
+  if(t && title) t.textContent = title;
+  if(s && sub) s.textContent = sub;
+}
   // ---------- EXPORT SUITE (XLSX / CSV / SUMMARY) ----------
   function getExportRows() {
     return (currentRows && currentRows.length) ? currentRows : data;
@@ -1768,38 +1800,7 @@ function tokenMatchOneField(queryToken, candidate, exactMode){
   elements.resultsCount.textContent = `Showing 0 results`;
   return;
 }
-// ---------- LOADING OVERLAY (min 6s) ----------
-const MIN_LOADING_MS = 6000;
-let loadingStart = Date.now();
 
-function showLoadingOverlay(){
-  loadingStart = Date.now();
-  const el = document.getElementById("loadingOverlay");
-  if(el) el.classList.remove("hidden");
-}
-
-function hideLoadingOverlayWhenReady(){
-  const el = document.getElementById("loadingOverlay");
-  if(!el) return;
-
-  const elapsed = Date.now() - loadingStart;
-  const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
-
-  setTimeout(()=>{
-    el.classList.add("hidden");
-    // optional: remove from DOM after fade
-    setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 250);
-  }, remaining);
-}
-
-function setLoadingMessage(title, sub){
-  const overlay = document.getElementById("loadingOverlay");
-  if(!overlay) return;
-  const t = overlay.querySelector(".loading-title");
-  const s = overlay.querySelector(".loading-sub");
-  if(t && title) t.textContent = title;
-  if(s && sub) s.textContent = sub;
-}
     const frag=document.createDocumentFragment();
 
     rows.forEach(r=>{
